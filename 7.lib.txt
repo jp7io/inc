@@ -1,0 +1,577 @@
+InterDyn
+Copyright 2002-2007 JP7
+http://JP7.com.br
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.09 - 2007/12/04
+
+#BUG#
+- Função "checkReferer()" precisava ser adaptada à nova funcionalidade de templates;
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.08 - 2007/08/08
+
+#BUG#
+- Função "jp7_lang()" precisa desconsiderar a querystring no parser;
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.07 - 2007/08/01
+
+#BUG#
+- Função "jp7_mail()" estava com a checagem de quebra de linha comentada;
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 1.06 - 2007/07/10
+
+#PLUS#
+- Inserido na classe "interadmin_tipos" a variavel "$this->menu[]";
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.05 - 2007/05/16
+
+#PLUS#
+- Inserido na função "interadmin_tipos_nome()" tratamento para parâmetros omitidos;
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.04 - 2007/04/25
+
+#BUG#
+- Inserido na função "interadmin_mysql_query()" o tratamento para a tabela de arquivos em todos os idiomas;
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.03 - 2007/04/19
+
+#BUG#
+- Corrigida na função "jp7_decrypt()" o return. Precisava da função trim para eliminar "NULL BYTES" do final;
+- Corrigida na função "jp7_encrypt()" e "jp7_decrypt()" o parâmetro "$key", que agora não é obrigatório;
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.02 - 2007/03/23
+
+#PLUS#
+- Adicionada a função "toParam()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.01 - 2007/03/10
+
+#PLUS#
+- Adicionadas na função "interadmin_tipos_campos()" as variáveis "label" e "permissoes";
+
+--------------------------------------------------------
+Nome: JP
+Versão 1.00 - 2007/03/04
+
+
+#BUG#
+- Adicionadas na função "interadmin_mysql_query()" os prefixos para idioma nas tabelas de arquivos;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.99 - 2007/03/03
+
+#PLUS#
+- Adicionadas na função "jp7_register_globals()" as variáveis COOKIE e SESSION;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.98 - 2007/02/22
+
+#PLUS#
+- Aprimorada a função "jp7_db_pages()" - alterada a classe do Go e Back total;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.97 - 2007/02/07
+
+#PLUS#
+- Aprimorada a classe "jp7_db_pages()" - inserido Go e Back total e também passagem das variáveis por Post;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.96 - 2007/02/02
+
+#PLUS#
+- Aprimorada a função "interadmin_tipos_campos()" - inseridos os campos "Form" e "Read Only";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.95 - 2007/01/31
+
+#BUG#
+- Aprimorada a função "interadmin_mysql_query()" - parser aprimorado;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.94 - 2007/01/28
+
+#BUG#
+- Aprimorada a função "interadmin_mysql_query()" - parser prevê o uso do "tab" no lugar do espaço em branco;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.93 - 2007/01/27
+
+#BUG#
+- Aprimorada a função "interadmin_mysql_query()" - parser com expressões regulares;
+- Modificada na função "interadmin_list()" a obrigatoriedade do parametro "sql_where";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.92 - 2007/01/26
+
+#PLUS#
+- Modificada a função "interadmin_mysql_query()" - parser com expressões regulares;
+- Modificada a função "interadmin_tipos()" onde foram inseridos os parametros "admin" e "busca" e colocado o "interadmin_mysql_query()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.91 - 2007/01/23
+
+#PLUS#
+- Inseridas as funçãos "jp7_encrypt()" e "jp7_decrypt()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.90 - 2007/01/22
+
+#PLUS#
+- Inserida a função "hex2bin()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.89 - 2006/12/21
+
+#BUG#
+- Alterado na função "jp7_pages()" a checagem para aplicações;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.88 - 2006/12/20
+
+#BUG#
+- Checado na função "jp7_fields_values()" o aplicação InterMail;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.87 - 2006/12/08
+
+#PLUS
+- Adicionado na função "jp7_fields_values()" a função "interadmin_mysql_query()".
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.86 - 2006/12/07
+
+#PLUS#
+- Retirada da função "jp7_index()" a checagem de versão do browser;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.85 - 2006/12/04
+
+#BUG#
+- Corrigido novamente na função "interadmin_mysql_query()" o parser para "JOIN";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.84 - 2006/11/14
+
+#PLUS
+- Adicionado na função "interadmin_mysql_query()" o return.
+
+#BUG#
+- Corrigido na função "interadmin_mysql_query()" o parser para "JOIN";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.83 - 2006/11/13
+
+#BUG#
+- Adicionado na função "interadmin_mysql_query()" a checagem do "date_publish,date_key,deleted" para tabelas customizadas;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.82 - 2006/10/28
+
+#PLUS#
+- Inserido na função "interadmin_list" o parâmetro "sql_where";
+
+#BUG#
+- Verificado na função "jp7_db_pages()" se a mesma é chamada pelo InterAdmin;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.81 - 2006/10/26
+
+#BUG#
+- Corrigido na função "jp7_index()" as variáveis de preview do InterAdmin;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.80 - 2006/10/24
+
+#BUG#
+- Adicionado na função "interadmin_mysql_query()" a checagem do "deleted_tipo";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.79 - 2006/10/23
+
+#PLUS#
+- Adicionado na classe "interadmin_tipos()" o parâmetro "replaceGlobals";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.78 - 2006/10/20
+
+#BUG#
+- Alterado na função "jp7_db_pages()" a expressão regular que forma a "querystring". De #(&p_page=[0-9])# para #(&p_page=[0-9]+)#;
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.77 - 2006/10/18
+
+#BUG#
+- Inserido na função "jp7_db_pages()" a variável global $rs;
+- Alterado na função "jp7_db_pages()" a linha do código de #$rs=mysql_query($sql,$db)or die(mysql_error());# para #interadmin_mysql_query("rs",$sql);#
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.76 - 2006/10/13
+
+#BUG#
+- Corrigina na função "interadmin_mysql_query()" a checagem de "INNER JOIN";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.75 - 2006/10/10
+
+#BUG#
+- Trocado na função "jp7_index()" o "include" por "readfile";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.74 - 2006/09/30
+
+#BUG#
+- Inserida na função "interadmin_mysql_query()" a checagem de "INNER JOIN";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.73 - 2006/09/29
+
+#PLUS#
+- Inserida na função "interadmin_mysql_query()" o echo do "$sql" em caso de debug;
+- Inserida a checagem do campo "deleted" nas funções "interadmin_mysql_query()", "interadmin_list()" e "interadmin_cabecalho()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.72 - 2006/09/21
+
+#PLUS#
+- Inserida a função "jp7_password()" para geração de string randômica;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.71 - 2006/09/14
+
+#PLUS#
+- Colocado na função "interadmin_mysql_query()" a checagem do "mostrar" caso a tabela seja de Tipos;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.70 - 2006/09/13
+
+#BUG#
+- Ajustado os replaces "\r\n" na função "jp7_mail()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.69 - 2006/09/12
+
+#PLUS#
+- Modificada a função "jp7_fields_values", "intval" foi substituído por "is_numeric";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.68 - 2006/09/04
+
+#BUG#
+- Ajustado os replaces "\r\n" na função "jp7_mail()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.67 - 2006/08/29
+
+#PLUS#
+- Inserido na função "jp7_mail()" tratamento e informações sobre erros;
+
+#BUG#
+- Feito na função "jp7_mail()" o replace dos "\n" para "\r\n";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.66 - 2006/08/26
+
+#PLUS#
+- Modificada a função "jp7_date_format". O novo formato é mais simples e aceita qualquer formato de data;
+- Modificada a função "jp7_db_select". A formatação de datas agora é padrão para todos aplicativos. Os "eval" foram substituídos por "GLOBALS";
+- Modificada a função "jp7_db_pages". Foi inserido o tratamento para o "mysql_query";
+- Modificada a função "jp7_db_checkbox. Os "eval" foram substituídos por "GLOBALS";
+- Inserida a função "interadmin_tipos_campos" no lugar da função "interadmin_tipos_campo_nome";
+- Modificada a função "interadmin_fields_values", que agora é apenas um alias da função "jp7_fields_values";
+- Modificada a função "jp7_fields_values", que agora aceita um escopo maior de variáveis e pode retornar no formato de objeto;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.65 - 2006/08/22
+
+#PLUS#
+- Modificada a função "jp7_register_globals". Os "eval" foram substituídos por "GLOBALS";
+
+--------------------------------------------------------
+Nome: JP e Thiago
+Versão 0.64 - 2006/08/17
+
+#PLUS#
+- Inserida a função "jp7_resizeImage", herdada do InterAdmin;
+- Adicionada na função "jp7_db_pages()" os parâmetros ($separador="|",$go_char="&raquo;",$back_char="&laquo;");
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.63 - 2006/07/25
+
+#PLUS#
+- Adicionada à função "jp7_date_format()" a opção de "d/m/Y";
+
+--------------------------------------------------------
+Nome: JP e Thiago
+Versão 0.62 - 2006/06/22
+
+#BUG#
+- Corrigida na função "jp7_db_insert()" o "return" com UPDATE;
+
+--------------------------------------------------------
+Nome: JP e Thiago
+Versão 0.61 - 2006/06/08
+
+#PLUS#
+- Adicionada à função "jp7_db_insert()" a função "mysql_insert_id()" com "return";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.60 - 2006/06/07
+
+#PLUS#
+- Adicionada à função "jp7_db_select()" tratamento para o InterTime;
+
+--------------------------------------------------------
+Nome: JP e Thiago
+Versão 0.59 - 2006/06/05
+
+#PLUS#
+- Adicionada à função "interadmin_fields_values()" a variável "s_interadmin_app";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.58 - 2006/05/28
+
+#BUG#
+- Corrigida a função "jp7_lang()". Quando a "lang" está vazia é considerada como "pt-br";
+
+--------------------------------------------------------
+Nome: ?
+Versão 0.57 - 2006/05/10
+
+?
+
+--------------------------------------------------------
+Nome: Thiago e JP
+Versão 0.56 - 2006/04/27
+
+#PLUS#
+- Adicionada a função "jp7_date_week()" a possibilidade de inserir a data "crua" no primeiro parâmetro;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.55 - 2006/04/18
+
+#BUG#
+- Corrigida na função "jp7_db_update()". Agora o concatenamento do valor antigo é opcional (adicionando o prefixo "_" ao campo);
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.54 - 2006/04/07
+
+#BUG#
+- Corrigida na função "jp7_image_text()" a funcionalidade para alinhar o texto para direita;
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.53 - 2006/03/20
+
+#PLUS#
+- Adicionada na função "jp7_db_pages()" mais uma propriedade ($htm_numbers_extra), ela adiciona 'go' and 'back';
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.52 - 2006/03/07
+
+#BUG#
+- Corrigida a função "jp7_db_select()". O parser "Date" estava sendo feito para todos os campos;
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.51 - 2006/03/02
+
+#PLUS#
+- Adicionada na função "jp7_image_text()" a funcionalidade para alinhar o texto para direita;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.50 - 2006/02/13
+
+#PLUS#
+- Alterada a função "interadmin_tipos()" - colocado "grand_parent_id";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.48 - 2006/02/11
+
+#PLUS#
+- Alterada a função "interadmin_mysql_query()" - colocado "char_key<>''";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.47 - 2006/02/10
+
+#PLUS#
+- Alterada a função "jp7_db_insert()" - colocado "return" no "update";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.46 - 2006/02/08
+
+#PLUS#
+- Alterada a função "interadmin_mysql_query()" - trocado "die" por "print";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.46 - 2006/01/18
+
+#PLUS#
+- Adicionada na função "toId()" mais um parametro "$tofile";
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.44 - 2006/01/03
+
+#PLUS#
+- Adicionada na função "jp7_db_pages()" mais um parametro ($parameters) para utilização em paginação com POST;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.43 - 2005/12/08
+
+#PLUS#
+- Inserida função "jp7_encode_mimeheader()" para principal em e-mails;
+- Inserida função "jp7_encode_mimeheader()" dentro da "jp7_mail()" para encodar o "Subject";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.42 - 2005/11/25
+
+#BUG#
+- Função "jp7_lang()" ajustada para identificação do idioma;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.41 - 2005/11/18
+
+#BUG#
+- Adicionado parametro "$HTTP_USER_AGENT" na função "checkBrowser()" e na função "jp7_index()";
+
+#PLUS$
+- Função "jp7_flash()" optimizada para padrão XHTML;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.40 - 2005/10/27
+
+#PLUS#
+- Adicionado parametro "lang" na função "jp7_index()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.39 - 2005/10/19
+
+#PLUS#
+- Adicionada função "toXHTML()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.38 - 2005/10/17
+
+#PLUS#
+- Adicionado parâmetro ("parameters") como array na função "jp7_flash()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.37 - 2005/10/14
+
+#BUG#
+- Alterada novamente checagem de extenção na função "jp7_flash()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.36 - 2005/10/11
+
+#BUG#
+- Alterada checagem de extenção na função "jp7_flash()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.35 - 2005/10/07
+
+#PLUS#
+- Adicionada a variável "nome_id" na classe "interadmin_tipos";
+
+--------------------------------------------------------
+Nome: JP, Thiago
+Versão 0.32 - 2005/09/23
+
+#PLUS#
+- Adicionada a classe "jp7_db_pages" para paginação;
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.31 - 2005/09/22
+
+#BUG#
+- Adicionada a verificação do root através da variável "PATH_TRANSLATED" na Função "jp7_doc_root()";
+
+--------------------------------------------------------
+Nome: JP
+Versão 0.30 - 2005/09/19
+
+#PLUS#
+- Verificação das funções e otimização do código na função "jp7_image_text()";
+
+--------------------------------------------------------
+Nome: Thiago
+Versão 0.29 - 2005/09/19
+
+#PLUS#
+- Adicionada na função "jp7_image_text()" a funcionalidade para centralizar o texto no eixo Y;
+- Adicionada na função "jp7_image_text()" a funcionalidade para retirar o antialising do texto;
+
+--------------------------------------------------------
