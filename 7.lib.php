@@ -1,15 +1,14 @@
 <?
 // JP7's PHP Functions
-// Copyright 2002-2007 JP7
+// Copyright 2002-2008 JP7
 // http://jp7.com.br
-// Versão 1.09 - 2007/12/04 by JP
+// Versão 1.09 - 2008/05/08 by Carlos
 
 
 // Config
 if($REMOTE_ADDR=="201.6.156.39"||$LOCAL_ADDR="192.168.0.2")error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if(!@ini_get("allow_url_fopen"))@ini_set("allow_url_fopen","1");
-
 
 // Basics
 
@@ -87,7 +86,7 @@ class Browser{
 		$this->ie=($this->browser=="ie");
 		$this->ns=($this->browser=="ns");
 		$this->mo=($this->browser=="mo");
-		$version="";
+		$version = "";
 		while(!$this->v){
 			$c=substr($useragent,$i++,1);
 			if(is_numeric($c)||$c=="."||$c==" ")$version.="$c";
@@ -132,7 +131,16 @@ class Browser{
 }
 
 // toBase (2003/08/25)
-function toBase($S){return addslashes(trim($S));}
+function toBase($S){
+	global $db;
+	if($S){
+		$S=$db->qstr($S,get_magic_quotes_gpc()); //trata as aspas. Ex.: mysql fica \' sqlserver ''
+		$S=trim($S);
+	}else{
+		$S="''";
+	}
+	return $S;
+}
 
 // toForm (2004/06/14)
 function toForm($S){
@@ -141,7 +149,7 @@ function toForm($S){
 	return stripslashes(str_replace("\"","&quot;",$S));
 }
 
-// 2007/09/14 by Thiago
+// toHTML (2006/02/10)
 function toHTML($S,$HTML=false,$busca_replace=false){
 	global $busca_varchar;
 	global $busca_text;
@@ -335,22 +343,17 @@ function jp7_date_month($m,$sigla=false){
 	return ($sigla)?substr($return,0,3):$return;
 }
 
+// jp7_date_diff (2008/04/15) by Paulo
 function jp7_date_diff($start,$end){
 	$start = explode("-",$start);
-	$start = mktime(0,0,0,$start[1],$start[0],$start[2]); // mes / dia / ano
-	
+	$start = mktime(0,0,0,$start[1],$start[2],$start[0]); // mes / dia / ano (padrao mktime)
 	$end   = explode("-",$end); 
-	$end   = mktime(0,0,0,$end[1],$end[0],$end[2]); // mes / dia / ano
-	
+	$end   = mktime(0,0,0,$end[1],$end[2],$end[0]); // mes / dia / ano (padrao mktime)
 	$diff  = ($end - $start);
-	
-	$diff  = explode("-",$diff);
-	
-	$diff  = $diff[1];
-	
-	return $diff;
+	$diff  = explode("-",date("Y-m-d",$diff));
+	$diff_r['m']= $diff[1];
+	return $diff_r['m'];
 }
-
 
 // Parse Data
 
@@ -376,10 +379,10 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 	global $db_name;
 	global $jp7_app;
 	$sql="SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
-	$rs=mysql_query($sql,$db);
-	while($row=mysql_fetch_object($rs)){
-		$rs2=mysql_query($sql,$db);
-		while($meta=mysql_fetch_field($rs2)){
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	while($row=$rs->FetchNextObj()){
+		$meta_cols=$db->MetaColumns($table, false);
+		foreach ($meta_cols as $meta){
 			$name=$meta->name;
 			// Dates
 			if(strpos($meta->type,"date")!==false){
@@ -389,81 +392,121 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 			}else{
 				if($jp7_app)$GLOBALS[$var_prefix.$name]=toForm($row->$name);
 				else $GLOBALS[$var_prefix.$name]=$row->$name;
-			}
+			}	
 		}
-		mysql_free_result($rs2);
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 }
 
-// jp7_db_insert (2006/06/22)
+// jp7_db_insert (2007/12/17 by JP e Cristiano)
 function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=true){
 	global $db;
 	global $db_name;
-	$table_fields=mysql_list_fields($db_name,$table,$db);
-	$table_columns=mysql_num_fields($table_fields);
+	
+	$table_columns=$db->MetaColumnNames($table);
+	array_shift($table_columns);
+	$table_columns_num=count($table_columns);
 	if($table_id_value){
 		// Update
 		$sql="UPDATE ".$table." SET ";
 		$j=0;
-		for($i=1;$i<$table_columns;$i++){
-			$table_field_name=mysql_field_name($table_fields,$i);
-			eval("global \$".$var_prefix.$table_field_name.";");
-			eval("\$var_isset=isset(\$".$var_prefix.$table_field_name.");");
-			eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
+		foreach($table_columns as $table_field_name){
+			if (is_array($var_prefix)) {
+				$var_isset = array_key_exists($table_field_name, $var_prefix);
+				$table_field_value = $var_prefix[$table_field_name];
+			} else {
+				eval("global \$".$var_prefix.$table_field_name.";");
+				eval("\$var_isset=isset(\$".$var_prefix.$table_field_name.");");
+				eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
+			}
 			if(!$var_check||$var_isset){
-				$sql.=((!$j)?" ":",")."`".$table_field_name."`='".toBase($table_field_value)."'";
+				//se for definido valor ou campo for inteiro
+				if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
+					$sql.=((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value);
+				//se não for definido valor e for mysql salva branco
+				}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
+					$sql.=((!$j)?" ":",")."".$table_field_name."=''";
+				//se não for definido valor e for != de mysql
+				}else{
+					$sql.=((!$j)?" ":",")."".$table_field_name."=NULL";
+				}
 				$j++;
 			}
 		}
 		$sql.=" WHERE ".$table_id_name."=".$table_id_value;
-		$rs=mysql_query($sql,$db)or die(mysql_error());
+		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 		return ($rs)?$table_id_value:0;
-	}else{
+	}else{		
 		// Insert
-		$sql="INSERT INTO ".$table." (";
-		for($i=1;$i<$table_columns;$i++){
-			$table_field_name=mysql_field_name($table_fields,$i);
-			$sql.="`".$table_field_name."`".(($i==$table_columns-1)?") ":",\n");
+		$i=1;
+		foreach($table_columns as $table_field_name){
+			if (is_array($var_prefix)) {
+				$table_field_value = $var_prefix[$table_field_name];
+			} else {
+				eval("global \$".$var_prefix.$table_field_name.";");
+				eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
+			}
+			$sql_campos.=" ".$table_field_name." ".(($i==$table_columns_num)?") ":",\n");
+			//se for definido valor
+			if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
+				$valores.=toBase($table_field_value).(($i==$table_columns_num)?")":",\n");
+			//se não for definido valor e for mysql salva branco
+			}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
+				$valores.="''".(($i==$table_columns_num)?")":",\n");
+			//se não for definido valor e for != de mysql
+			}else{
+				$valores.="NULL".(($i==$table_columns_num)?")":",\n");
+			}
+			$i++;
 		}
-		$sql.="VALUES (";
-		for($i=1;$i<$table_columns;$i++){
-			$table_field_name=mysql_field_name($table_fields,$i);
-			eval("global \$".$var_prefix.$table_field_name.";");
-			eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
-			$sql.="'".toBase($table_field_value)."'".(($i==$table_columns-1)?")":",\n");
-		}
-		$rs=mysql_query($sql,$db)or die(mysql_error());
+		$sql="INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;
+		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		// Last ID
 		eval("global \$".$var_prefix.$table_id_name.";");
-		eval("\$".$var_prefix.$table_id_name."=".mysql_insert_id().";");
-		return mysql_insert_id();
+		eval("\$".$var_prefix.$table_id_name."=".$db->Insert_ID().";");
+		return $db->Insert_ID();
 	}
 }
 
 // 2007/02/22 by JP
 class jp7_db_pages{
-	function jp7_db_pages($sql,$limit=10,$page=1,$type="",$numbers_limit="1000",$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;"){
+	function jp7_db_pages($sql=null,$limit=10,$page=1,$type="",$numbers_limit="1000",$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;",$records=null){
 		// SQL
 		global $db;
 		global $db_name;
 		global $rs;
 		if(!$page)$page=1;
-		if($GLOBALS["jp7_app"])$rs=mysql_query($sql,$db);
-		else $rs=interadmin_mysql_query($sql);
-		$row=mysql_fetch_object($rs);
-		$this->records=$row->records;
-		$this->total=ceil($row->records/$limit);
+		
+		if($sql){
+			if($GLOBALS["jp7_app"])$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+			else $rs=interadmin_query($sql);		
+			$row=$rs->FetchNextObj();
+			$this->records=$row->records;
+			$rs->Close();
+		}else{
+			if($records)
+				$this->records=$records;
+			else
+				return '[aa]';
+		}
+		
+		$this->total=ceil($this->records/$limit);
 		$this->page=$page;
-		$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
-		mysql_free_result($rs);
+		//$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
+		$this->limit=$limit;
+		$this->init=(($page-1)*$limit);
+		
 		// HTM
 		global $QUERY_STRING;
-		$this->query_string=preg_replace("(&p_page=[0-9]+)","",$QUERY_STRING);
+		
+		$this->query_string=preg_replace("(&p_page=[0-9]+)","",$QUERY_STRING);		
+		$this->query_string=str_replace("go_url=".$_GET["go_url"],"",$this->query_string);
+		//$this->query_string=substr($this->query_string,1);
 		global $_POST;
 		foreach($_POST as $key=>$value){
 			if($key!="p_page")$this->query_string.="&".$key."=".$value;
 		}
+		
 		if($this->total){
 			if($this->total>1){
 				// Numbers
@@ -515,9 +558,9 @@ function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
 	if($GLOBALS["interadmin_visualizar"]){
 		return (($var_value)?"Sim":"Não");
 	}else{
-	return "".
-		"<input type=\"checkbox\" name=\"jp7_db_checkbox_".$name."\" id=\"jp7_db_checkbox_".$name."\" value=\"".$value."\"".(($var_value)?" checked":"").$readonly." onclick=\"form['".$name."'].value=(checked)?value:''\".".(($xtra)?" ".$xtra:"").">".
-		"<input type=\"hidden\" name=\"".$name."\" value=\"".(($var_value)?$value:"")."\">";
+		return "".
+		"<input type=\"checkbox\" name=\"jp7_db_checkbox_".$name."\" id=\"jp7_db_checkbox_".$name."\" value=\"".$value."\"".(($var_value)?" checked=\"checked\"":"").$readonly." onclick=\"form['".$name."'].value=(checked)?value:''\"".(($xtra)?" ".$xtra:"")." />".
+		"<input type=\"hidden\" name=\"".$name."\" value=\"".(($var_value)?$value:"")."\" />";
 	}
 }
 
@@ -534,8 +577,8 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	}
 	// Update Concatenado (_)
 	$sql="SELECT ".implode(",",$fields_arr_db)." FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
-	$rs=mysql_query($sql,$db)or die(mysql_error());
-	if($row=mysql_fetch_array($rs)){
+	$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
+	if($row =(array)$rs->FetchNextObj()){
 		foreach($fields_arr as $field){
 			if(strpos($field,"_")===0){
 				$field=substr($field,1);
@@ -543,7 +586,7 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 			}
 		}
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 	// Update
 	$sql="UPDATE ".$table." SET ";
 	for($i=0;$i<count($fields_arr_db);$i++){
@@ -552,12 +595,12 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 		if($i!=count($fields_arr_db)-1)$sql.=",";
 	}
 	$sql.=" WHERE ".$table_id_name."=".$table_id_value;
-	$rs=mysql_query($sql,$db)or die(mysql_error());
+	$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
 }
 
 // 2007/03/10 by JP
 function interadmin_tipos_campos($campos){
-	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes");
+	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default");
 	$campos=split("{;}",$campos);
 	for($i=0;$i<count($campos);$i++){
 		$parameters=split("{,}",$campos[$i]);
@@ -596,6 +639,11 @@ function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
 
 // 2007/04/25 by JP
 function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
+	return interadmin_query($sql,$sql_db,$sql_debug);
+}
+
+// 2007/03/04 by JP
+function interadmin_query($sql,$sql_db="",$sql_debug=false,$numrows=null,$offset=null){	
 	global $c_publish;
 	global $c_path_upload;
 	global $s_interadmin_user;
@@ -603,6 +651,9 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
 	global $db;
 	global $db_prefix;
 	global $lang;
+		
+	$DbNow=$db->BindTimeStamp(date("Y-m-d H:i:s"));
+	
 	// Debug
 	if($sql_debug||($GLOBALS[debug_sql]&&$GLOBALS[c_jp7])){
 		$sql_original_debug=preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>',$sql,1);
@@ -623,18 +674,18 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
 		// Com Alias
 		foreach($out[1] as $key=>$value){
 			$alias=$out[2][$key];
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND ".$alias.".deleted_tipo='' AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND ".$alias.".deleted='' AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".date("Y-m-d H:i:s")."' AND ".$alias.".char_key<>'' AND ".$alias.".deleted=''".(($c_publish&&!$s_interadmin_preview)?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
+			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
+			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
+			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".$DbNow."' AND ".$alias.".char_key<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
 			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
 		}
 	}else{
 		// Sem Alias
 		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)",$sql_from,$out,PREG_PATTERN_ORDER);
 		foreach($out[0] as $key=>$value){
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND deleted_tipo='' AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND deleted='' AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".date("Y-m-d H:i:s")."' AND char_key<>'' AND deleted=''".(($c_publish&&!$s_interadmin_preview)?" AND publish<>''":"")." AND ",$sql_where);
+			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ",$sql_where);
+			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ",$sql_where);
+			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND publish<>''":"")." AND ",$sql_where);
 		}
 		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
 	}
@@ -646,7 +697,29 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
 		echo "<div style=\"width:auto;color:#333;background:#ccc;border:1px solid gray;font-weight:normal\">".$sql_debug."</div>";
 	}
 	// Return
-	$rs_pre=mysql_query($sql,($sql_db)?$sql_db:$db)or jp7_debug(mysql_error(),$sql);
+	//if($db_type){
+		if($sql_db){
+			
+			if(isset($numrows) && isset($offset))
+				$rs_pre=$sql_db->SelectLimit($sql,$numrows,$offset)or die(jp7_debug($db->ErrorMsg(),$sql));
+			else
+			$rs_pre=$sql_db->Execute($sql)or die(jp7_debug($sql_db->ErrorMsg(),$sql));
+				
+		} else{
+		
+			if(isset($numrows) && isset($offset))
+				$rs_pre=$db->SelectLimit($sql,$numrows,$offset)or die(jp7_debug($db->ErrorMsg(),$sql));
+		else
+			$rs_pre=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+				
+		}
+	/*}else{
+		if($sql_db)
+			$rs_pre=mysql_query($sql,$sql_db) or die(jp7_debug(mysql_error(), $sql));
+		else
+			$rs_pre=mysql_query($sql,$db) or die(jp7_debug(mysql_error(), $sql));
+	}*/
+			
 	if($rs&&$sql)eval("global \$".$rs.";\$".$rs."=\$rs_pre;");
 	else return $rs_pre;
 }
@@ -737,7 +810,7 @@ function interadmin_mysql_query($rs,$sql="",$debug=false){
 }
 */
 
-// interadmin_tipos_nome (2008/01/14 by JP)
+// interadmin_tipos_nome (2008/01/09 by JP)
 function interadmin_tipos_nome($id_tipo,$nolang=false){
 	if(!$id_tipo)return false;
 	elseif(is_numeric($id_tipo)){
@@ -745,11 +818,13 @@ function interadmin_tipos_nome($id_tipo,$nolang=false){
 		global $db_prefix;
 		global $lang;
 		$sql="SELECT nome,nome".$lang->prefix." AS nome_lang FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
-		$rs=mysql_query($sql,$db);
-		$row=mysql_fetch_object($rs);
+		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		$row=$rs->FetchNextObj();
 		$nome=($row->nome_lang&&!$nolang)?$row->nome_lang:$row->nome;
-		mysql_free_result($rs);
+		$rs->Close();
 		return $nome;
+	}else{
+		return "Tipos";
 	}
 }
 
@@ -773,16 +848,16 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	" WHERE id_tipo=".$id_tipo.
 	" AND char_key<>''".
 	(($s_interadmin_preview)?"":" AND publish<>''").
-	" AND deleted=''".
+	" AND (deleted='' OR deleted IS NULL)".
 	" AND date_publish<='".date("Y/m/d H:i:s")."'".
 	$sql_where.
 	" ORDER BY ".$order;
-	$rs=mysql_query($sql);
-	while($row=mysql_fetch_object($rs)){
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	while($row=$rs->FetchNextObj()){
 		if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected class=\"on\"":"").">".toHTML($row->field)."</option>\n";
 		else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 	if($type=="list"){
 		$S.="".
 		"</ul>\n".
@@ -796,9 +871,9 @@ function interadmin_fields_values($param_0,$param_1="",$param_2=""){
 	return jp7_fields_values($param_0,$param_1,$param_2);
 }
 
-// 2008/04/05 by JP
-function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
-	if(is_numeric($param_0)){
+// 2006/12/20 by JP
+function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = false){
+	if (is_numeric($param_0)) {
 		// ($id,$field)
 		global $db_prefix;
 		global $lang;
@@ -806,13 +881,13 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
 		$table_id_name="id";
 		$table_id_value=$param_0;
 		$fields=$param_1;
-	}elseif(is_numeric($param_1)){
+	} elseif (is_numeric($param_1)) {
 		// ($table,$id,$field)
-		$table=$param_0;
-		$table_id_name="id";
-		$table_id_value=$param_1;
-		$fields=$param_2;
-	}else{
+		$table = $param_0;
+		$table_id_name = "id";
+		$table_id_value = $param_1;
+		$fields = $param_2;
+	} else {
 		// ($table,$table_id_name,$table_id_value,$field)
 		$table=$param_0;
 		$table_id_name=$param_1;
@@ -820,28 +895,39 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
 		$fields=$param_3;
 	}
 	if(!$fields)$fields="varchar_key";
-	
 	if(is_array($fields)){
 		$fields_arr = $fields;
 		$fields	= implode(',', $fields_arr);
 	} else {
 		$fields_arr = explode(',', $fields);
 	}
-	
-	if($table_id_value){
+	if ($table_id_value) {
 		global $db;
 		global $db_name;
-		$sql="SELECT ".$fields." FROM ".$table." WHERE ".$table_id_name."='".$table_id_value."'";
-		$rs=($GLOBALS["jp7_app"]=="intermail"||$GLOBALS["debug_oop"])?mysql_query($sql):interadmin_mysql_query($sql);
-		if($row=mysql_fetch_object($rs)){
-			if(count($fields_arr)>1){
-				foreach($fields_arr as $field){
-					$O->$field=$row->$field;
-				}
-			}else $O=$row->$fields;
+		$sql = "SELECT ".$fields." FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
+		if ($GLOBALS['db_type']) {
+			$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+			if ($row = $rs->FetchNextObj()) {
+				if (count($fields_arr) > 1 || $OOP) {
+					foreach ($fields_arr as $field) {
+						$O->$field = $row->$field;
+					}
+				} else $O = $row->$fields;
+			}
+			$rs->Close();
+			return $O;
+		} else {
+			$rs = ($GLOBALS["jp7_app"]=='intermail') ? mysql_query($sql) : interadmin_mysql_query($sql);
+			if ($row = $rs->FetchNextObj()) {
+				if (count($fields_arr) > 1) {
+					foreach ($fields_arr as $field){
+						$O->$field = $row->$field;
+					}
+				} else $O = $row->$fields;
+			}
+			$rs->Close();
+			return $O;
 		}
-		mysql_free_result($rs);
-		return $O;
 	}
 }
 
@@ -855,11 +941,11 @@ function jp7_id_value($varchar_key,$id_tipo=0){
 	$sql="SELECT id FROM ".$table." WHERE".
 	" varchar_key='".$varchar_key."'".
 	(($id_tipo)?" AND id_tipo=".$id_tipo:"");
-	$rs=mysql_query($sql,$db)or die(mysql_error());
-	if($row=mysql_fetch_object($rs)){
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	if($row=$rs->FetchNextObj()){
 		$I=$row->id;
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 	return $I;
 }
 
@@ -910,8 +996,8 @@ class interadmin_tipos{
 		global $lang;
 		settype($id_tipo,'integer');
 		$sql="SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!="pt-br")?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
-		$rs=interadmin_mysql_query($sql);
-		while($row=mysql_fetch_object($rs)){
+		$rs=interadmin_query($sql);
+		while($row=$rs->FetchNextObj()){
 			$this->id_tipo[]=$id_tipo;
 			$this->model_id_tipo[]=$row->model_id_tipo;
 			$this->nome[]=($row->nome_lang)?$row->nome_lang:$row->nome;
@@ -924,7 +1010,7 @@ class interadmin_tipos{
 			$this->admin[]=$row->admin;
 			$this->interadmin_tipos_tipos($row->parent_id_tipo);
 		}
-		mysql_free_result($rs);
+		$rs->Close();
 	}
 	function interadmin_tipos($id_tipo,$id=0,$replaceGlobals=false){
 		global $db;
@@ -934,32 +1020,32 @@ class interadmin_tipos{
 		// Id
 		if($id&&is_numeric($id)){
 			$sql="SELECT id_tipo,parent_id,varchar_key FROM ".$db_prefix.$lang->prefix." WHERE id=".$id;
-			$rs=mysql_query($sql,$db)or die(mysql_error());
-			while($row=mysql_fetch_object($rs)){
+			$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+			while($row=$rs->FetchNextObj()){
 				$id_tipo=$row->id_tipo;
 				$parent_id=$row->parent_id;
 				$id_nome=$row->varchar_key;
 			}
-			mysql_free_result($rs);
+			$rs->Close();
 		}
 		// Parent Id
 		if($parent_id&&is_numeric($parent_id)){
 			$sql="SELECT id_tipo,parent_id FROM ".$db_prefix.$lang->prefix." WHERE id=".$parent_id;
-			$rs=mysql_query($sql,$db)or die(mysql_error());
-			while($row=mysql_fetch_object($rs)){
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
+			while($row=$rs->FetchNextObj()){
 				$id_tipo=$row->id_tipo;
 				$grand_parent_id=$row->parent_id;
 			}
-			mysql_free_result($rs);
+			$rs->Close();
 		}
 		// Grand Parent Id
 		if($grand_parent_id&&is_numeric($grand_parent_id)){
 			$sql="SELECT id_tipo FROM ".$db_prefix.$lang->prefix." WHERE id=".$grand_parent_id;
-			$rs=mysql_query($sql,$db)or die(mysql_error());
-			while($row=mysql_fetch_object($rs)){
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
+			while($row=$rs->FetchNextObj()){
 				$id_tipo=$row->id_tipo;
 			}
-			mysql_free_result($rs);
+			$rs->Close();
 		}
 		// Tipos
 		if($id_tipo&&is_numeric($id_tipo)){
@@ -999,11 +1085,11 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
 		" ORDER BY ordem,nome";
 	}
 	$sql.=" LIMIT 1";
-	$rs=mysql_query($sql,$db);
-	if($row=mysql_fetch_object($rs)){
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+	if($row=$rs->FetchNextObj()){
 		return $row->id_tipo;
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 }
 
 // interadmin_cabecalho (2006/11/29)
@@ -1019,10 +1105,10 @@ class interadmin_cabecalho{
 			" AND publish<>''".
 			" AND deleted=''".
 			" ORDER BY int_key,date_publish DESC";
-			$rs=mysql_query($sql,$db);
-			if($rand)$rand=rand(1,mysql_num_rows($rs));
+			$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+			if($rand)$rand=rand(1,$rs->RecordCount());
 			$j=1;
-			while($row=mysql_fetch_object($rs)){
+			while($row=$rs->FetchNextObj()){
 				if($j==$rand||!$rand){
 					$this->varchar_key=$row->varchar_key;
 					$this->varchar_1=$row->varchar_1;
@@ -1034,7 +1120,7 @@ class interadmin_cabecalho{
 				}
 				$j++;
 			}
-			mysql_free_result($rs);
+			$rs->Close();
 			$check_arr=explode(",",$check);
 			foreach($check_arr as $check_field){
 				eval("\$check_value=\$this->".$check_field.";");
@@ -1102,7 +1188,7 @@ function jp7_flash($src,$w,$h,$alt="",$id="",$xtra="",$parameters=""){
 			$w="";
 			$h="";
 		}
-		return "<img src=\"".$src."\"".(($w&&$h)? " width=".$w." height=".$h:"")." border=0 alt=\"".$alt."\"".(($id)?" name=\"".$id."\"":"").(($xtra)?" ".$xtra:"")."/>";
+		return "<img src=\"".$src."\"".(($w&&$h)? " width=".$w." height=".$h:"")." border=\"0\" alt=\"".$alt."\"".(($id)?" name=\"".$id."\"":"").(($xtra)?" ".$xtra:"")."/>";
 	}
 }
 
@@ -1257,10 +1343,10 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 			if(function_exists("file_get_contents")){
 				$template=file_get_contents($template);
 			}else{
-				ob_start();
-				readfile($template);
-				$template=ob_get_contents();
-				ob_end_clean();
+			ob_start();
+			readfile($template);
+			$template=ob_get_contents();
+			ob_end_clean();
 			}
 			$message_html=str_replace("%MESSAGE%",$message_html,$template);
 		}
@@ -1305,7 +1391,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	// Encode
 	$subject=jp7_encode_mimeheader($subject);
 	// Check CRLF
-	if(strpos($_ENV["OS"],"Windows")===false){
+	if(strpos($_ENV["OS"],"Windows")===false||!$_ENV["OS"]){
 		$message=str_replace("\r\n","\n",$message);
 		$headers=str_replace("\r\n","\n",$headers);
 	}
@@ -1484,10 +1570,6 @@ function jp7_host($hosts){
 	}
 }
 
-// Actions
-jp7_register_globals();
-$c_jp7=($REMOTE_ADDR=="201.6.156.39"||$REMOTE_ADDR=="192.168.0.2"||$REMOTE_HOST=="192.168.0.2"||$LOCAL_ADDR=="192.168.0.2"||$SERVER_ADDR=="192.168.0.2");
-
 function getFileName($filename){
 	return ($GLOBALS["c_jp7"])?$filename:"";
 }
@@ -1511,7 +1593,7 @@ function jp7_debug($msgErro=null, $sql=null, $sendMail=true){
 	$S.="<strong style=\"color:red\">       ERRO:</strong> ".$msgErro."\n";
 	$S.="<strong style=\"color:red\">    ARQUIVO:</strong> ".$erroDetalhesArray['file']."\n";	
 	$S.="<strong style=\"color:red\">      LINHA:</strong> ".$erroDetalhesArray['line']."\n";	
-	$S.="<strong style=\"color:red\">        URL:</strong> ".(($_SERVER['HTTPS']=='on')?"https://":"http://").$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]."\n";
+	$S.="<strong style=\"color:red\">        URL:</strong> ".(($_SERVER['HTTPS']=='on')?"https://":"http://").$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]."\n";	
 	if($_SERVER["HTTP_REFERER"])	
 	$S.="<strong style=\"color:red\">    REFERER:</strong> ".$_SERVER["HTTP_REFERER"]."\n";	
 	$S.="<strong style=\"color:red\">         IP:</strong> ".$_SERVER["REMOTE_ADDR"]."\n";
@@ -1532,37 +1614,114 @@ function jp7_debug($msgErro=null, $sql=null, $sendMail=true){
 	
 	//Envia email
 	if($GLOBALS['c_server_type']=="Principal"){
-		$to='debug@jp7.com.br';
 		if(trim($GLOBALS['c_site']))
-			$subject="[".$GLOBALS['c_site']."]";
+			$cliente = $GLOBALS['c_site'] . ']';
 		elseif(trim($_SESSION['s_interadmin_cliente']))
-			$subject="[".$_SESSION['s_interadmin_cliente']."]";
+			$cliente = $_SESSION['s_interadmin_cliente'] . ']';
 		elseif(trim($_COOKIE['cookie_interadmin_cliente']))
-			$subject="[".$_COOKIE['cookie_interadmin_cliente']."]";
-		$subject.="[InterAdmin][Erro]";
-		$message="Ocorreram erros no InterAdmin<br />".$S;
-		//$headers="To: ".$to." <".$to.">\r\n";
-		$headers.="From: ".$to." <".$to.">\r\n";
-		$parameters="";
+			$cliente = $_COOKIE['cookie_interadmin_cliente'];
+		$subject = '['. $cliente . '][' . ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site' . '][Erro]';
+		$message = "Ocorreram erros no InterAdmin<br />" . $S;
+		$headers = "To: " . $to . " <" . $to . ">\r\n";
+		$headers .= "From: " . $to . " <" . $to . ">\r\n";
+		$parameters = "";
 		//$template="form_htm.php";
 		$html=true;
-		if($sendMail)jp7_mail($to,$subject,$message,$headers,$parameters,$template,$html);
+		$to='debug+' . $cliente . '@jp7.com.br';
+		jp7_mail($to,$subject,$message,$headers,$parameters,$template,$html);
 		if($GLOBALS['c_server_type']=="Principal"){
 			$S = "Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href=\"debug@jp7.com.br\">debug@jp7.com.br</a>";
-			//header("Location: /em_manutencao.htm");
+			header("Location: /em_manutencao.htm");
 			//Caso nao funcione o header, tenta por javascript
 			?>
-            
-			<script type="text/javascript">
-			window.top.location.href="/em_manutencao.htm";
+            <script language="javascript" type="text/javascript">
+			document.location.href="/em_manutencao.htm";
 			</script>
-
             <?
 			exit();
 		}
-	}else{
-		die($S);
-	} 
+	}
 	return $S;	
 }
+
+/**
+ * XOR encrypts a given string with a given key phrase.
+ *
+ * @param     string    $InputString    Input string
+ * @param     string    $KeyPhrase      Key phrase
+ * @return    string    Encrypted string    
+ */    
+function XOREncryption($InputString, $KeyPhrase){
+ 
+    $KeyPhraseLength = strlen($KeyPhrase);
+ 
+    // Loop trough input string
+    for ($i = 0; $i < strlen($InputString); $i++){
+ 
+        // Get key phrase character position
+        $rPos = $i % $KeyPhraseLength;
+ 
+        // Magic happens here:
+        $r = ord($InputString[$i]) ^ ord($KeyPhrase[$rPos]);
+ 
+        // Replace characters
+        $InputString[$i] = chr($r);
+    }
+ 
+    return $InputString;
+}
+ 
+// Helper functions, using base64 to
+// create readable encrypted texts:
+ 
+function XOREncrypt($InputString, $KeyPhrase){
+    $InputString = XOREncryption($InputString, $KeyPhrase);
+    $InputString = urlencode($InputString);
+    return $InputString;
+}
+ 
+function XORDecrypt($InputString, $KeyPhrase){
+    $InputString = urldecode($InputString);
+    $InputString = XOREncryption($InputString, $KeyPhrase);
+    return $InputString;
+}
+
+
+// Autoload
+/*
+// Carrega Classes
+define("ROOT_DIR",dirname(__FILE__)."/");
+
+function __autoload($className){
+   //$folder=classFolder($className);
+   //if($folder)require_once($folder."/".$className.".php")
+	 $include = require_once(jp7_doc_root().'classes/'.$className.".class.php");
+	 //if(!$include) require_once(jp7_doc_root().'interaccount/classes/'.$className."class.php");
+}
+
+function classFolder($className,$folder="classes") {
+   $dir=dir(ROOT_DIR.$folder);
+   if($folder=="classes"&&file_exists(ROOT_DIR.$folder."/".$className.".php"))return $folder;
+	 else{
+	 	while(false!==($entry=$dir->read())){
+			$checkFolder=$folder."/".$entry;
+			if(strlen($entry)>2){
+				if(is_dir(ROOT_DIR.$checkFolder)){
+					if(file_exists(ROOT_DIR.$checkFolder."/".$className.".php"))return $checkFolder;
+					else{
+						$subFolder=classFolder($className,$checkFolder);
+						if($subFolder)return $subFolder;
+					}
+				}
+			}
+		}
+	}
+	$dir->close();
+  return 0;
+}
+*/
+
+// Actions
+jp7_register_globals();
+$c_jp7=($REMOTE_ADDR=="201.6.156.39"||$REMOTE_ADDR=="192.168.0.2"||$REMOTE_HOST=="192.168.0.2"||$LOCAL_ADDR=="192.168.0.2"||$SERVER_ADDR=="192.168.0.2");
 ?>
