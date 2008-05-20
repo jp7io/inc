@@ -1,18 +1,35 @@
 <?
-// JP7's PHP Functions
-// Copyright 2002-2008 JP7
-// http://jp7.com.br
-// Vers„o 1.09 - 2008/05/08 by Carlos
+/**
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes
+ * @author JP7 (last update by Carlos)
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @version 1.09 (2008/05/08)
+ * @package JP7_Core
+ */
 
-
-// Config
+/**
+ * Config 
+ */
 if($REMOTE_ADDR=="201.6.156.39"||$LOCAL_ADDR="192.168.0.2")error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if(!@ini_get("allow_url_fopen"))@ini_set("allow_url_fopen","1");
 
-// Basics
+/**
+ * Basic functions
+ * @category Basics
+ */
 
-// toId (2006/01/18)
+/**
+ * Takes off diacritics and empty spaces from a string, if $tofile is <tt>FALSE</tt> (default) the case is changed to lowercase.
+ *
+ * @param string $S String to be formatted.
+ * @param bool $tofile Sets whether it will be used for a filename or not, <tt>FALSE</tt> is the default value.
+ * @param string $separador	Separator used to replace empty spaces.
+ * @return string Formatted string.
+ * @version (2006/01/18)
+ */
 function toId($S,$tofile=false,$separador=""){
 	if($separador)$S=str_replace(" ",$separador,$S);
 	$S=preg_replace("([·‡„‚‰¡¿√¬ƒ™])","a",$S);
@@ -33,7 +50,15 @@ function toId($S,$tofile=false,$separador=""){
 	return $S;
 }
 
-// wap_toHTML (2005/08/10)
+/**
+ * Takes off diacritics from a string and replaces linebreaks by <br/>.
+ *
+ * @param string $S The input string.
+ * @global bool 
+ * @return string Formatted string.
+ * @todo It still needs to be documented the usage of global $html.
+ * @version (2005/08/10)
+ */
 function wap_toHTML($S){
 	global $html;
 	if(!$html)$S=str_replace("$","$$",$S);
@@ -56,9 +81,24 @@ function wap_toHTML($S){
 	return $S;
 }
 
-// checkBrowser (2005/11/18)
+/**
+ * @global Browser $is
+ */
 $is=new Browser($HTTP_USER_AGENT);
+
+/**
+ * class Browser
+ *
+ * @version (2005/11/18)
+ * @subpackage Browser
+ */
 class Browser{
+	/**
+	 * Checks browser, browser version, and whether it's a robot or not
+	 *
+	 * @param string $useragent Browser information from $HTTP_USER_AGENT.
+	 * @return Browser
+	 */	
 	function Browser($useragent){
 		$this->userAgent=$useragent;
 		$i=0;
@@ -130,11 +170,18 @@ class Browser{
 	}
 }
 
-// toBase (2003/08/25)
+/**
+ * Quotes a string to be sent to the database. Ex.: 'mysql' becomes ''mysql''.
+ *
+ * @param string $S The input string.
+ * @global ADOConnection
+ * @return string Quoted string.
+ * @version (2003/08/25)
+ */
 function toBase($S){
 	global $db;
 	if($S){
-		$S=$db->qstr($S,get_magic_quotes_gpc()); //trata as aspas. Ex.: mysql fica \' sqlserver ''
+		$S=$db->qstr($S,get_magic_quotes_gpc());
 		$S=trim($S);
 	}else{
 		$S="''";
@@ -142,14 +189,28 @@ function toBase($S){
 	return $S;
 }
 
-// toForm (2004/06/14)
+/**
+ * Replaces double and single quotes so they can be used inside an HTML element's attribute. Ex.: \'test\' becomes &#39;test&#39;
+ *
+ * @param string $S String to be formatted.
+ * @return string Formatted string.
+ * @version (2004/06/14)
+ */
 function toForm($S){
 	$S=str_replace("\'","&#39;",$S);// Bug LocaWeb e JavaScript
 	$S=str_replace('\"','"',$S);// Bug LocaWeb
 	return stripslashes(str_replace("\"","&quot;",$S));
 }
 
-// toHTML (2006/02/10)
+/**
+ * Formats an string to be used as HTML text, strips slashes and replaces values.
+ *
+ * @param string $S String to be formatted.
+ * @param bool $HTML If <tt>FALSE</tt> (default) the line breaks are replaced by <br />
+ * @param bool $busca_replace If <tt>TRUE</tt> the function uses the regex string ($busca_varchar or $busca_text, passed by globals) to replace values. <tt>FALSE</tt> is the default value.
+ * @return string Formatted string.
+ * @version (2004/06/14)
+ */
 function toHTML($S,$HTML=false,$busca_replace=false){
 	global $busca_varchar;
 	global $busca_text;
@@ -165,14 +226,27 @@ function toHTML($S,$HTML=false,$busca_replace=false){
 	}
 }
 
-// toScript (2004/05/31)
+/**
+ * Formats a string to be used inside a javascript. Replaces \" by &quot; and ' by \'.
+ *
+ * @param string $S String to be formatted.
+ * @return string Formatted string.
+ * @version (2004/05/31)
+ */
 function toScript($S){
 	$S=str_replace("\"","&quot;",$S);
 	$S=str_replace("'","\'",$S);
 	return $S;
 }
 
-// 2007/06/25 by JP
+/**
+ * Formats a string to be used inside a parameter. Replaces \" by &quot; and line breaks by empty spaces (" ").
+ *
+ * @param string $S String to be formatted.
+ * @return string Formatted string.
+ * @version (2007/06/25)
+ * @author JP
+ */
 function toParam($S){
 	$S=str_replace("\"","&quot;",$S);
 	$S=str_replace("\n"," ",$S);
@@ -182,31 +256,64 @@ function toParam($S){
 	return $S;
 }
 
-// hex2bin (2007/01/22 by JP)
+/**
+ * Converts Hex string into binary string.
+ *
+ * @param string $S String to be converted.
+ * @return string Binary string.
+ * @version (2007/01/22)
+ * @author JP
+ */
 function hex2bin($S){
 	return pack("H".strlen($S),$S); 
 }
 
-// 2007/04/19 by JP
+/**
+ * Encrypts a string using a key.
+ *
+ * @param string $S String that will be encrypted.
+ * @param string $key Key with which the data will be encrypted, the key will be required to decrypt it as well, the default value is the md5 hash of $_SERVER["HTTP_HOST"].
+ * @param string $cipher One of the MCRYPT_ciphername constants of the name of the algorithm, the default value is <tt>MCRYPT_RIJNDAEL_128</tt>.
+ * @param string $mode One of the MCRYPT_MODE_modename constants, the default value is <tt>MCRYPT_MODE_ECB</tt>.
+ * @return string Encrypted string.
+ * @version (2007/04/19)
+ * @author JP
+ */
 function jp7_encrypt($S,$key="",$cipher=MCRYPT_RIJNDAEL_128,$mode=MCRYPT_MODE_ECB){
 	if(!$key)$key=md5($_SERVER["HTTP_HOST"]);
 	$iv=mcrypt_create_iv(mcrypt_get_iv_size($cipher,$mode),MCRYPT_RAND);
 	return bin2hex(mcrypt_encrypt($cipher,$key,$S,$mode,$iv));
 }
 
-// 2007/04/19 by JP
+/**
+ * Decrypts a string using a key.
+ *
+ * @param string $S Encrypted string.
+ * @param string $key Key with which the data was encrypted, the default value is the md5 hash of $_SERVER["HTTP_HOST"].
+ * @param string $cipher One of the MCRYPT_ciphername constants of the name of the algorithm, the default value is <tt>MCRYPT_RIJNDAEL_128</tt>.
+ * @param string $mode One of the MCRYPT_MODE_modename constants, the default value is <tt>MCRYPT_MODE_ECB</tt>.
+ * @return string Decrypted string.
+ * @version (2007/04/19)
+ * @author JP
+ */
 function jp7_decrypt($S,$key="",$cipher=MCRYPT_RIJNDAEL_128,$mode=MCRYPT_MODE_ECB){
 	if(!$key)$key=md5($_SERVER["HTTP_HOST"]);
 	$iv=mcrypt_create_iv(mcrypt_get_iv_size($cipher,$mode),MCRYPT_RAND);
 	return trim(mcrypt_decrypt($cipher,$key,hex2bin($S),$mode,$iv),"\0");
 }
 
-// toXHTML (2005/10/19)
+/**
+ * Changes the case of common HTML tags to lowercase, changes the align attribute on <p>, and close <br> tags, adapting it to XHTML standards. The affected tags are: <P>, <BR>, <IMG>, <TABLE>, <TR>, <TH> and <TD>.
+ *
+ * @param string $S HTML string.
+ * @return string XHTML string.
+ * @version (2005/10/19)
+ */
 function toXHTML($S){
 	$S=str_replace("<P>","<p>",$S);
 	$S=str_replace("<P ","<p ",$S);
 	$S=str_replace("</P>","</p>",$S);
-	$S=str_replace("<BR>","<br/>",$S);
+	$S=str_replace("<BR>","<br />",$S);
 	$S=str_replace("<IMG ","<img ",$S);
 	$S=str_replace("<TABLE","<table",$S);
 	$S=str_replace("<TR","<tr",$S);
@@ -223,47 +330,71 @@ function toXHTML($S){
 	return $S;
 }
 
-// checkReferer (2007/12/04)
-function checkReferer($S,$protocol="http"){
-	global $HTTP_HOST;
-	global $HTTP_REFERER;
-	global $REQUEST_URI;
+/**
+ * Checks if the referer page is the same as it was expected to be.
+ *
+ * @param string $S Expected referer page's URL.
+ * @param string $protocol Protocol used, the default value is "http".
+ * @return bool <tt>TRUE</tt> if the referer is the expected page, <tt>FALSE</tt> if not.
+ * @author update by Carlos 
+ * @version (2008/05/19) - changed from $HTTP_HOST to $_SERVER['HTTP_HOST'].
+ */
+function checkReferer($S, $protocol="http"){
 	/*
 	while(strpos($S,"../")!==false){
-		
 	}
 	*/
 	if(!dirname($S)||dirname($S)=="."){
-		$S=$protocol."://".$HTTP_HOST.dirname($REQUEST_URI)."/".$S;
+		$S = $protocol."://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/" . $S;
 	}
-	return (strpos($HTTP_REFERER,$S)===0);
+	return (strpos($_SERVER['HTTP_REFERER'],$S) === 0);
 }
 
-// jp7_string_left (2004/02/28)
-function jp7_string_left($S,$size){
+/**
+ * Shrinks the input string and adds "..." if it is larger than the maximum length, the input string is not changed if its shorter.
+ *
+ * @param string $S Input string.
+ * @param int $size Max. lenght of the output string.
+ * @return string Shrunk string.
+ * @version (2004/02/28)
+ * @todo Check whether the lines 365-369 are required or not.
+ */
+function jp7_string_left($S, $length){
 	global $s_interadmin_lang;
 	global $c_lang;
-	if($c_lang){
+	if ($c_lang){
 		foreach($c_lang as $item){
-			if($item[0]==$s_interadmin_lang&&$item[2])$size=$size*8;
+			if ($item[0] == $s_interadmin_lang && $item[2]) $length = $length * 8;
 		}
 	}
-	return (strlen($S)>$size)?substr($S,0,$size)."...":$S;
+	return (strlen($S) > $length) ? substr($S, 0, $length) . "..." : $S;
 }
 
-// jp7_register_globals (2007/03/03)
+/**
+ * Sets global variables using values from superglobals if "register_globals" is OFF, emulating this feature.
+ *
+ * @global string
+ * @version (2007/03/03)
+ */
 function jp7_register_globals(){
 	global $HTTP_HOST;
-	if(!@ini_get('register_globals')||!$HTTP_HOST){
-		if($_SERVER)foreach($_SERVER as $key=>$value){$GLOBALS[$key]=$_SERVER[$key];}
-		if($_GET)foreach($_GET as $key=>$value){$GLOBALS[$key]=$_GET[$key];}
-		if($_POST)foreach($_POST as $key=>$value){$GLOBALS[$key]=$_POST[$key];}
-		if($_COOKIE)foreach($_COOKIE as $key=>$value){$GLOBALS[$key]=$_COOKIE[$key];}
-		if($_SESSION)foreach($_SESSION as $key=>$value){$GLOBALS[$key]=$_SESSION[$key];}
+	if(!@ini_get('register_globals') || !$HTTP_HOST){
+		if ($_SERVER) foreach ($_SERVER as $key=>$value){ $GLOBALS[$key] = $_SERVER[$key]; }
+		if ($_GET) foreach ($_GET as $key=>$value){ $GLOBALS[$key] = $_GET[$key]; }
+		if ($_POST) foreach ($_POST as $key=>$value){ $GLOBALS[$key] = $_POST[$key]; }
+		if ($_COOKIE) foreach ($_COOKIE as $key=>$value){ $GLOBALS[$key] = $_COOKIE[$key]; }
+		if ($_SESSION) foreach ($_SESSION as $key=>$value){ $GLOBALS[$key] = $_SESSION[$key]; }
 	}
 }
 
-// jp7_password (2006/09/21 by JP)
+/**
+ * Shrinks down the input string and adds "..." if it is larger than the maximum length, or returns it unchanged if its shorter.
+ *
+ * @param string $length Length of the created password, the default value is 6.
+ * @return string Shrunk string.
+ * @version (2006/09/21)
+ * @author JP
+ */
 function jp7_password($length=6){
 	$chars="abcdefghijkmnopqrstuvwxyz023456789";
 	$S="";
@@ -871,7 +1002,7 @@ function interadmin_fields_values($param_0,$param_1="",$param_2=""){
 	return jp7_fields_values($param_0,$param_1,$param_2);
 }
 
-// 2006/12/20 by JP
+// 2008/05/19 by JP
 function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = false){
 	if (is_numeric($param_0)) {
 		// ($id,$field)
@@ -904,7 +1035,14 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = f
 	if ($table_id_value) {
 		global $db;
 		global $db_name;
-		$sql = "SELECT ".$fields." FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
+		$sql = "SELECT ".$fields.
+		" FROM ".$table.
+		" WHERE ".$table_id_name."=".$table_id_value;
+		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
+			$sql .=	" AND publish <> ''" .
+			" AND (deleted = '' OR deleted IS NULL)" .
+			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
+		}
 		if ($GLOBALS['db_type']) {
 			$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 			if ($row = $rs->FetchNextObj()) {
