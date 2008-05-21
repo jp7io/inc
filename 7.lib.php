@@ -7,19 +7,15 @@
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.09 (2008/05/08)
  * @package JP7_Core
+ * @todo Replace $S by $string on local function scope variables.
  */
 
 /**
- * Config 
+ * Configuring "allow_url_fopen" and "error_reporting".
  */
 if($REMOTE_ADDR=="201.6.156.39"||$LOCAL_ADDR="192.168.0.2")error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if(!@ini_get("allow_url_fopen"))@ini_set("allow_url_fopen","1");
-
-/**
- * Basic functions
- * @category Basics
- */
 
 /**
  * Takes off diacritics and empty spaces from a string, if $tofile is <tt>FALSE</tt> (default) the case is changed to lowercase.
@@ -374,6 +370,7 @@ function jp7_string_left($S, $length){
  * Sets global variables using values from superglobals if "register_globals" is OFF, emulating this feature.
  *
  * @global string
+ * @todo Check if this function could be flagged as "deprecated", and check the order its creating globals, cause $_GET variables could override $_SESSION variables creating problems.
  * @version (2007/03/03)
  */
 function jp7_register_globals(){
@@ -388,10 +385,10 @@ function jp7_register_globals(){
 }
 
 /**
- * Shrinks down the input string and adds "..." if it is larger than the maximum length, or returns it unchanged if its shorter.
+ * Creates an alphanumeric password (a-z, 0-9)
  *
  * @param string $length Length of the created password, the default value is 6.
- * @return string Shrunk string.
+ * @return string Created password.
  * @version (2006/09/21)
  * @author JP
  */
@@ -404,17 +401,28 @@ function jp7_password($length=6){
 	return $S;
 }
 
-// 2008/02/06 by JP
+/**
+ * Formats and prints the elements of an array or object, using the print_r() function and adding the <pre> tag around it.
+ *
+ * @param mixed $S Array or object that will have its elements printed.
+ * @param bool $return If <tt>TRUE</tt> the formatted string is returned, otherwise its printed, default value is <tt>FALSE</tt>.
+ * @return string|NULL Formatted string or <tt>NULL</tt>. 
+ * @version (2008/02/06)
+ * @author JP
+ */
 function jp7_print_r($S,$return=false){
 	$S="<pre>".print_r($S,1)."</pre>";
 	if($return)return $S;
 	else echo $S;
 }
 
-
-// Date
-
-// jp7_date_split (2004/03/04)
+/**
+ * Splits a time/date into an array.
+ *
+ * @param string $date String containing a date/time on the format Y-m-d H:i:s or Y/m/d H:i:s.
+ * @return array Array containing the following keys: Y, m, M, d, H, i, s and y.
+ * @version (2004/03/04)
+ */
 function jp7_date_split($date){
 	$date=str_replace(" ",",",$date);
 	$date=str_replace("/",",",$date);
@@ -433,10 +441,19 @@ function jp7_date_split($date){
 	);
 }
 
-// jp7_date_format (2006/08/24)
+/**
+ * Returns date formatted according to given format.
+ *
+ * @param string $date Date/time string.
+ * @param string $format Format using: "Y", "m", "M", "d", "H", "i", "s" or "y". The default value is "d/m/Y", when english language is active the "d/m" is automatically replaced by "m/d". 
+ * @global string
+ * @return string|NULL Returns formatted date or <tt>NULL</tt> if no date is given.
+ * @todo Maybe the str_replace would be done on a different way when english language is active.
+ * @version (2006/08/24)
+ */
 function jp7_date_format($date,$format="d/m/Y"){
+	global $lang;
 	if($date){
-		global $lang;
 		if($lang->lang=="en"){
 			$format=str_replace("d/m","m/d",$format);
 			$format=str_replace("d-m","m-d",$format);
@@ -451,7 +468,16 @@ function jp7_date_format($date,$format="d/m/Y"){
 	}
 }
 
-// jp7_date_week (2006/04/27)
+/**
+ * Returns textual representation for the day of the week.
+ *
+ * @param string $w Date/time string.
+ * @param string $sigla If <tt>TRUE</tt> returns only the three first letters, the default value is <tt>FALSE</tt>.
+ * @global string
+ * @return string Textual representation for the day of the week.
+ * @todo Replace $W by $l so it can use the same names as date() functions uses for the day of the week.
+ * @version (2006/04/27)
+ */
 function jp7_date_week($w,$sigla=false){
 	global $lang;
 	switch($lang->lang){
