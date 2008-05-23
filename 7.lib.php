@@ -343,8 +343,7 @@ function toXHTML($S){
  * @param string $S Expected referer page's URL.
  * @param string $protocol Protocol used, the default value is "http".
  * @return bool <tt>TRUE</tt> if the referer is the expected page, <tt>FALSE</tt> if not.
- * @author update by Carlos 
- * @version (2008/05/19) - changed from $HTTP_HOST to $_SERVER['HTTP_HOST'].
+ * @version (2008/05/19)
  */
 function checkReferer($S, $protocol="http"){
 	/*
@@ -364,11 +363,12 @@ function checkReferer($S, $protocol="http"){
  * @param int $size Max. lenght of the output string.
  * @return string Shrunk string.
  * @version (2004/02/28)
- * @todo Check whether the lines 365-369 are required or not.
+ * @global string
+ * @global string
+ * @todo Check if the lines inside the block "if ($c_lang){  ...  }" are used or not.
  */
 function jp7_string_left($S, $length){
-	global $s_interadmin_lang;
-	global $c_lang;
+	global $s_interadmin_lang, $c_lang;
 	if ($c_lang){
 		foreach($c_lang as $item){
 			if ($item[0] == $s_interadmin_lang && $item[2]) $length = $length * 8;
@@ -413,7 +413,7 @@ function jp7_password($length=6){
 }
 
 /**
- * Formats and prints the elements of an array or object, using the print_r() function and adding the <pre> tag around it.
+ * Formats and prints the elements of an array or object, using the print_r() function and adding the "pre" tag around it.
  *
  * @param mixed $S Array or object that will have its elements printed.
  * @param bool $return If <tt>TRUE</tt> the formatted string is returned, otherwise its printed, default value is <tt>FALSE</tt>.
@@ -571,8 +571,7 @@ function jp7_tel_split($tel){
  * @version (2006/08/23)
  */
 function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
-	global $db;
-	global $jp7_app;
+	global $db, $jp7_app;
 	$sql="SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while($row=$rs->FetchNextObj()){
@@ -594,7 +593,7 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 }
 
 /**
- * Updates or inserts a record on the given table using values from global variables. 
+ * Inserts or updates a record on the given table using values from global variables. 
  *
  * @param string $table Name of the table where it will insert or update data.
  * @param string $table_id_name Name of the key field.
@@ -682,7 +681,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
  */
 class jp7_db_pages{
 	/**
-	 * 
+	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie, e.g. echo jp7_db_pages_instance->htm;
 	 *
 	 * @param string $sql SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
 	 * @param int $limit Itens per page, the default value is 10.
@@ -690,23 +689,20 @@ class jp7_db_pages{
  	 * @param string $type Type of the pagination, the available types are "combo", "numbers-top", "numbers-bottom", the default value is "".
 	 * @param int $numbers_limit Maximum number of pages listed, the default value is 1000.
 	 * @param string $parameters Values to be inserted before the query string when creating links for the pages, the default value is "".
-	 * @param string $separador Separator to be placed between the links for the pages, default value is "|".
-	 * @param string 
-	 * @param string 
-	 * @param string 
-	 * @param string 
-	 * @param string 
-	 * @param string 
+	 * @param string $separador Separator which will be placed between two pages, default value is "|".
+	 * @param string $go_char Character used on the "Next" button or link.
+	 * @param string $back_char Character used on the "Back" button or link.
+	 * @param string $go_char_plus Character used on the "Last" button or link.
+	 * @param string $back_char_plus Character used on the "First" button or link.
+	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
 	 * @global ADOConnection
 	 * @global ADORecordSet
-	 * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record´s ID.
+	 * @return string|NULL If neither $sql nor $records is given the string "[aa]" is returned, otherwise nothing is returned.
 	 * @author JP, Cristiano
 	 * @version (2007/02/22)
 	 */
 	function jp7_db_pages($sql=NULL,$limit=10,$page=1,$type="",$numbers_limit=1000,$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;",$records=NULL){
-		// SQL
-		global $db;
-		global $rs;
+		global $db, $rs;
 		if(!$page)$page=1;
 
 		if($sql){
@@ -782,7 +778,19 @@ class jp7_db_pages{
 	}
 }
 
-// 2007/07/13 by JP
+/**
+ * Creates a checkbox and a hidden field, the hidden field will have a value or not depending on whether the checkbox is checked or not.
+ *
+ * @param string $name Name of the hidden field.
+ * @param string $value Value that the hidden field will have if the checkbox is checked, the default value is "S".
+ * @param string $var Name of global variable containing the current value for the hidden field, the default value is "".
+ * @param string $readonly Readonly parameter to be inserted on the checkbox. e.g. readonly="readonly"
+ * @param string $xtra Additional HTML parameter to be inserted on the checkbox.
+ * @return string If $GLOBALS["interadmin_visualizar"] is set it returns "Sim" or "Não", otherwise it returns the created HTML for checkbox and hidden field.
+ * @todo Make $readonly a boolean, setting if the field is readonly or not. Check if its better to replace $GLOBALS["interadmin_visualizar"] by global $interadmin_visualizar.
+ * @author JP
+ * @version (2007/07/13)
+ */
 function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
 	if(!$var)$var=$name;
 	$var_value=$GLOBALS[$var];
@@ -795,7 +803,18 @@ function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
 	}
 }
 
-// jp7_db_update (2006/04/18)
+/**
+ * Updates a record on the given table using values from global variables. 
+ *
+ * @param string $table Name of the table where it will update data.
+ * @param string $table_id_name Name of the key field.
+ * @param mixed $table_id_value Value expected for the key field. 
+ * @param string $fields Names of the fields that will be updated separated by comma (,). e.g. 'name1,name2,name3'.
+ * @global ADOConnection
+ * @return NULL Nothing is returned.
+ * @author JP
+ * @version (2006/04/18)
+ */
 function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	global $db;
 	$fields_arr=split(",",$fields);
@@ -829,7 +848,14 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
 }
 
-// 2007/03/10 by JP
+/**
+ * Creates an array from a given list of fields using Interadmin's format.
+ *
+ * @param string $campos String containing the fields of a type, fields separated by {;}, parameters separated by {,}.
+ * @return array Array of fields with its parameters.
+ * @author JP
+ * @version (2007/03/10)
+ */
 function interadmin_tipos_campos($campos){
 	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default");
 	$campos=split("{;}",$campos);
@@ -845,12 +871,20 @@ function interadmin_tipos_campos($campos){
 	return $A;
 }
 
-// interadmin_tipos_campo (2004/11/03)
+/**
+ * Gets an array containing "nome" and "xtra" values of a field on Interadmin. 
+ *
+ * @param string $db_prefix Prefix of the table.
+ * @param string $id_tipo ID of the type which will be searched (column "id_tipo").
+ * @param string $var_key Name of the field from this type that will be got. e.g. "varchar_key".
+ * @global ADOConnection
+ * @global string
+ * @global int
+ * @return array Array containing "nome" and "xtra" values of the field.
+ * @version (2004/11/03)
+ */
 function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
-	global $db;
-	global $db_name;
-	global $tipo_campos;
-	global $tipo_model_id_tipo;
+	global $db, $tipo_campos, $tipo_model_id_tipo;
 	$tipo_model_id_tipo=$id_tipo;
 	while($tipo_model_id_tipo){
 		jp7_db_select($db_prefix."_tipos","id_tipo",$tipo_model_id_tipo,"tipo_");
@@ -868,13 +902,31 @@ function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
 	}
 }
 
-// 2007/04/25 by JP
+/**
+ * Alias for interadmin_query().
+ *
+ * @deprecated
+ * @author JP
+ * @version (2007/04/25)
+ */
 function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
 	return interadmin_query($sql,$sql_db,$sql_debug);
 }
 
-// 2007/03/04 by JP
-function interadmin_query($sql,$sql_db="",$sql_debug=false,$numrows=null,$offset=null){	
+/**
+ * Runs a SQL query and returns its recordset.
+ *
+ * @param string $sql SQL query which will be executed.
+ * @param ADOConnection $sql_db Database which will be used, the default value is "".
+ * @param bool $sql_debug Formats and prints the SQL string for debug purposes, the default value is <tt>FALSE</tt>.
+ * @param int $numrows Number of records to be retrieved from the database, the default value is <tt>NULL</tt>.
+ * @param int $offset Number of ignored records before is starts retrieving, the default value is <tt>NULL</tt>.
+ * @return ADORecordSet Recordset object.
+ * @todo Check if 'if($rs&&$sql)eval("global \$".$rs.";\$".$rs."=\$rs_pre;");' is needed.
+ * @author JP
+ * @version (2007/03/04)
+ */
+function interadmin_query($sql,$sql_db="",$sql_debug=FALSE,$numrows=NULL,$offset=NULL){	
 	global $c_publish;
 	global $c_path_upload;
 	global $s_interadmin_user;
@@ -1041,9 +1093,17 @@ function interadmin_mysql_query($rs,$sql="",$debug=false){
 }
 */
 
-// interadmin_tipos_nome (2008/01/09 by JP)
-function interadmin_tipos_nome($id_tipo,$nolang=false){
-	if(!$id_tipo)return false;
+/**
+ * Gets the name of a type from its ID.
+ *
+ * @param int $id_tipo ID of the type.
+ * @param bool $nolang If <tt>TRUE</tt> it will return the name regardless of the current language, the default value is <tt>FALSE</tt>.
+ * @return string|bool If $id_tipo is numeric it returns the name of the type, if its <tt>FALSE</tt> it returns <tt>FALSE</tt>, otherwise it returns "Tipos".
+ * @author JP
+ * @version (2008/01/09)
+ */
+function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
+	if(!$id_tipo)return FALSE;
 	elseif(is_numeric($id_tipo)){
 		global $db;
 		global $db_prefix;
