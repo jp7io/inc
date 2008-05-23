@@ -7,7 +7,6 @@
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.09 (2008/05/08)
  * @package JP7_Core
- * @todo Replace $S by $string on local function scope variables.
  */
 
 /**
@@ -43,6 +42,18 @@ function toId($S,$tofile=false,$separador=""){
 	}
 	$S=preg_replace("([\(\)])","",$S);
 	if($separador!="-")$S=preg_replace("([/-])","_",$S);
+	return $S;
+}
+
+/**
+ * Takes off diacritics and replace spaces with - from a string
+ *
+ * @param string $S String to be formatted.
+ * @return string Formatted string.
+ * @version (2008/05/21)
+ */
+function toSeo($S) {
+	$S = toId($S, false, '-');
 	return $S;
 }
 
@@ -167,7 +178,7 @@ class Browser{
 }
 
 /**
- * Quotes a string to be sent to the database. Ex.: 'mysql' becomes ''mysql''.
+ * Quotes a string to be sent to the database. e.g. 'mysql' becomes ''mysql''.
  *
  * @param string $S The input string.
  * @global ADOConnection
@@ -186,7 +197,7 @@ function toBase($S){
 }
 
 /**
- * Replaces double and single quotes so they can be used inside an HTML element's attribute. Ex.: \'test\' becomes &#39;test&#39;
+ * Replaces double and single quotes so they can be used inside an HTML element's attribute. e.g. \'test\' becomes &#39;test&#39;
  *
  * @param string $S String to be formatted.
  * @return string Formatted string.
@@ -385,7 +396,7 @@ function jp7_register_globals(){
 }
 
 /**
- * Creates an alphanumeric password (a-z, 0-9)
+ * Creates an alphanumeric password (a-z, 0-9).
  *
  * @param string $length Length of the created password, the default value is 6.
  * @return string Created password.
@@ -448,7 +459,6 @@ function jp7_date_split($date){
  * @param string $format Format using: "Y", "m", "M", "d", "H", "i", "s" or "y". The default value is "d/m/Y", when english language is active the "d/m" is automatically replaced by "m/d". 
  * @global string
  * @return string|NULL Returns formatted date or <tt>NULL</tt> if no date is given.
- * @todo Maybe the str_replace would be done on a different way when english language is active.
  * @version (2006/08/24)
  */
 function jp7_date_format($date,$format="d/m/Y"){
@@ -469,13 +479,12 @@ function jp7_date_format($date,$format="d/m/Y"){
 }
 
 /**
- * Returns textual representation for the day of the week.
+ * Returns textual representation for the day of the week, such as Sunday or Saturday. Supports english and portuguese.
  *
- * @param string $w Date/time string.
- * @param string $sigla If <tt>TRUE</tt> returns only the three first letters, the default value is <tt>FALSE</tt>.
+ * @param int|string $w A numeric representation of the day of the week (0 for Sunday through 6 for Saturday), or a date/time string.
+ * @param string $sigla If <tt>TRUE</tt> returns only the first three letters, the default value is <tt>FALSE</tt>.
  * @global string
  * @return string Textual representation for the day of the week.
- * @todo Replace $W by $l so it can use the same names as date() functions uses for the day of the week.
  * @version (2006/04/27)
  */
 function jp7_date_week($w,$sigla=false){
@@ -489,7 +498,15 @@ function jp7_date_week($w,$sigla=false){
 	return ($sigla)?substr($return,0,3):$return;
 }
 
-// jp7_date_month (2004/06/14)
+/**
+ * Returns textual representation of a month, such as January or March. Supports english and portuguese.
+ *
+ * @param int $m Numeric representation of a month, (1 for January through 12 for December).
+ * @param string $sigla If <tt>TRUE</tt> returns only the first three letters, the default value is <tt>FALSE</tt>.
+ * @global string
+ * @return string Textual representation of a month.
+ * @version (2004/06/14)
+ */
 function jp7_date_month($m,$sigla=false){
 	global $lang;
 	switch($lang->lang){
@@ -500,7 +517,16 @@ function jp7_date_month($m,$sigla=false){
 	return ($sigla)?substr($return,0,3):$return;
 }
 
-// jp7_date_diff (2008/04/15) by Paulo
+/**
+ * Calculates the number of months from the start date to the end date.
+ *
+ * @param string $start Start date, string on the "Y-m-d" format.
+ * @param string $end End date, string on the "Y-m-d" format. 
+ * @return int Number of months.
+ * @author Paulo
+ * @todo Add functionality to return days and years too, and to take off the time aggregated with a date, like: 2008-10-08 00:01:02.
+ * @version (2008/04/15)
+ */
 function jp7_date_diff($start,$end){
 	$start = explode("-",$start);
 	$start = mktime(0,0,0,$start[1],$start[2],$start[0]); // mes / dia / ano (padrao mktime)
@@ -512,9 +538,14 @@ function jp7_date_diff($start,$end){
 	return $diff_r['m'];
 }
 
-// Parse Data
-
-// jp7_tel_split (2004/08/12)
+/**
+ * Splits a telephone number into "ddd", "numero" and "ramal".
+ *
+ * @param string $tel String containing a telephone number.
+ * @return array Array containing "ddd", "numero" and "ramal".
+ * @todo Add support for poorly formatted telephones like: "-Ramal:", " R:", " - R:", maybe taking off empty spaces and "-".
+ * @version (2004/08/12)
+ */
 function jp7_tel_split($tel){
 	$tel=str_replace("(","",$tel);
 	$tel=str_replace(")",",",$tel);
@@ -527,13 +558,20 @@ function jp7_tel_split($tel){
 	);
 }
 
-
-// Database
-
-// jp7_db_select (2006/08/23)
+/**
+ * Searches for a value on the database and creates global variables from the result.
+ *
+ * @param string $table Name of the table where it will search.
+ * @param string $table_id_name Name of the key field.
+ * @param mixed $table_id_value Value expected for the key field.
+ * @param string $var_prefix Prefix used when creating the global variables from the result, on the format: prefix + field name, the default value is "".
+ * @global ADOConnection
+ * @global bool
+ * @return NULL Nothing is returned, but the function creates global variables.
+ * @version (2006/08/23)
+ */
 function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 	global $db;
-	global $db_name;
 	global $jp7_app;
 	$sql="SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
@@ -555,13 +593,24 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 	$rs->Close();
 }
 
-// jp7_db_insert (2007/12/17 by JP e Cristiano)
+/**
+ * Updates or inserts a record on the given table using values from global variables. 
+ *
+ * @param string $table Name of the table where it will insert or update data.
+ * @param string $table_id_name Name of the key field.
+ * @param mixed $table_id_value Value expected for the key field, the default value is 0. If a value is given the row is updated, otherwise it is inserted. 
+ * @param string $var_prefix Prefix used to get values from global variables, the default value is "". e.g. For the field name "varchar_1" and the global variable "pre_varchar_1", the prefix should be "pre_".
+ * @param bool $var_check If <tt>FALSE</tt> prepares the data for empty and null values before updating, the default value is <tt>TRUE</tt>.
+ * @global ADOConnection
+ * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record´s ID.
+ * @author JP, Cristiano
+ * @version (2007/12/17)
+ */
 function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=true){
 	global $db;
-	global $db_name;
 	
 	$table_columns=$db->MetaColumnNames($table);
-	array_shift($table_columns);
+	array_shift($table_columns); // ID is the first value
 	$table_columns_num=count($table_columns);
 	if($table_id_value){
 		// Update
@@ -625,15 +674,41 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
 	}
 }
 
-// 2007/02/22 by JP
+/**
+ * class jp7_db_pages
+ *
+ * @version (2007/02/22)
+ * @subpackage jp7_db_pages
+ */
 class jp7_db_pages{
-	function jp7_db_pages($sql=null,$limit=10,$page=1,$type="",$numbers_limit="1000",$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;",$records=null){
+	/**
+	 * 
+	 *
+	 * @param string $sql SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
+	 * @param int $limit Itens per page, the default value is 10.
+	 * @param int $page Current page, the default value is 1.
+ 	 * @param string $type Type of the pagination, the available types are "combo", "numbers-top", "numbers-bottom", the default value is "".
+	 * @param int $numbers_limit Maximum number of pages listed, the default value is 1000.
+	 * @param string $parameters Values to be inserted before the query string when creating links for the pages, the default value is "".
+	 * @param string $separador Separator to be placed between the links for the pages, default value is "|".
+	 * @param string 
+	 * @param string 
+	 * @param string 
+	 * @param string 
+	 * @param string 
+	 * @param string 
+	 * @global ADOConnection
+	 * @global ADORecordSet
+	 * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record´s ID.
+	 * @author JP, Cristiano
+	 * @version (2007/02/22)
+	 */
+	function jp7_db_pages($sql=NULL,$limit=10,$page=1,$type="",$numbers_limit=1000,$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;",$records=NULL){
 		// SQL
 		global $db;
-		global $db_name;
 		global $rs;
 		if(!$page)$page=1;
-		
+
 		if($sql){
 			if($GLOBALS["jp7_app"])$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 			else $rs=interadmin_query($sql);		
@@ -654,12 +729,10 @@ class jp7_db_pages{
 		$this->init=(($page-1)*$limit);
 		
 		// HTM
-		global $QUERY_STRING;
-		
-		$this->query_string=preg_replace("(&p_page=[0-9]+)","",$QUERY_STRING);		
+		$this->query_string=preg_replace("(&p_page=[0-9]+)","", $_SERVER['QUERY_STRING']);		
 		$this->query_string=str_replace("go_url=".$_GET["go_url"],"",$this->query_string);
 		//$this->query_string=substr($this->query_string,1);
-		global $_POST;
+		
 		foreach($_POST as $key=>$value){
 			if($key!="p_page")$this->query_string.="&".$key."=".$value;
 		}
@@ -670,13 +743,14 @@ class jp7_db_pages{
 				$this->htm_numbers_extra=$this->htm_numbers="<div class=\"numbers\"><ul>";
 				$min=$page;
 				$max=$min+$numbers_limit-1;
-				if($max>$this->total){
+				if($max>$this->total){ 
 					$min=$this->total-$numbers_limit+1;
 					$max=$this->total;
 				}
 				if($min<1){
 					$min=1;
 				}
+
 				if($page!=1&&$this->total>2&&$page>2)$this->htm_numbers_extra.="<li class=\"".(($page==1)?"back-off":"bgleft_plus")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=1'\">".$back_char_plus."</li>";
 				$this->htm_numbers_extra.="<li class=\"".(($page==1)?"back-off":"bgleft")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".($page-1)."'\">".$back_char."</li>";
 				for($i=$min;$i<=$max;$i++){
@@ -1011,7 +1085,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	" ORDER BY ".$order;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while($row=$rs->FetchNextObj()){
-		if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected class=\"on\"":"").">".toHTML($row->field)."</option>\n";
+		if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
 		else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
 	}
 	$rs->Close();
@@ -1692,7 +1766,7 @@ function jp7_resizeImage($im_src,$src,$dst,$w,$h,$q=90,$s=10000000){
 
 // jp7_encode_mimeheader (2005/12/08)
 function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
-	return (function_exists("mb_encode_mimeheader"))?mb_encode_mimeheader($S,$charset,$transfer_encoding):$S;
+	return (function_exists("mb_encode_mimeheader"))?mb_encode_mimeheader($S,$charset,$transfer_encoding,(strpos($_ENV["OS"],"Windows")===false||!$_ENV["OS"])?"\n":"\r\n"):$S;
 }
 
 // jp7_index (2008/01/11 by JP)
