@@ -1098,7 +1098,7 @@ function interadmin_mysql_query($rs,$sql="",$debug=false){
  *
  * @param int $id_tipo ID of the type.
  * @param bool $nolang If <tt>TRUE</tt> it will return the name regardless of the current language, the default value is <tt>FALSE</tt>.
- * @return string|bool If $id_tipo is numeric it returns the name of the type, if its <tt>FALSE</tt> it returns <tt>FALSE</tt>, otherwise it returns "Tipos".
+ * @return string|bool If $id_tipo is numeric it is returned the name of the type, if it evaluates as <tt>FALSE</tt> it is returned <tt>FALSE</tt>, otherwise it is returned "Tipos".
  * @author JP
  * @version (2008/01/09)
  */
@@ -1119,12 +1119,25 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
 	}
 }
 
-// interadmin_list (2007/01/27 by JP)
+/**
+ * 
+ *
+ * @param string $table Name of the table containing the itens.
+ * @param int $id_tipo ID of the type.
+ * @param int $id ID of the current item.
+ * @param string $type Two values are accepted: combo or list.
+ * @param string $order
+ * @param string $field
+ * @param string $sql_where
+ * @global ADOConnection
+ * @global bool
+ * @global string
+ * @return string Generated HTML code for a combo or a list.
+ * @author JP
+ * @version (2007/01/27)
+ */
 function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where=""){
-	global $db;
-	global $db_name;
-	global $s_interadmin_preview;
-	global $l_selecione;
+	global $db, $s_interadmin_preview, $l_selecione;
 	//global $id;
 	if($type=="list"){
 		$S="".
