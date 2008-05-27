@@ -681,7 +681,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
  */
 class jp7_db_pages{
 	/**
-	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie, e.g. echo jp7_db_pages_instance->htm;
+	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie ($this->htm).
 	 *
 	 * @param string $sql SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
 	 * @param int $limit Itens per page, the default value is 10.
@@ -697,7 +697,7 @@ class jp7_db_pages{
 	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
 	 * @global ADOConnection
 	 * @global ADORecordSet
-	 * @return string|NULL If neither $sql nor $records is given the string "[aa]" is returned, otherwise nothing is returned.
+	 * @return string|jp7_db_pages If neither $sql nor $records is given the string "[aa]" is returned.
 	 * @author JP, Cristiano
 	 * @version (2007/02/22)
 	 */
@@ -906,6 +906,7 @@ function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
  * Alias for interadmin_query().
  *
  * @deprecated
+ * @see interadmin_query()
  * @author JP
  * @version (2007/04/25)
  */
@@ -1120,19 +1121,19 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
 }
 
 /**
- * 
+ * Creates a list from values on the database.
  *
  * @param string $table Name of the table containing the itens.
  * @param int $id_tipo ID of the type.
  * @param int $id ID of the current item.
- * @param string $type Two values are accepted: combo or list.
- * @param string $order
- * @param string $field
- * @param string $sql_where
+ * @param string $type Type of the list, the available values are: "combo" or "list", the default value is "list".
+ * @param string $order SQL string to be placed after the "ORDER BY" statement, the default value is "int_key,date_publish,varchar_key".
+ * @param string $field Name of the field which will be used as label on the list, the default value is "varchar_key".
+ * @param string $sql_where Additional SQL string to be placed after the "WHERE" statement, it must start with "AND ", the default value is "".
  * @global ADOConnection
  * @global bool
  * @global string
- * @return string Generated HTML code for a combo or a list.
+ * @return string Generated HTML code for a combobox or a list.
  * @author JP
  * @version (2007/01/27)
  */
@@ -1170,17 +1171,38 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	return $S;
 }
 
-// 2006/08/24
+
+/**
+ * Alias for jp7_fields_values().
+ *
+ * @see jp7_fields_values()
+ * @version (2006/08/24)
+ */
 function interadmin_fields_values($param_0,$param_1="",$param_2=""){
 	return jp7_fields_values($param_0,$param_1,$param_2);
 }
 
-// 2008/05/19 by JP
-function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = false){
+/**
+ * Gets values from a specified record on the database. It has 3 behaviors as explained on the parameters' description.
+ *
+ * @param int|string $param_0 If it is numeric, it will be the ID value, otherwise it will be the name of the table.
+ * @param int|string $param_1 If $param_0 is numeric it will be the name of the fields, if $param_0 is not numeric and it is numeric, it will be the ID value, otherwise it will be the name of the key field.  
+ * @param string $param_2 If $param_0 is not numeric and $param_1 is numeric, it will be the name of the fields, if both are not numeric it will be the ID value.
+ * @param string $param_3 If $param_0 and $param_1 are not numeric, it will be the name of the fields.
+ * @param bool $OOP If <tt>TRUE</tt> an object will be returned even when there is only one result, the default value is <tt>FALSE</tt>.
+ * @global ADOConnection
+ * @global string
+ * @global string
+ * @return mixed Returns an object containing the values. If there is only one value it returns the value itself, except if $OOP is <tt>TRUE</tt>.
+ * @author JP
+ * @todo ($GLOBALS["jp7_app"]=='intermail') will not be TRUE, since the previous condition ($GLOBALS['db_type']) is TRUE on the Intermail.
+ * @version (2008/05/19)
+ */
+function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = FALSE){
+	global $db;
 	if (is_numeric($param_0)) {
 		// ($id,$field)
-		global $db_prefix;
-		global $lang;
+		global $db_prefix, $lang;
 		$table=$db_prefix.$lang->prefix;
 		$table_id_name="id";
 		$table_id_value=$param_0;
@@ -1206,8 +1228,6 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = f
 		$fields_arr = explode(',', $fields);
 	}
 	if ($table_id_value) {
-		global $db;
-		global $db_name;
 		$sql = "SELECT ".$fields.
 		" FROM ".$table.
 		" WHERE ".$table_id_name."=".$table_id_value;
@@ -1228,7 +1248,7 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = f
 			$rs->Close();
 			return $O;
 		} else {
-			$rs = ($GLOBALS["jp7_app"]=='intermail') ? mysql_query($sql) : interadmin_mysql_query($sql);
+			$rs = ($GLOBALS["jp7_app"]=='intermail') ? $db-Execute($sql) : interadmin_mysql_query($sql);
 			if ($row = $rs->FetchNextObj()) {
 				if (count($fields_arr) > 1) {
 					foreach ($fields_arr as $field){
@@ -1242,10 +1262,20 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = f
 	}
 }
 
-// jp7_id_value (2006/09/12)
+/**
+ * Gets the ID of a record on the database from its "varchar_key" and "id_tipo" values.
+ *
+ * @param string $varchar_key Value of the field "varchar_key".
+ * @param int $id_tipo Value of the field "id_tipo" (Optional).
+ * @global ADOConnection
+ * @global string
+ * @global string
+ * @return int Value of the field "id", which is the ID of the record.
+ * @author JP
+ * @version (2006/09/12)
+ */
 function jp7_id_value($varchar_key,$id_tipo=0){
 	global $db;
-	global $db_name;
 	global $db_prefix;
 	global $lang;
 	$table=$db_prefix.$lang->prefix;
@@ -1260,19 +1290,32 @@ function jp7_id_value($varchar_key,$id_tipo=0){
 	return $I;
 }
 
-// 2007/08/08 by JP
+/**
+ * class jp7_lang
+ *
+ * @author JP
+ * @version (2007/08/08)
+ * @subpackage jp7_lang
+ */
 class jp7_lang{
-	function jp7_lang($lang="pt-br",$force=false){
+	/**
+	 * Checks the current language.
+	 *
+	 * @param string $lang Current language, the default value is "pt-br".
+	 * @param bool $force If <tt>TRUE</tt> it skips the check and $lang becomes the current language, the default value is <tt>FALSE</tt>.
+	 * @global string
+	 * @return jp7_lang Object with the following properties: $this->lang, $this->prefix, $this->path and $this->path_2.
+	 * @author JP
+	 * @version (2006/09/12)
+	 */
+	function jp7_lang($lang="pt-br",$force=FALSE){
 		if($force)$this->lang=$lang;
 		else{
-			global $REQUEST_URI;
-			global $SCRIPT_NAME;
-			global $QUERY_STRING;
 			global $c_path;
-			global $c_site;
-			$this->lang=($REQUEST_URI)?$REQUEST_URI:$SCRIPT_NAME;
-			if($QUERY_STRING){
-				$pos1=strpos($this->lang,$QUERY_STRING);
+			//global $c_site;
+			$this->lang=($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:$_SERVER['SCRIPT_NAME'];
+			if($_SERVER['QUERY_STRING']){
+				$pos1=strpos($this->lang,$_SERVER['QUERY_STRING']);
 				if($pos1!==false)$this->lang=substr($this->lang,0,$pos1);
 			}
 			$this->lang=explode("/",$this->lang);
@@ -1299,8 +1342,23 @@ class jp7_lang{
 	}
 }
 
-// 2007/07/10 by Thiago
+/**
+ * class interadmin_tipos
+ *
+ * @author Thiago
+ * @version (2007/07/10)
+ * @subpackage interadmin_tipos
+ */
 class interadmin_tipos{
+	/**
+	 * Gets data of the specified type from the database, and does the same with all of its parent types recursively.
+	 *
+	 * @param int $id_tipo ID of the type.
+	 * @global ADOConnection
+	 * @global string
+	 * @global string
+	 * @return NULL
+	 */
 	function interadmin_tipos_tipos($id_tipo){
 		global $db;
 		global $db_prefix;
@@ -1323,7 +1381,20 @@ class interadmin_tipos{
 		}
 		$rs->Close();
 	}
-	function interadmin_tipos($id_tipo,$id=0,$replaceGlobals=false){
+	/**
+ 	 * Finds the type of a record by its ID, gets its data from the database, and does the same with all of its parent types recursively.
+ 	 *
+	 * @param int $id_tipo ID of the type.
+	 * @param int $id ID of the record (optional), it overrides the value of $id_tipo with the record's id_tipo.
+	 * @param bool $replaceGlobals If <tt>TRUE</tt> the global $id_tipo is replaced by the local $id_tipo, the default value is <tt>FALSE</tt>.
+	 * @global ADOConnection
+	 * @global string
+	 * @global string
+	 * @global string
+	 * @todo Check if the "Parent Id" and "Grand Parent Id" code are working properly, since they are replacing $id_tipo it might not bring the children data.
+	 * @return interadmin_tipos
+	 */
+	function interadmin_tipos($id_tipo,$id=0,$replaceGlobals=FALSE){
 		global $db;
 		global $db_prefix;
 		global $lang;
@@ -1381,7 +1452,18 @@ class interadmin_tipos{
 	}
 }
 
-// interadmin_id_tipo (2007/05/23)
+/**
+ * Gets the id_tipo from the record's ID or from its parent_id_tipo.
+ *
+ * @param int $id Record's ID.
+ * @param int $parent_id_tipo Parent type's ID (optional).
+ * @param int $model_id_tipo Model type's ID (optional).
+ * @global ADOConnection
+ * @global string
+ * @global string
+ * @return int|NULL If $id is specified it returns its id_tipo, otherwise it returns the first child's id_tipo for the $parent_id_tipo. If both fail nothing is returned.
+ * @version (2007/05/23)
+ */
 function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
 	global $db;
 	global $db_prefix;
@@ -1403,9 +1485,27 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
 	$rs->Close();
 }
 
-// interadmin_cabecalho (2006/11/29)
+/**
+ * class interadmin_cabecalho
+ *
+ * @version (2006/11/29)
+ * @subpackage interadmin_cabecalho
+ */
 class interadmin_cabecalho{
-	function interadmin_cabecalho($i=0,$model_id_tipo=5,$check="file_1,file_2",$rand=false){
+	/**
+	 * Gets text and images of the specified type.
+	 *
+	 * @param int $i Index of the type on the global $tipos, the default value is 0.
+	 * @param int $model_id_tipo Value of the model_id_tipo of this type, used to find the correct type, default value is 5.
+	 * @param string $check Fields which will have their values checked to make sure they are not empty, names separated by comma (,), the default value is "file_1,file_2".
+	 * @param bool $rand The default value is <tt>FALSE</tt>.
+	 * @global ADOConnection
+	 * @global string
+	 * @global string
+	 * @return interadmin_cabecalho 
+	 * @version (2006/11/29)
+	 */
+	function interadmin_cabecalho($i=0,$model_id_tipo=5,$check="file_1,file_2",$rand=FALSE){
 		global $db;
 		global $db_prefix;
 		global $tipos;
@@ -1445,10 +1545,20 @@ class interadmin_cabecalho{
 	}
 }
 
-
-// Other
-
-// jp7_flash (2005/11/18)
+/**
+ * Generates the code for inserting Flash(.swf) files, or an image when its not a flash file.
+ *
+ * @param string $src URL of the Flash file.
+ * @param int $w Width.
+ * @param int $h Height.
+ * @param string $alt Alternative text for the image.
+ * @param string $id ID of the "object" tag.
+ * @param string $xtra Additional parameters for the "object" tag.
+ * @param string $parameters Additional "param" tags. 
+ * @global Browser
+ * @return string Generated HTML code.
+ * @version (2005/11/18)
+ */
 function jp7_flash($src,$w,$h,$alt="",$id="",$xtra="",$parameters=""){
 	$pos1=strpos($src,"?");
 	$ext=($pos1)?substr($src,0,$pos1):$src;
@@ -1554,22 +1664,33 @@ function jp7_interlog($id_cliente,$host="jp7.com.br",$db_name_interlog="interlog
 	}
 }
 
-// jp7_path (2003/08/25)
+/**
+ * Adds a trailing slash on a path, in case it doesn't have one.
+ *
+ * @param string $S Input String (Path, URL).
+ * @return string String with a trailing slash.
+ * @version (2003/08/25)
+ */
 function jp7_path($S){
 	return (strrpos($S,"/")+1==strlen($S)||!$S)?$S:$S."/";
 }
 
-// jp7_doc_root (2005/09/22)
+
+/**
+ * Attempts to find the root directory.
+ *
+ * @global string
+ * @global bool
+ * @global string
+ * @return string Root directory.
+ * @version (2005/09/22)
+ */
 function jp7_doc_root(){
-	global $DOCUMENT_ROOT;
-	global $PATH_TRANSLATED;
-	global $PATH_INFO;
-	global $c_jp7;
-	global $c_path;
-	$S=$DOCUMENT_ROOT;
+ 	global $PATH_INFO, $c_jp7, $c_path;
+	$S=$_SERVER['DOCUMENT_ROOT'];
 	if(!$S)$S=@ini_get('doc_root');
 	if(!$S){
-		$S=dirname($PATH_TRANSLATED);
+		$S=dirname($_SERVER['PATH_TRANSLATED']);
 		if($c_jp7){
 			$S=str_replace("\\","/",$S);
 			$S=str_replace("//","/",$S);
@@ -1584,12 +1705,24 @@ function jp7_doc_root(){
 	return $S;
 }
 
-// jp7_include (2005/04/29)
+/**
+ * Attempts to include a file from two levels above and, if it fails, tries from the root.
+ *
+ * @param string $file Filename which will be included. e.g. "inc/example.php".
+ * @return NULL
+ * @version (2005/09/22)
+ */
 function jp7_include($file){
 	if(!@include "../../".$file)@include jp7_doc_root().$file;
 }
 
-// jp7_path_find (2005/05/01)
+/**
+ * Attempts to find a file on the directories above the current directory and, if it fails, it points to the root.
+ *
+ * @param string $file Filename.
+ * @return string Path to the file.
+ * @version (2005/05/01)
+ */
 function jp7_path_find($file){
 	$path="";
 	$ok=false;
@@ -1603,15 +1736,38 @@ function jp7_path_find($file){
 	else return $path.$file;
 }
 
-// jp7_extension (2003/08/25)
+/**
+ * Gets the extension of a file.
+ *
+ * @param string $S Filename.
+ * @return string Extension of the file or "---" if no extension is found.
+ * @version (2003/08/25)
+ */
 function jp7_extension($S){
 	$path_parts=pathinfo($S);
 	$ext=trim($path_parts["extension"]." ");
 	return (!$ext)?"---":$ext;
 }
 
-// 2007/08/01 by JP
-function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=true,$attachments=""){
+/**
+ * Formats and sends an e-mail message.
+ *
+ * @param string $to Receiver, or receivers of the mail.
+ * @param string $subject Subject of the email to be sent. 
+ * @param string $message Message to be sent.
+ * @param string $headers String to be inserted at the begin of the email header (only if $html is <tt>FALSE</tt>).
+ * @param string $parameters Additional parameters to the program configured to use when sending mail using the sendmail_path configuration setting.
+ * @param string $template Path to the template file.
+ * @param bool $html If <tt>FALSE</tt> will send the message on the text-only format. The default value is <tt>TRUE</tt>.
+ * @param string $attachments
+ * @see http://www.php.net/manual/en/function.mail.php
+ * @global bool
+ * @return bool Returns <tt>TRUE</tt> if the mail was successfully accepted for delivery, <tt>FALSE</tt> otherwise.
+ * @author JP
+ * @version (2007/08/01)
+ */
+function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=TRUE,$attachments=""){
+	global $debug;
 	// TEXT
 	if(strpos($message,"<br>")!==false){
 		$text_hr="";
@@ -1634,11 +1790,9 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 			$message_html=str_replace("\r\n","<br>\r\n",$message_html); // Linux to Mail Format
 		}
 		if($template){
-			global $HTTP_HOST;
-			global $SCRIPT_NAME;
 			@ini_set("allow_url_fopen","1");
 			if((!dirname($template)||dirname($template)==".")&&@ini_get("allow_url_fopen")){
-				$template="http://".$HTTP_HOST.dirname($SCRIPT_NAME)."/".$template;
+				$template="http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME'])."/".$template;
 			}
 			if($pos1=strpos($template,"?")){
 				//$template=substr($template,0,$pos1+1).urlencode(substr($template,$pos1+1));
@@ -1710,7 +1864,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	if($GLOBALS['c_server_type']!="Principal")$to="debug@jp7.com.br";
 	$mail=mail($to,$subject,$message,$headers,$parameters);
 	if(!$mail)$mail=mail($to,$subject,$message,$headers); // Safe Mode
-	global $debug;if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
+	if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
 	return $mail;
 }
 
