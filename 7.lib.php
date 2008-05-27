@@ -1763,6 +1763,7 @@ function jp7_extension($S){
  * @see http://www.php.net/manual/en/function.mail.php
  * @global bool
  * @return bool Returns <tt>TRUE</tt> if the mail was successfully accepted for delivery, <tt>FALSE</tt> otherwise.
+ * @todo The parameter $attachments is not used.
  * @author JP
  * @version (2007/08/01)
  */
@@ -1868,67 +1869,97 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	return $mail;
 }
 
-// jp7_image_text (2006/04/07)
-function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,$padding="0 0 0 0",$shadow=false,$antialiasing=""){
-	$im=ImageCreateFromPng($filename_src);
+/**
+ * Write text to the image using TrueType fonts, shadows are supported.
+ *
+ * @param string $filename_src Path to the PNG image.
+ * @param string $filename_dst The path to save the file to.
+ * @param float $size The font size. Depending on your version of GD, this should be specified as the pixel size (GD1) or point size (GD2).
+ * @param float $angle The angle in degrees, with 0 degrees being left-to-right reading text. Higher values represent a counter-clockwise rotation.
+ * @param int|string $x The coordinates given by x and y will define the basepoint of the first character (roughly the lower-left corner of the character). The available values are an integer value or the strings "center", right" and "trim".
+ * @param int|string $y The y-ordinate. This sets the position of the fonts baseline, not the very bottom of the character. The available values are an integer value or "center".
+ * @param string $col RGB string with its values separated by comma, e.g. "255,0,0" would be the color red.
+ * @param string $fontfile The path to the TrueType font you wish to use.
+ * @param string $text The text string in UTF-8 encoding. If a character is used in the string which is not supported by the font, a hollow rectangle will replace the character. 
+ * @param string $padding Padding for the text, using CSS-like format, the default value is "0 0 0 0".
+ * @param array|bool $shadow Array containing "color" (RGB string separated by comma),  "x" and "y" (the coordinates of the shadow), the default value is <tt>FALSE</tt>.
+ * @param string $antialiasing If it receives the char "-" (minus) the antialiasing is turned off, the default value is "".
+ * @return NULL
+ * @version (2006/04/07)
+ */
+function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,$padding="0 0 0 0",$shadow=FALSE,$antialiasing=""){
+	$im=imagecreatefrompng($filename_src);
 	$col_arr=explode(",",$col);
-	$col_arr=ImageColorAllocate($im,$col_arr[0],$col_arr[1],$col_arr[2]);
+	$col_arr=imagecolorallocate($im,$col_arr[0],$col_arr[1],$col_arr[2]);
 	if($x!=="center"&&$shadow){
 		$shadow_color=explode(",",$shadow[color]);
-		if(function_exists('ImageColorAllocateAlpha'))$shadow_color=ImageColorAllocateAlpha($im,$shadow_color[0],$shadow_color[1],$shadow_color[2],$shadow_color[3]);
-		else $shadow_color=ImageColorAllocate($im,$shadow_color[0],$shadow_color[1],$shadow_color[2]);
-		ImageTTFText($im,$size,$angle,$x+$shadow[x],$y+$shadow[y],$shadow_color,$fontfile,$text);
+		if(function_exists('imagecolorallocatealpha'))$shadow_color=imagecolorallocatealpha($im,$shadow_color[0],$shadow_color[1],$shadow_color[2],$shadow_color[3]);
+		else $shadow_color=imagecolorallocate($im,$shadow_color[0],$shadow_color[1],$shadow_color[2]);
+		imagettftext($im,$size,$angle,$x+$shadow[x],$y+$shadow[y],$shadow_color,$fontfile,$text);
 	}
-	ImageTTFText($im,$size,$angle,($x==="center"||$x==="right"||$x==="trim")?0:$x,($y==="center")?0:$y,$antialiasing.$col_arr,$fontfile,$text);
-	ImagePng($im,$filename_dst);
-	ImageDestroy($im);
+	imagettftext($im,$size,$angle,($x==="center"||$x==="right"||$x==="trim")?0:$x,($y==="center")?0:$y,$antialiasing.$col_arr,$fontfile,$text);
+	imagepng($im,$filename_dst);
+	imagedestroy($im);
 	// Center
 	if($x==="center"||$y==="center"){
-		$im=imageCreateFromPng($filename_dst);
+		$im=imagecreatefrompng($filename_dst);
 		$padding=explode(" ",$padding);
 		$center=imagettfbbox($size,$angle,$fontfile,$text);
 		if($x==="center"){
 			$x=$center[4]+1;
-			$x=(ImageSX($im)-$x-$padding[3])/2;
+			$x=(imagesx($im)-$x-$padding[3])/2;
 		}
 		if($y=="center"){
 			$y=$center[5]+1;
-			$y=(ImageSY($im)-$y-$padding[0])/2;
+			$y=(imagesy($im)-$y-$padding[0])/2;
 		}
 		if($x!=="center")jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,"",$shadow,$antialiasing);
-		ImageDestroy($im);
+		imagedestroy($im);
 	// Right
 	}elseif($x==="right"){
-		$im=imageCreateFromPng($filename_dst);
+		$im=imagecreatefrompng($filename_dst);
 		$padding=explode(" ",$padding);
 		$right=imagettfbbox($size,$angle,$fontfile,$text);
 		if($x==="right"){
 			$x=$right[4];
-			$x=(ImageSX($im)-$x-$padding[1]);
+			$x=(imagesx($im)-$x-$padding[1]);
 		}
 		if($x!=="right")jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,"",$shadow,$antialiasing);
-		ImageDestroy($im);
+		imagedestroy($im);
 	// Trim
 	}elseif($x==="trim"){
-		$im=imageCreateFromPng($filename_dst);
+		$im=imagecreatefrompng($filename_dst);
 		$padding=explode(" ",$padding);
 		$x=imagettfbbox($size,$angle,$fontfile,$text);
 		$x=$x[4]+1;
 		if($x!=="trim"){
-			$im2=imageCreate($x+$padding[1]+$padding[3],imagesy($im));
+			$im2=imagecreate($x+$padding[1]+$padding[3],imagesy($im));
 			$im_bg=imagecolorsforindex($im,imagecolorat($im,1,1));
 			$im_bg=imagecolorallocate($im2,$im_bg["red"],$im_bg["green"],$im_bg["blue"]);
 			imagefill($im2,0,0,$im_bg);
 			imagecolortransparent($im2,$im_bg);
-			imagecopymerge($im2,$im,$padding[1],0,0,0,$x+$padding[1]+$padding[3],ImageSY($im),100);
+			imagecopymerge($im2,$im,$padding[1],0,0,0,$x+$padding[1]+$padding[3],imagesy($im),100);
 			imagepng($im2,$filename_dst);
-			imageDestroy($im2);
+			imagedestroy($im2);
 		}
-		ImageDestroy($im);
+		imagedestroy($im);
 	}
 }
 
-// jp7_resizeImage (2006/08/17)
+/**
+ * Resizes an image to the specified dimensions.
+ *
+ * @param resource $im_src An image resource, returned by one of the image creation functions, such as imagecreatefromjpeg().
+ * @param string $src Path to the source image. 
+ * @param string $dst Path to the destination image. 
+ * @param int $w Destination width. 
+ * @param int $h Destination height. 
+ * @param int $q Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
+ * @param int $s Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
+ * @return NULL
+ * @todo Line 1986 and Line 1990 - "$dst_h=$w;" need to be checked. Line 1996 - "if(filesize($src)/1000>$s)" a 10MB from filesize would become 10KB, which goes against what the comments are saying ("$s=10000000;// 10 MB").
+ * @version (2006/08/17)
+ */
 function jp7_resizeImage($im_src,$src,$dst,$w,$h,$q=90,$s=10000000){
 	$c_gd=function_exists("imagecreatefromjpeg");
 	// Check Size and Orientation (Horizontal x Vertical)
@@ -1991,23 +2022,39 @@ function jp7_resizeImage($im_src,$src,$dst,$w,$h,$q=90,$s=10000000){
 	}
 }
 
-// jp7_encode_mimeheader (2005/12/08)
+/**
+ * Attempts to encode a given string by the MIME header encoding scheme. 
+ *
+ * @param string $S The string to be encoded.
+ * @param string $charset Specifies the name of the character set in which the string is represented in, the default value is "iso-8859-1".
+ * @param string $transfer_encoding Specifies the scheme of MIME encoding. It should be either "B" (Base64) or "Q" (Quoted-Printable), the default value is "Q".
+ * @see http://www.php.net/manual/en/function.mb-encode-mimeheader.php
+ * @return string If mb_encode_mimeheader() exists it returns the converted version of the string represented in ASCII, otherwise it returns the input string.
+ * @version (2005/12/08)
+ */
 function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
 	return (function_exists("mb_encode_mimeheader"))?mb_encode_mimeheader($S,$charset,$transfer_encoding,(strpos($_ENV["OS"],"Windows")===false||!$_ENV["OS"])?"\n":"\r\n"):$S;
 }
 
-// jp7_index (2008/01/11 by JP)
+
+/**
+ * 
+ *
+ * @param string $lang 
+ * @return NULL
+ * @author JP
+ * @version (2008/01/11)
+ */
 function jp7_index($lang=""){
 	session_start();
-	global $HTTP_HOST;
-	global $HTTP_ACCEPT;
+	//global $HTTP_ACCEPT;
 	global $HTTP_USER_AGENT;
 	global $is;
 	global $path;
 	global $publish;
 	global $s_interadmin_preview;
 	$path=dirname($_SERVER["SCRIPT_NAME"]);
-	$path=jp7_path("http://".$HTTP_HOST.$path);
+	$path=jp7_path("http://".$_SERVER['HTTP_HOST'].$path);
 	// Publish Check
 	$admin_time=@filemtime("interadmin.log");
 	$index_time=@filemtime("site/home/index_P.htm");
@@ -2110,11 +2157,11 @@ function jp7_debug($msgErro=null, $sql=null, $sendMail=true){
 }
 
 /**
- * XOR encrypts a given string with a given key phrase.
+ * Encrypts a given string with a given key phrase.
  *
- * @param     string    $InputString    Input string
- * @param     string    $KeyPhrase      Key phrase
- * @return    string    Encrypted string    
+ * @param string $InputString Input string
+ * @param string $KeyPhrase Key phrase
+ * @return string Encrypted string    
  */    
 function XOREncryption($InputString, $KeyPhrase){
  
