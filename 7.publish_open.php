@@ -11,6 +11,10 @@ if ($publish && !$s_interadmin_preview && !$interadmin_gerar_menu) {
 		$publish_file = $lang->path . basename($_SERVER['PHP_SELF'], '.php') . '_P.' . $publish_file_type;
 	} else {
 		$publish_file = $_SERVER['REQUEST_URI'];
+		$pos1 = strpos($publish_file, '?');
+		if ($pos1 !== false) {
+			$publish_file = substr($publish_file, 0, $pos1);
+		}
 		$pos1 = strrpos($publish_file, '/');
 		if ($pos1 == strlen($publish_file) - 1) {
 			$publish_file .= 'index.php';

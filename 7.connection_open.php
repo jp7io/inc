@@ -33,17 +33,26 @@ $lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang']
 @include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 
 // DB Connection
-if ($db_type == 'mysql' || $db_type == '') {
+//if (!$db_adodb && ($db_type == 'mysql' || $db_type == '')) {
+if ($db_mysql) {
 	//$db = mysql_connect($db_host, $db_user, $db_pass) or die ('Could not connect');
 	@$db = mysql_connect($db_host, $db_user, $db_pass) or die (jp7_debug(mysql_error(), null, false));	
 	mysql_select_db($db_name, $db);
+	include (dirname(__FILE__) . '/3thparty/adodb/adodb.inc.php');
+	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
+	$ADODB_LANG = 'pt-br';
+	//$db_type - Ex.: odbc, mssql, mysql, etc.
+	$dsn = "mysql://{$db_user}:{$db_pass}@{$db_host}/{$db_name}"; 
+	$adodb = ADONewConnection($dsn);
 } else {
+	if(!$db_type)$db_type='mysql';
 	include (dirname(__FILE__) . '/3thparty/adodb/adodb.inc.php');
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
 	//$db_type - Ex.: odbc, mssql, mysql, etc.
 	$dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}"; 
-	$db = ADONewConnection($dsn); 
+	$db = ADONewConnection($dsn);
+	$adodb = $db;
 	//$db->debug = true;
 }
 

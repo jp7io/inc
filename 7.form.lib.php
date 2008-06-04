@@ -92,11 +92,11 @@ function interadmin_returnCampo($campo){
 				$sql="SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
 				" WHERE parent_id_tipo=".$campo_nome.
 				" ORDER BY ordem,nome";
-				$rs=mysql_query($sql,$db);
-				while($row=mysql_fetch_object($rs)){
+				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+				while($row=$rs->FetchNextObj()){
 					$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
 				}
-				mysql_free_result($rs);
+				$rs->Close();
 			}
 		}else{
 			$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
@@ -125,7 +125,7 @@ function interadmin_returnCampo($campo){
 					break;
 			}
 		}
-		$form="<input type=\"".((strpos($campo,"password_")===0)?"password":"text")."\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress.">";
+		$form="<input type=\"".((strpos($campo,"password_")===0)?"password":"text")."\"".((strpos($campo,"password_")===0)?" xtype=\"password\"":"")." name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress.">";
 	}
 	$form.="<input type=\"hidden\" name=\"".$campo."_xtra[]\" value=\"".$xtra."\"".$readonly.">";
 	if($readonly&&$valor_default)$form.="<input type=\"hidden\" name=\"".$campo."[]\" value=\"".$valor."\">";
@@ -189,6 +189,14 @@ function interadmin_returnCampo($campo){
 					"<td colspan=2>".$form."</td>".
 					"<td>".$S_ajuda."</td>".
 				"</tr>\n";
+				if(strpos($campo,"password_")===0){
+					echo "".
+					"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+						"<th title=\"".$campo."_check\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>".
+						"<td colspan=2><input type=\"password\" xtype=\"password\" name=\"".$campo."[]\" label=\"Confirmação de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>".
+						"<td>".$S_ajuda."</td>".
+					"</tr>\n";
+				}
 			}else{
 				echo $form;
 			}
@@ -217,13 +225,13 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	if($db_type) 
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	else 
-		$rs=mysql_query($sql,$db);
+		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while($row=($db_type)?$rs->FetchNextObj():mysql_fetch_object($rs)){
 		$campos=interadmin_tipos_campos($row->campos);
 		$select_lang=$row->language;
 		$select_tabela=$row->tabela;
 	}
-	($db_type)?$rs->Close():mysql_free_result($rs);
+	($db_type)?$rs->Close():$rs->Close();
 	// Combo Fields
 	if($campos){
 		foreach($campos as $select_campo){
@@ -256,7 +264,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	if($db_type) 
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	else 
-		$rs=mysql_query($sql,$db);
+		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	$S='';
 	for($i=0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
@@ -294,7 +302,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		else $R.="<option value=\"".$row->id."\"".(($selected)?" SELECTED style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"").">"./*substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</option>\n";
 		//if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
 	}
-	($db_type)?$rs->Close():mysql_free_result($rs);
+	($db_type)?$rs->Close():$rs->Close();
 	return $R;
 }
 
@@ -307,14 +315,14 @@ function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$pre
 	" WHERE parent_id_tipo=".$parent_id_tipo_2.
 	$sql_where.
 	" ORDER BY ordem,nome";
-	$rs=mysql_query($sql,$db);
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	$S='';
 	for($i=0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
 		else $S.='> ';
 	}
 	$i=0;
-	while($row=mysql_fetch_object($rs)){
+	while($row=$rs->FetchNextObj()){
 		if(is_array($current_id_tipo))$selected=in_array($row->id_tipo,$current_id_tipo);
 		else $selected=($row->id_tipo==$current_id_tipo);
 		if(interadmin_tipos_nome($parent_id_tipo_2)=="Classes"||$classes)$classes=true;
@@ -329,7 +337,7 @@ function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$pre
 		if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name,$classes,$readonly);
 		$i++;
 	}
-	mysql_free_result($rs);
+	$rs->Close();
 }
 
 // jp7_DF_sendMail (2007/08/06 by JP)
@@ -343,7 +351,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 		if(strpos($key,"DF_")===0||$key=="debug")eval("\$".$key."=\"".$value."\";");
 	}
 	if($debug){
-		$DF_to=($DF_from)?$DF_from:"debug@sites.jp7.com.br";
+		$DF_to=($DF_from)?$DF_from:"debug@jp7.com.br";
 		$DF_to_name.=" (Debug)";
 	}
 	if(!$DF_client)$DF_client=$DF_to;
@@ -412,14 +420,23 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 			if(!$debug/*&&!@ini_get("safe_mode")*/)$headers.=strtoupper(substr($key,3)).": ".$value."\r\n";
 		}elseif(strpos($key,"DF_spacer")===0){
 			$message.="<br>\r\n";
+		}elseif(strpos($key,"_select_multi")!==false){
+			$value=str_replace(" ,","<br>",$value); // PC to HTML
+			$value=str_replace("<br>","<br>\r\n",$value); // HTML to HTML with CRLF
+			$message.="<font size=1><b>".substr($key,0,strlen($key)-13).":</b></font>&nbsp;<br>\r\n".
+			"<div style=\"background:#F2F2F2;margin-top:3px;padding:5px;border:1px solid #CCC\">\r\n".
+			"<font face=\"verdana\" size=2 color=\"#000000\" style=\"font-size:13px\">\r\n".
+			toHTML($value,true)."\r\n".
+			"</font>\r\n".
+			"</div>\r\n";
 		}elseif(strpos($key,"_textarea")!==false){
 			$value=str_replace("\r\n","<br>",$value); // PC to HTML
 			$value=str_replace("\r","<br>",$value); // Mac to HTML
 			$value=str_replace("\n","<br>",$value); // Linux to HTML
 			$value=str_replace("<br>","<br>\r\n",$value); // HTML to HTML with CRLF
 			$message.="<font size=1><b>".substr($key,0,strlen($key)-9).":</b></font>&nbsp;<br>\r\n".
-			"<div style=\"background:#F2F2F2;margin-top:3;padding:5;border:1px solid #CCC\">\r\n".
-			"<font face=\"verdana\" size=2 color=\"#000000\">\r\n".
+			"<div style=\"background:#F2F2F2;margin-top:3px;padding:5px;border:1px solid #CCC\">\r\n".
+			"<font face=\"verdana\" size=2 color=\"#000000\" style=\"font-size:13px\">\r\n".
 			toHTML($value,true)."\r\n".
 			"</font>\r\n".
 			"</div>\r\n";
@@ -535,65 +552,65 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 					// Selects Multi
 					if($key_out&&is_int(intval($key_out))){
 						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
-						$rs=mysql_query($sql,$db);
-						if($row=mysql_fetch_object($rs))$key_out=$row->nome;
-						mysql_free_result($rs);
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+						if($row=$rs->FetchNextObj())$key_out=$row->nome."_select_multi";
+						$rs->Close();
 					}
 					if($value/*&&is_int(intval($value))*/){
 						if($campo[xtra]){
 							$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo IN (".$value.")";
-							$rs=mysql_query($sql,$db);
-							while($row=mysql_fetch_object($rs)){
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							while($row=$rs->FetchNextObj()){
 								$value_arr[]=$row->nome;
 							}
-							mysql_free_result($rs);
+							$rs->Close();
 						}else{
 							$sql="SELECT varchar_key FROM ".$db_prefix." WHERE id IN (".$value.")";
-							$rs=mysql_query($sql,$db);
-							while($row=mysql_fetch_object($rs)){
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							while($row=$rs->FetchNextObj()){
 								$value_arr[]=$row->varchar_key;
 							}
-							mysql_free_result($rs);
+							$rs->Close();
 						}
-						$value=join(",",$value_arr);
+						$value=join(" ,",$value_arr);
 					}
 				}elseif(strpos($key,"select_")===0){
 					// Selects
 					if($key_out&&is_int(intval($key_out))){
 						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
-						$rs=mysql_query($sql,$db);
-						if($row=mysql_fetch_object($rs))$key_out=$row->nome;
-						mysql_free_result($rs);
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+						if($row=$rs->FetchNextObj())$key_out=$row->nome;
+						$rs->Close();
 					}
 					if($value&&is_int(intval($value))){
 						if($campo[xtra]){
 							$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($value);
-							$rs=mysql_query($sql,$db);
-							if($row=mysql_fetch_object($rs))$value=$row->nome;
-							mysql_free_result($rs);
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							if($row=$rs->FetchNextObj())$value=$row->nome;
+							$rs->Close();
 						}else{
 							$sql="SELECT varchar_key FROM ".$db_prefix." WHERE id=".intval($value);
-							$rs=mysql_query($sql,$db);
-							if($row=mysql_fetch_object($rs))$value=$row->varchar_key;
-							mysql_free_result($rs);
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							if($row=$rs->FetchNextObj())$value=$row->varchar_key;
+							$rs->Close();
 						}
 					}
 				}elseif(strpos($key,"parent_id")===0){
 					// Parent ID
 					if($value){
 						$sql="SELECT id_tipo,varchar_key FROM ".$db_prefix." WHERE id=".$value;
-						$rs=mysql_query($sql,$db);
-						$row=mysql_fetch_object($rs);
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+						$row=$rs->FetchNextObj();
 						$key_out=$row->id_tipo;
 						$value=$row->varchar_key;
-						mysql_free_result($rs);
+						$rs->Close();
 					}
 					if($key_out){
 						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".$key_out;
-						$rs=mysql_query($sql,$db);
-						$row=mysql_fetch_object($rs);
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+						$row=$rs->FetchNextObj();
 						$key_out=$row->nome;
-						mysql_free_result($rs);
+						$rs->Close();
 					}
 				}
 				if(strpos($key,"text_")===0){

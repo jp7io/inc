@@ -11,9 +11,9 @@ class InterAdmin{
 	 * @param varchar $_db_prefix
 	 * @return object
 	 */
-	function __construct($id = '', $_db_prefix = ''){
-		$this->id = $id;
-		$this->db_prefix = ($_db_prefix) ? $_db_prefix : $GLOBALS['db_prefix'];
+	function __construct($id, $_db_prefix=''){
+		$this->id=$id;
+		$this->db_prefix=($_db_prefix)?$_db_prefix:$GLOBALS['db_prefix'];
 	}
 	function __get($var){
 		if($var == 'id'){
@@ -39,22 +39,6 @@ class InterAdmin{
 		}
 	}
 	/**
-	 * @return mixed
-	 */
-	function setFieldsValues($fields_values){
-		if ($this->id) {
-			foreach ($fields_values as $key=>$value) {
-				$GLOBALS['setFieldsValues_' . $this->id . '_' . $key] = $value;
-			}
-			jp7_db_insert($this->db_prefix, 'id', $this->id, 'setFieldsValues_' . $this->id . '_');
-		} else {
-			foreach ($fields_values as $key=>$value) {
-				$GLOBALS['setFieldsValues_' . $key] = $value;
-			}
-			$this->id = jp7_db_insert($this->db_prefix, 'id', 0, 'setFieldsValues_');
-		}
-	}
-	/**
 	 * @return object
 	 */
 	function getTipo(){
@@ -65,19 +49,18 @@ class InterAdmin{
 	 * @param int $id_tipo
 	 * @return array
 	 */
-	function getChildren($id_tipo,$orderby=""){
+	function getChildren($id_tipo){
 		global $db;
 		global $jp7_app;
 		$sql="SELECT id FROM ".$this->db_prefix.
 		" WHERE id_tipo=".$id_tipo.
 		((!$jp7_app) ? " AND deleted<>'S'" : "").
-		" AND parent_id=".$this->id.
-		(($orderby)?" ORDER BY ".$orderby:"");
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		while($row = $rs->FetchNextObj()){
-			$interadmins[]=new InterAdmin($row->id, $this->db_prefix);
+		" AND parent_id=".$this->id;
+		$rs=mysql_query($sql)or die(mysql_error());
+		while($row=mysql_fetch_array($rs)){
+			$interadmins[]=new InterAdmin($row['id'], $this->db_prefix);
 		}
-		$rs->Close();
+		mysql_free_result($rs);
 		return $interadmins;
 	}
 	/**
@@ -86,6 +69,7 @@ class InterAdmin{
 	function getURL(){
 		return $this->getTipo()->getURL().'?id='.$this->id;
 	}
+	
 }
 
 /**
@@ -126,55 +110,32 @@ class InterAdminTipo{
 		global $db;
 		$sql="SELECT id_tipo FROM ".$this->db_prefix."_tipos".
 		" WHERE parent_id_tipo=".$this->id_tipo;
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		while($row = $rs->FetchNextObj()){
-			$interadminsTipos[]=new InterAdminTipo($row->id_tipo, $this->db_prefix);
+		$rs=mysql_query($sql)or die(mysql_error());
+		while($row=mysql_fetch_array($rs)){
+			$interadminsTipos[]=new InterAdminTipo($row['id_tipo'], $this->db_prefix);
 		}
-		$rs->Close();
+		mysql_free_result($rs);
 		return $interadminsTipos;
 	}
 	/**
 	 * @return array
 	 */
-	function getInterAdmins($where = null){
+	function getInterAdmins(){
 		global $db;
-		$sql = "SELECT id FROM " . $this->db_prefix.
-		" WHERE id_tipo=" . $this->id_tipo;
-		if($where) $sql .= " AND ({$where})";
-		//$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		while($row = $rs->FetchNextObj()){
-			$interadmins[] = new InterAdmin($row->id, $this->db_prefix);
+		$sql="SELECT id FROM ".$this->db_prefix.
+		" WHERE id_tipo=".$this->id_tipo;
+		$rs=mysql_query($sql)or die(mysql_error());
+		while($row=mysql_fetch_array($rs)){
+			$interadmins[]=new InterAdmin($row['id'], $this->db_prefix);
 		}
-		$rs->Close();
+		mysql_free_result($rs);
 		return $interadmins;
 	}
 	/**
 	 * @return ?
 	 */
 	function getCampos(){
-		$campos				= $this->getFieldsValues('campos');
-		$campos_parameters	= array("tipo", "nome", "ajuda", "tamanho", "obrigatorio", "separador", "xtra", "lista", "orderby", "combo", "readonly", "form", "label", "permissoes", "default");
-		$campos				= split("{;}", $campos);
-		for($i = 0; $i < count($campos); $i++){
-			$parameters = split("{,}", $campos[$i]);
-			if($parameters[0]){
-				$A[$parameters[0]]['ordem'] = ($i+1);
-				$isSelect = (strpos($parameters[0], 'select_') !== false);
-				for($j = 0 ; $j < count($parameters); $j++){
-					$A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
-				}
-				if($isSelect && $A[$parameters[0]]['nome']!='all'){
-					$id_tipo = $A[$parameters[0]]['nome'];
-					$Cadastro_r = new InterAdminTipo($id_tipo);	
-					$A[$parameters[0]]['children'] = $Cadastro_r->getCampos();
-					//jp7_print_r($parameters[0]);
-					//jp7_print_r($A[$parameters[0]]['nome']);
-				}
-			}
-		}
-		return $A;
-		//return interadmin_tipos_campos($this->getFieldsValues('campos'));
+		return interadmin_tipos_campos($this->getFieldsValues('campos'));
 	}
 	/**
 	 * @return string

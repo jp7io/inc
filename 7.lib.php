@@ -7,6 +7,7 @@
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.09 (2008/05/08)
  * @package JP7_Core
+ * @todo Use FALSE instead of NULL on default values for bool parameters, "" (or ''?) on strings, and 0 on int.
  */
 
 /**
@@ -25,7 +26,7 @@ if(!@ini_get("allow_url_fopen"))@ini_set("allow_url_fopen","1");
  * @return string Formatted string.
  * @version (2006/01/18)
  */
-function toId($S,$tofile=false,$separador=""){
+function toId($S,$tofile=FALSE,$separador=""){
 	if($separador)$S=str_replace(" ",$separador,$S);
 	$S=preg_replace("([·‡„‚‰¡¿√¬ƒ™])","a",$S);
 	$S=preg_replace("([ÈËÍÎ…» À&])","e",$S);
@@ -50,10 +51,15 @@ function toId($S,$tofile=false,$separador=""){
  *
  * @param string $S String to be formatted.
  * @return string Formatted string.
- * @version (2008/05/21)
+ * @version (2008/05/27)
  */
 function toSeo($S) {
-	$S = toId($S, false, '-');
+	$S = str_replace(':', '',$S);
+	$S = str_replace(',', '',$S);
+	$S = str_replace('?', '',$S);
+	$S = str_replace(' - ', '-',$S);
+	$S = str_replace('.', '',$S);
+	$S = toId($S, FALSE, '-');
 	return $S;
 }
 
@@ -215,12 +221,13 @@ function toForm($S){
  * @param string $S String to be formatted.
  * @param bool $HTML If <tt>FALSE</tt> (default) the line breaks are replaced by <br />
  * @param bool $busca_replace If <tt>TRUE</tt> the function uses the regex string ($busca_varchar or $busca_text, passed by globals) to replace values. <tt>FALSE</tt> is the default value.
+ * @global string
+ * @global string
  * @return string Formatted string.
  * @version (2004/06/14)
  */
-function toHTML($S,$HTML=false,$busca_replace=false){
-	global $busca_varchar;
-	global $busca_text;
+function toHTML($S,$HTML=FALSE,$busca_replace=FALSE){
+	global $busca_varchar, $busca_text;
 	$busca=($busca_varchar)?$busca_varchar:$busca_text;
 	if($S){
 		if(!$HTML)$S=str_replace(chr(13)," <br /> ",$S);
@@ -360,7 +367,7 @@ function checkReferer($S, $protocol="http"){
  * Shrinks the input string and adds "..." if it is larger than the maximum length, the input string is not changed if its shorter.
  *
  * @param string $S Input string.
- * @param int $size Max. lenght of the output string.
+ * @param int $length Max. lenght of the output string.
  * @return string Shrunk string.
  * @version (2004/02/28)
  * @global string
@@ -421,7 +428,7 @@ function jp7_password($length=6){
  * @version (2008/02/06)
  * @author JP
  */
-function jp7_print_r($S,$return=false){
+function jp7_print_r($S,$return=FALSE){
 	$S="<pre>".print_r($S,1)."</pre>";
 	if($return)return $S;
 	else echo $S;
@@ -432,7 +439,7 @@ function jp7_print_r($S,$return=false){
  *
  * @param string $date String containing a date/time on the format Y-m-d H:i:s or Y/m/d H:i:s.
  * @return array Array containing the following keys: Y, m, M, d, H, i, s and y.
- * @version (2004/03/04)
+ * @version (2008/05/27)
  */
 function jp7_date_split($date){
 	$date=str_replace(" ",",",$date);
@@ -443,7 +450,8 @@ function jp7_date_split($date){
 	return array(
 		Y=>$date[0],
 		m=>$date[1],
-		M=>jp7_date_month($date[1]),
+		M=>jp7_date_month($date[1],true),
+		F=>jp7_date_month($date[1]),
 		d=>$date[2],
 		H=>$date[3],
 		i=>$date[4],
@@ -487,7 +495,7 @@ function jp7_date_format($date,$format="d/m/Y"){
  * @return string Textual representation for the day of the week.
  * @version (2006/04/27)
  */
-function jp7_date_week($w,$sigla=false){
+function jp7_date_week($w,$sigla=FALSE){
 	global $lang;
 	switch($lang->lang){
 		case "en":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
@@ -507,7 +515,7 @@ function jp7_date_week($w,$sigla=false){
  * @return string Textual representation of a month.
  * @version (2004/06/14)
  */
-function jp7_date_month($m,$sigla=false){
+function jp7_date_month($m,$sigla=FALSE){
 	global $lang;
 	switch($lang->lang){
 		case "en":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
@@ -575,11 +583,11 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 	$sql="SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while($row=$rs->FetchNextObj()){
-		$meta_cols=$db->MetaColumns($table, false);
+		$meta_cols=$db->MetaColumns($table, FALSE);
 		foreach ($meta_cols as $meta){
 			$name=$meta->name;
 			// Dates
-			if(strpos($meta->type,"date")!==false){
+			if(strpos($meta->type,"date")!==FALSE){
 				$GLOBALS[$var_prefix.$name]=$row->$name;
 				$GLOBALS[$var_prefix.$name."_split"]=jp7_date_split($row->$name);
 				$GLOBALS[$var_prefix.$name."_time"]=strtotime($row->$name);
@@ -605,7 +613,7 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
  * @author JP, Cristiano
  * @version (2007/12/17)
  */
-function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=true){
+function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=TRUE){
 	global $db;
 	
 	$table_columns=$db->MetaColumnNames($table);
@@ -1130,6 +1138,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @param string $order SQL string to be placed after the "ORDER BY" statement, the default value is "int_key,date_publish,varchar_key".
  * @param string $field Name of the field which will be used as label on the list, the default value is "varchar_key".
  * @param string $sql_where Additional SQL string to be placed after the "WHERE" statement, it must start with "AND ", the default value is "".
+ * @param bool $seo.
  * @global ADOConnection
  * @global bool
  * @global string
@@ -1137,7 +1146,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @author JP
  * @version (2007/01/27)
  */
-function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where=""){
+function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=false){
 	global $db, $s_interadmin_preview, $l_selecione;
 	//global $id;
 	if($type=="list"){
@@ -1159,8 +1168,13 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	" ORDER BY ".$order;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while($row=$rs->FetchNextObj()){
-		if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
-		else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
+		if($seo){
+			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
+			else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
+		}else{
+			if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
+			else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
+		}
 	}
 	$rs->Close();
 	if($type=="list"){
@@ -1710,10 +1724,14 @@ function jp7_doc_root(){
  *
  * @param string $file Filename which will be included. e.g. "inc/example.php".
  * @return NULL
- * @version (2005/09/22)
+ * @version (2008/05/28)
  */
 function jp7_include($file){
-	if(!@include "../../".$file)@include jp7_doc_root().$file;
+	if ($GLOBALS['debug_filename']) echo '<div class="filename">' . $file . '</div>';
+	$include = @include $file;
+	if (!$include) {
+		if (!@include '../../' . $file) @include jp7_doc_root() . $file;
+	}
 }
 
 /**
@@ -2036,11 +2054,14 @@ function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
 	return (function_exists("mb_encode_mimeheader"))?mb_encode_mimeheader($S,$charset,$transfer_encoding,(strpos($_ENV["OS"],"Windows")===false||!$_ENV["OS"])?"\n":"\r\n"):$S;
 }
 
-
 /**
- * 
+ * Performs common tasks on index pages, caching and redirecting to the home page.
  *
- * @param string $lang 
+ * @param string $lang Current language.
+ * @global Browser
+ * @global string
+ * @global bool
+ * @global bool
  * @return NULL
  * @author JP
  * @version (2008/01/11)
@@ -2048,11 +2069,7 @@ function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
 function jp7_index($lang=""){
 	session_start();
 	//global $HTTP_ACCEPT;
-	global $HTTP_USER_AGENT;
-	global $is;
-	global $path;
-	global $publish;
-	global $s_interadmin_preview;
+	global $is, $path, $publish, $s_interadmin_preview;
 	$path=dirname($_SERVER["SCRIPT_NAME"]);
 	$path=jp7_path("http://".$_SERVER['HTTP_HOST'].$path);
 	// Publish Check
@@ -2066,39 +2083,63 @@ function jp7_index($lang=""){
 		$path=$path.(($lang&&$lang!="pt-br")?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_interadmin_preview)?"?s_interadmin_preview=".$s_interadmin_preview:"");
 		@ini_set("allow_url_fopen","1");
 		//if(!@include $path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($HTTP_USER_AGENT))header("Location: ".$path);
-		if(!@readfile($path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($HTTP_USER_AGENT)))header("Location: ".$path);
+		if(!@readfile($path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
 	//}
 }
 
-// jp7_host (2005/08/10)
+/**
+ * Checks if one of the specified hosts is the current host.
+ *
+ * @param string $hosts List of hosts separated by comma (,).
+ * @return bool Returns <tt>TRUE</tt> if the current host is found.
+ * @author JP
+ * @version (2005/08/10)
+ */
 function jp7_host($hosts){
-	global $HTTP_HOST;
 	$hosts=explode(",",$hosts);
 	foreach($hosts as $host){
-		if(strpos($HTTP_HOST,$host)!==false){
-			return true;
+		if(strpos($_SERVER['HTTP_HOST'],$host)!==FALSE){
+			return TRUE;
 			exit;
 		}
 	}
 }
 
+/**
+ * Checks if its c_jp7 to return the string.
+ *
+ * @param string $filename Input string.
+ * @return string If the global variable "c_jpj" is evaluated as <tt>TRUE</tt> it returns the input string, otherwise it returns an empty string.
+ * @todo What is this used for?
+ */
 function getFileName($filename){
 	return ($GLOBALS["c_jp7"])?$filename:"";
 }
 
-/* get file size */
 
+/**
+ * Gets file size
+ *
+ * @param string $file Path to the file.
+ * @return string Size of the file in KB or MB.
+ * @todo Where does $url_size come from?
+ */
 function jp7_file_size($file){
 	$file = ceil(@filesize($file)/1000);
 	$file = ($url_size<1000)?ceil($file)."KB":round($file/1000,1)."MB";
 	return $file;
 }
 
+
 /**
- * Comando para depurar saida de erros
+ * Gets and formats the backtrace of an error, optionally sends it on an e-mail and shows user friendly maintenance screen.
  *
- */  
-function jp7_debug($msgErro=null, $sql=null, $sendMail=true){
+ * @param string $msgErro Error message, the default is <tt>NULL</tt>.
+ * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
+ * @param bool $sendMail If <tt>TRUE</tt> sends an email.
+ * @return string HTML formatted backtrace.
+ */
+function jp7_debug($msgErro=NULL, $sql=NULL, $sendMail=TRUE){
 	$backtrace=debug_backtrace();krsort($backtrace);
 	$erroDetalhesArray=reset($backtrace);
 	$S="<pre style=\"background-color:#FFFFFF;font-size:11px;text-align:left;padding:10px;\">";	
@@ -2138,7 +2179,7 @@ function jp7_debug($msgErro=null, $sql=null, $sendMail=true){
 		$headers .= "From: " . $to . " <" . $to . ">\r\n";
 		$parameters = "";
 		//$template="form_htm.php";
-		$html=true;
+		$html=TRUE;
 		$to='debug+' . $cliente . '@jp7.com.br';
 		jp7_mail($to,$subject,$message,$headers,$parameters,$template,$html);
 		if($GLOBALS['c_server_type']=="Principal"){
@@ -2183,21 +2224,31 @@ function XOREncryption($InputString, $KeyPhrase){
     return $InputString;
 }
  
-// Helper functions, using base64 to
-// create readable encrypted texts:
- 
+/**
+ * Encrypts a given string with a given key phrase.
+ *
+ * @param string $InputString Input string
+ * @param string $KeyPhrase Key phrase
+ * @return string Encrypted string    
+ */    
 function XOREncrypt($InputString, $KeyPhrase){
     $InputString = XOREncryption($InputString, $KeyPhrase);
     $InputString = urlencode($InputString);
     return $InputString;
 }
- 
+
+/**
+ * Decrypts a given string with a given key phrase.
+ *
+ * @param string $InputString Input string
+ * @param string $KeyPhrase Key phrase
+ * @return string Decrypted string    
+ */ 
 function XORDecrypt($InputString, $KeyPhrase){
     $InputString = urldecode($InputString);
     $InputString = XOREncryption($InputString, $KeyPhrase);
     return $InputString;
 }
-
 
 // Autoload
 /*
@@ -2235,5 +2286,8 @@ function classFolder($className,$folder="classes") {
 
 // Actions
 jp7_register_globals();
+/*
+ * @global bool $c_jp7
+ */
 $c_jp7=($REMOTE_ADDR=="201.6.156.39"||$REMOTE_ADDR=="192.168.0.2"||$REMOTE_HOST=="192.168.0.2"||$LOCAL_ADDR=="192.168.0.2"||$SERVER_ADDR=="192.168.0.2");
 ?>
