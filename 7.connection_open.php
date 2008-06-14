@@ -24,7 +24,7 @@ if($c_template)include $c_doc_root . '_templates/' . $c_template . '/config.php'
 @session_start();
 
 // PHPMyAdmin
-if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
+if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === FALSE && !$only_info) {
 
 // Language
 $lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();

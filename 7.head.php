@@ -11,9 +11,7 @@
 <? if($c_template){?>
 	<link rel="stylesheet" type="text/css" href="/_templates/<?=$c_template?>/css/style.css" />
 <? }?>
-<? if($debug_filename){?>
-	<style>div.filename{display:block}</style>
-<? }?>
+<? echo $debugger->debugStyle; ?>
 <? if(!$c_w3c){?><script type="text/javascript">if(document.getElementById&&!document.all)document.write('<link rel="stylesheet" href="../../css/<?=$c_site?>_ns.css">')</script><?}?>
 <script type="text/javascript">
 var d=document

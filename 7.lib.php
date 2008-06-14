@@ -11,11 +11,37 @@
  */
 
 /**
- * Configuring "allow_url_fopen" and "error_reporting".
+ * Setting "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
  */
-if($REMOTE_ADDR=="201.6.156.39"||$LOCAL_ADDR="192.168.0.2")error_reporting(E_ALL ^ E_NOTICE);
+if ($REMOTE_ADDR == '201.6.156.39' || $LOCAL_ADDR = '192.168.0.2') error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
-if(!@ini_get("allow_url_fopen"))@ini_set("allow_url_fopen","1");
+if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
+jp7_register_globals();
+
+/*
+ * @global bool $c_jp7
+ */
+$c_jp7 = ($REMOTE_ADDR == '201.6.156.39' || $REMOTE_ADDR == '192.168.0.2' || $REMOTE_HOST == '192.168.0.2' || $LOCAL_ADDR == '192.168.0.2' || $SERVER_ADDR == '192.168.0.2');
+
+/*
+ * @global Debug $debugger
+ */
+$debugger = new Debug();
+
+/**
+ * @global Browser $is
+ */
+$is = new Browser($HTTP_USER_AGENT);
+
+/**
+ * Includes a class in case it hasn't been defined yet.
+ *
+ * @param string $className Name of the class
+ * @return NULL Nothing is returned
+ */
+function __autoload($className){
+	require_once(jp7_path_find('../classes/' . $className . '.class.php'));
+}
 
 /**
  * Takes off diacritics and empty spaces from a string, if $tofile is <tt>FALSE</tt> (default) the case is changed to lowercase.
@@ -47,20 +73,63 @@ function toId($S,$tofile=FALSE,$separador=""){
 }
 
 /**
- * Takes off diacritics and replace spaces with - from a string
+ * Takes off diacritics from a string and replace special characters and empty spaces by '-'. 
  *
  * @param string $S String to be formatted.
  * @return string Formatted string.
- * @version (2008/05/27)
+ * @author JP, update by Carlos
+ * @version (2008/06/12) 
  */
 function toSeo($S) {
-	$S = str_replace(':', '',$S);
-	$S = str_replace(',', '',$S);
-	$S = str_replace('?', '',$S);
-	$S = str_replace(' - ', '-',$S);
-	$S = str_replace('.', '',$S);
+	/*$S = str_replace(' - ', '-',$S);
+	$S = str_replace('/', '-',$S);
+	$S=preg_replace("([·‡„‚‰¡¿√¬ƒ™])","a",$S);
+	$S=preg_replace("([ÈËÍÎ…» À&])","e",$S);
+	$S=preg_replace("([ÌÏÓÔÕÃŒœ])","i",$S);
+	$S=preg_replace("([ÛÚıÙˆ”“’‘÷∫])","o",$S);
+	$S=preg_replace("([˙˘˚¸⁄Ÿ€‹])","u",$S);
+	$S=preg_replace("([Á«])","c",$S);
+	$S=preg_replace("([Ò—])","n",$S);
+	$S = preg_replace("([^(\d\w- )])",'',$S);
 	$S = toId($S, FALSE, '-');
-	return $S;
+	return $S;*/
+	$S = preg_replace("([·‡„‚‰¡¿√¬ƒ™])", 'a', $S);
+	$S = preg_replace("([ÈËÍÎ…» À&])", 'e', $S);
+	$S = preg_replace("([ÌÏÓÔÕÃŒœ])", 'i', $S);
+	$S = preg_replace("([ÛÚıÙˆ”“’‘÷∫])", 'o', $S);
+	$S = preg_replace("([˙˘˚¸⁄Ÿ€‹])", 'u', $S);
+	$S = preg_replace("([Á«])", 'c', $S);
+	$S = preg_replace("([Ò—])", 'n', $S);
+	$S = preg_replace("([^\d\w]+)", ' ', $S);
+	$S = str_replace(' ', '-', trim($S));
+	return strtolower($S);
+}
+
+/**
+ * Generates a SQL WHERE statement with REGEXP for 'decoding' the toSeo() function.
+ *
+ * @param string $field Field where the data will be searched, e.g. varchar_key.
+ * @param string $str String to be formatted and searched.
+ * @param string $regexp Optional REGEXP string, the default value is '[^(\d\w)+]?'.
+ * @return string Formatted SQL WHERE statement with a REGEXP.
+ * @author Carlos
+ * @version (2008/06/12) 
+ */
+function toSeoSearch($field, $str, $regexp = '[^\d\w+]?'){
+	$str = str_replace('-', '', $str);
+	$sqlwhere = $regexp;
+	for ($i=0; $i < strlen($str); $i++){
+		$char = $str[$i];
+		$char = str_replace('a', '[a·‡„‚‰¡¿√¬ƒ™]', $char);
+		$char =	str_replace('e', '[eÈËÍÎ…» À&]', $char);
+		$char = str_replace('i', '[iÌÏÓÔÕÃŒœ]', $char);
+		$char =	str_replace('o', '[oÛÚıÙˆ”“’‘÷∫]', $char);
+		$char =	str_replace('u', '[u˙˘˚¸⁄Ÿ€‹]', $char);
+		$char =	str_replace('c', '[cÁ«]', $char);
+		$char =	str_replace('n', '[nÒ—]', $char);
+		$sqlwhere .= $char . $regexp;
+	}
+	return $field . " REGEXP '" . $sqlwhere . "'";
 }
 
 /**
@@ -74,7 +143,7 @@ function toSeo($S) {
  */
 function wap_toHTML($S){
 	global $html;
-	if(!$html)$S=str_replace("$","$$",$S);
+	if(!$html)$S = str_replace("$","$$",$S);
 	$S=str_replace(chr(13),"<br/>",$S);
 	$S=str_replace("<br>","<br/>",$S);
 	$S=preg_replace("([·‡„‚‰™])","a",$S);
@@ -92,95 +161,6 @@ function wap_toHTML($S){
 	$S=preg_replace("([«])","C",$S);
 	$S=preg_replace("([—])","N",$S);
 	return $S;
-}
-
-/**
- * @global Browser $is
- */
-$is=new Browser($HTTP_USER_AGENT);
-
-/**
- * class Browser
- *
- * @version (2005/11/18)
- * @subpackage Browser
- */
-class Browser{
-	/**
-	 * Checks browser, browser version, and whether it's a robot or not
-	 *
-	 * @param string $useragent Browser information from $HTTP_USER_AGENT.
-	 * @return Browser
-	 */	
-	function Browser($useragent){
-		$this->userAgent=$useragent;
-		$i=0;
-		if(strpos($useragent,"Safari")){
-			$this->browser="sa";
-			$this->v=5;
-		}elseif(strpos($useragent,"Opera")){
-			$this->browser="op";
-			$i=strpos($useragent,"Opera")+6;
-		}elseif(strpos($useragent,"MSIE")){
-			$this->browser="ie";
-			$i=strpos($useragent,"MSIE")+4;
-		}elseif(strpos($useragent,"Mozilla/")!==false&&strpos($useragent,"compatible")===false){
-			$this->browser="ns";
-			$i=strpos($useragent,"Mozilla/")+8;
-		}elseif(strpos($useragent,"Mozilla/5.0")!==false){
-			$this->browser="mo";
-			$this->v=5;
-		}else{
-			$this->browser=$useragent;
-			$this->v=-1;
-		}
-		$this->sa=($this->browser=="sa");
-		$this->op=($this->browser=="op");
-		$this->ie=($this->browser=="ie");
-		$this->ns=($this->browser=="ns");
-		$this->mo=($this->browser=="mo");
-		$version = "";
-		while(!$this->v){
-			$c=substr($useragent,$i++,1);
-			if(is_numeric($c)||$c=="."||$c==" ")$version.="$c";
-			else $this->v=($version)?doubleval($version):-1;
-		}
-		$this->ns4=($this->ns&&$version<5);
-		if(strpos($useragent,"Win"))$this->os="win";
-		elseif(strpos($useragent,"Mac"))$this->os="mac";
-		elseif(strpos($useragent,"Unix"))$this->os="unx";
-		elseif(strpos($useragent,"Linux"))$this->os="lnx";
-		elseif(strpos($useragent,"SunOS"))$this->os="sol";
-		else $this->os=null;
-		$this->win=($this->os=="win");
-		$this->mac=($this->os=="mac");
-		$this->unx=($this->os=="unx");
-		$this->lnx=($this->os=="lnx");
-		$this->sol=($this->os=="sol");
-		// Robots	
-		if($this->browser==$useragent){
-			$robots=array(
-				"wget",
-				"getright",
-				"yahoo",
-				"altavista",
-				"lycos",
-				"infoseek",
-				"lwp",
-				"webcrawler",
-				"linkexchange",
-				"slurp",
-				"google"
-			);
-			for($i=0;$i<count($robots);$i++){
-				if(strpos(strtolower($useragent),$robots[$i])!==false){
-					$this->robot=$robots[$i];
-					$this->browser="robot";
-					break;
-				}
-			}
-		}
-	}
 }
 
 /**
@@ -358,9 +338,10 @@ function checkReferer($S, $protocol="http"){
 	}
 	*/
 	if(!dirname($S)||dirname($S)=="."){
-		$S = $protocol."://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . "/" . $S;
+		$S_parent = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname(dirname($_SERVER['REQUEST_URI'])) . '/' . $S;
+		$S = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $S;
 	}
-	return (strpos($_SERVER['HTTP_REFERER'],$S) === 0);
+	return (strpos($_SERVER['HTTP_REFERER'], $S) === 0 || strpos($_SERVER['HTTP_REFERER'], $S_parent) === 0);
 }
 
 /**
@@ -388,7 +369,7 @@ function jp7_string_left($S, $length){
  * Sets global variables using values from superglobals if "register_globals" is OFF, emulating this feature.
  *
  * @global string
- * @todo Check if this function could be flagged as "deprecated", and check the order its creating globals, cause $_GET variables could override $_SESSION variables creating problems.
+ * @todo Check if this function could be flagged as "deprecated".
  * @version (2007/03/03)
  */
 function jp7_register_globals(){
@@ -686,104 +667,10 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
  *
  * @version (2007/02/22)
  * @subpackage jp7_db_pages
+ * @deprecated Kept as an alias to Pagination class.
  */
-class jp7_db_pages{
-	/**
-	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie ($this->htm).
-	 *
-	 * @param string $sql SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
-	 * @param int $limit Itens per page, the default value is 10.
-	 * @param int $page Current page, the default value is 1.
- 	 * @param string $type Type of the pagination, the available types are "combo", "numbers-top", "numbers-bottom", the default value is "".
-	 * @param int $numbers_limit Maximum number of pages listed, the default value is 1000.
-	 * @param string $parameters Values to be inserted before the query string when creating links for the pages, the default value is "".
-	 * @param string $separador Separator which will be placed between two pages, default value is "|".
-	 * @param string $go_char Character used on the "Next" button or link.
-	 * @param string $back_char Character used on the "Back" button or link.
-	 * @param string $go_char_plus Character used on the "Last" button or link.
-	 * @param string $back_char_plus Character used on the "First" button or link.
-	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
-	 * @global ADOConnection
-	 * @global ADORecordSet
-	 * @return string|jp7_db_pages If neither $sql nor $records is given the string "[aa]" is returned.
-	 * @author JP, Cristiano
-	 * @version (2007/02/22)
-	 */
-	function jp7_db_pages($sql=NULL,$limit=10,$page=1,$type="",$numbers_limit=1000,$parameters="",$separador="|",$go_char="&gt;",$back_char="&lt;",$go_char_plus="&raquo;",$back_char_plus="&laquo;",$records=NULL){
-		global $db, $rs;
-		if(!$page)$page=1;
-
-		if($sql){
-			if($GLOBALS["jp7_app"])$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-			else $rs=interadmin_query($sql);		
-			$row=$rs->FetchNextObj();
-			$this->records=$row->records;
-			$rs->Close();
-		}else{
-			if($records)
-				$this->records=$records;
-			else
-				return '[aa]';
-		}
-		
-		$this->total=ceil($this->records/$limit);
-		$this->page=$page;
-		//$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
-		$this->limit=$limit;
-		$this->init=(($page-1)*$limit);
-		
-		// HTM
-		$this->query_string=preg_replace("(&p_page=[0-9]+)","", $_SERVER['QUERY_STRING']);		
-		$this->query_string=str_replace("go_url=".$_GET["go_url"],"",$this->query_string);
-		//$this->query_string=substr($this->query_string,1);
-		
-		foreach($_POST as $key=>$value){
-			if($key!="p_page")$this->query_string.="&".$key."=".$value;
-		}
-		
-		if($this->total){
-			if($this->total>1){
-				// Numbers
-				$this->htm_numbers_extra=$this->htm_numbers="<div class=\"numbers\"><ul>";
-				$min=$page;
-				$max=$min+$numbers_limit-1;
-				if($max>$this->total){ 
-					$min=$this->total-$numbers_limit+1;
-					$max=$this->total;
-				}
-				if($min<1){
-					$min=1;
-				}
-
-				if($page!=1&&$this->total>2&&$page>2)$this->htm_numbers_extra.="<li class=\"".(($page==1)?"back-off":"bgleft_plus")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=1'\">".$back_char_plus."</li>";
-				$this->htm_numbers_extra.="<li class=\"".(($page==1)?"back-off":"bgleft")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".($page-1)."'\">".$back_char."</li>";
-				for($i=$min;$i<=$max;$i++){
-					$this->htm_numbers.="<li".(($i==$page)?" class=\"on\"":"")." onclick=\"location='?".$parameters.$this->query_string."&p_page=".$i."'\">".$i."</li>";
-					$this->htm_numbers_extra.="<li".(($i==$page)?" class=\"on\"":"")." onclick=\"location='?".$parameters.$this->query_string."&p_page=".$i."'\">".$i."</li>";
-					if($i!=$max){$this->htm_numbers.="<li>".$separador."</li>";$this->htm_numbers_extra.="<li>".$separador."</li>";}
-				}
-				$this->htm_numbers_extra.="<li class=\"".(($page==$this->total)?"go-off":"bgright")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".($page+1)."'\">".$go_char."</li>";
-				if($page!=$this->total&&$this->total>2&&$page<($this->total-1))$this->htm_numbers_extra.="<li class=\"".(($page==$this->total)?"go-off":"bgright_plus")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".$this->total."'\">".$go_char_plus."</li>";
-				$this->htm_numbers_extra.="</ul></div>";
-				$this->htm_numbers.="</ul></div>";
-			}
-			// Combo
-			$this->htm_combo="<div class=\"text\">P·gina</div>".
-			"<select onchange=\"location='?".$parameters.$this->query_string."&p_page='+this[selectedIndex].value\">\n".
-			"<script>jp7_num_combo(1,".$this->total.",".$page.")</script>".
-			"</select>\n<div class=\"text\">de ".$this->total."</div>\n";
-			// Buttons
-			$this->htm_back="<input type=\"button\" class=\"back".(($page==1)?" back-off":"")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".($page-1)."'\"".(($page==1)?" disabled":"").">\n";
-			$this->htm_go="<input type=\"button\" class=\"go".(($page==$this->total)?" go-off":"")."\" onclick=\"location='?".$parameters.$this->query_string."&p_page=".($page+1)."'\"".(($page==$this->total)?" disabled":"").">\n";
-			// Types
-			$this->htm="<div class=\"jp7_db_pages\" style=\"width:auto\"><div class=\"".$type."\">\n";
-			if($type=="combo")$this->htm.=$this->htm_back.$this->htm_combo.$this->htm_go;
-			elseif($type=="numbers-top")$this->htm.=$this->htm_numbers.$this->htm_back.$this->htm_go;
-			elseif($type=="numbers-bottom")$this->htm.=$this->htm_back.$this->htm_go.$this->htm_numbers;
-			else $this->htm.=$this->htm_back.$this->htm_numbers.$this->htm_go;
-			$this->htm.="</div></div>\n";
-		}
-	}
+class jp7_db_pages extends Pagination{
+	// Alterado o nome para Pagination
 }
 
 /**
@@ -935,7 +822,7 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
  * @author JP
  * @version (2007/03/04)
  */
-function interadmin_query($sql,$sql_db="",$sql_debug=FALSE,$numrows=NULL,$offset=NULL){	
+function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NULL, $offset = NULL){	
 	global $c_publish;
 	global $c_path_upload;
 	global $s_interadmin_user;
@@ -943,35 +830,34 @@ function interadmin_query($sql,$sql_db="",$sql_debug=FALSE,$numrows=NULL,$offset
 	global $db;
 	global $db_prefix;
 	global $lang;
-		
-	$DbNow=$db->BindTimeStamp(date("Y-m-d H:i:s"));
-	
+	global $debugger;
+
+	$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
+
 	// Debug
-	if($sql_debug||($GLOBALS[debug_sql]&&$GLOBALS[c_jp7])){
-		$sql_original_debug=preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>',$sql,1);
-		echo "<div style=\"width:auto;color:#ccc;background:#333;border:1px solid gray;font-weight:normal\">".$sql_original_debug."</div>";
-	}
+	//$debugger->showSql($sql, $sql_debug, '#FF0000');
+
 	// Split
-	$sql_slipt=preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'),'{;}\1\2',$sql,1);
-	$sql_slipt=explode("{;}",$sql_slipt);
-	foreach($sql_slipt as $value){
-		if(!$sql_select&&strpos($value,"SELECT ")!==false)$sql_select=$value;
-		if(!$sql_from&&strpos($value,"FROM ")!==false)$sql_from=$value;
-		if(!$sql_where&&strpos($value,"WHERE ")!==false)$sql_where=$value;
-		if(!$sql_final&&strpos($value,"ORDER BY ")!==false)$sql_final=$value;
+	$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
+	$sql_slipt = explode("{;}", $sql_slipt);
+	foreach ($sql_slipt as $value) {
+		if(!$sql_select && strpos($value, "SELECT ") !== FALSE) $sql_select = $value;
+		if(!$sql_from && strpos($value, "FROM ") !== FALSE) $sql_from = $value;
+		if(!$sql_where && strpos($value, "WHERE ") !== FALSE) $sql_where = $value;
+		if(!$sql_final && strpos($value, "ORDER BY ") !== FALSE) $sql_final = $value;
 	}
 	// Parser
-	preg_match_all("(([^ ,]+) AS ([^ ,]+))",$sql_from,$out,PREG_PATTERN_ORDER);
-	if(count($out[1])){
+	preg_match_all("(([^ ,]+) AS ([^ ,]+))", $sql_from, $out, PREG_PATTERN_ORDER);
+	if (count($out[1])) {
 		// Com Alias
 		foreach($out[1] as $key=>$value){
-			$alias=$out[2][$key];
+			$alias = $out[2][$key];
 			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
 			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
 			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".$DbNow."' AND ".$alias.".char_key<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
 			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
 		}
-	}else{
+	} else {
 		// Sem Alias
 		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)",$sql_from,$out,PREG_PATTERN_ORDER);
 		foreach($out[0] as $key=>$value){
@@ -979,31 +865,25 @@ function interadmin_query($sql,$sql_db="",$sql_debug=FALSE,$numrows=NULL,$offset
 			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ",$sql_where);
 			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND publish<>''":"")." AND ",$sql_where);
 		}
-		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
+		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
 	}
 	// Join
-	$sql=$sql_select.$sql_from.$sql_where.$sql_final;
+	$sql = $sql_select . $sql_from . $sql_where . $sql_final;
 	// Debug
-	if($sql_debug||($GLOBALS[debug_sql]&&$GLOBALS[c_jp7])){
-		$sql_debug=preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>',$sql,1);
-		echo "<div style=\"width:auto;color:#333;background:#ccc;border:1px solid gray;font-weight:normal\">".$sql_debug."</div>";
-	}
+	$debugger->showSql($sql, $sql_debug);
+
 	// Return
 	//if($db_type){
 		if($sql_db){
-			
 			if(isset($numrows) && isset($offset))
-				$rs_pre=$sql_db->SelectLimit($sql,$numrows,$offset)or die(jp7_debug($db->ErrorMsg(),$sql));
+				$rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
 			else
-			$rs_pre=$sql_db->Execute($sql)or die(jp7_debug($sql_db->ErrorMsg(),$sql));
-				
+				$rs_pre = $sql_db->Execute($sql) or die(jp7_debug($sql_db->ErrorMsg(), $sql));
 		} else{
-		
-			if(isset($numrows) && isset($offset))
-				$rs_pre=$db->SelectLimit($sql,$numrows,$offset)or die(jp7_debug($db->ErrorMsg(),$sql));
-		else
-			$rs_pre=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-				
+			if (isset($numrows) && isset($offset))
+				$rs_pre = $db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
+			else
+				$rs_pre = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
 	/*}else{
 		if($sql_db)
@@ -1012,7 +892,7 @@ function interadmin_query($sql,$sql_db="",$sql_debug=FALSE,$numrows=NULL,$offset
 			$rs_pre=mysql_query($sql,$db) or die(jp7_debug(mysql_error(), $sql));
 	}*/
 			
-	if($rs&&$sql)eval("global \$".$rs.";\$".$rs."=\$rs_pre;");
+	if ($rs && $sql) eval("global \$" . $rs . ";\$" . $rs . "=\$rs_pre;");
 	else return $rs_pre;
 }
 
@@ -1362,6 +1242,7 @@ class jp7_lang{
  * @author Thiago
  * @version (2007/07/10)
  * @subpackage interadmin_tipos
+ * @deprecated It will be incorporated and suplanted by InterAdminTipos
  */
 class interadmin_tipos{
 	/**
@@ -1462,6 +1343,13 @@ class interadmin_tipos{
 				$this->path=implode("/",$this->nome_id);
 				$this->path_title=implode("/",$this->nome);
 			}
+		}
+		$path_seo = '';
+		$path_seo_arr = array();
+		foreach ((array) $this->nome as $key=>$nome) {
+			$path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
+			$path_seo_arr[] = $path_seo;
+			$this->path_seo[] = '/' . $GLOBALS['c_path'] . implode('/', $path_seo_arr);
 		}
 	}
 }
@@ -1682,13 +1570,14 @@ function jp7_interlog($id_cliente,$host="jp7.com.br",$db_name_interlog="interlog
  * Adds a trailing slash on a path, in case it doesn't have one.
  *
  * @param string $S Input String (Path, URL).
+ * @param bool $reverse If <tt>TRUE</tt> the trailing slash is removed instead of added, the default value is <tt>FALSE</tt>.
  * @return string String with a trailing slash.
  * @version (2003/08/25)
  */
-function jp7_path($S){
-	return (strrpos($S,"/")+1==strlen($S)||!$S)?$S:$S."/";
+function jp7_path($S, $reverse = FALSE){
+	if ($reverse) return (substr($S, strlen($S) - 1) == '/') ? substr($S, 0, strlen($S) - 1) : $S; 
+	else return (strrpos($S,'/') + 1 == strlen($S) || !$S) ? $S : $S . '/';
 }
-
 
 /**
  * Attempts to find the root directory.
@@ -1723,11 +1612,14 @@ function jp7_doc_root(){
  * Attempts to include a file from two levels above and, if it fails, tries from the root.
  *
  * @param string $file Filename which will be included. e.g. "inc/example.php".
+ * @global Debug
  * @return NULL
- * @version (2008/05/28)
+ * @version (2008/06/13)
+ * @deprecated Instead of using this function use "include jp7_path_find('folder/filename.php');"
  */
 function jp7_include($file){
-	if ($GLOBALS['debug_filename']) echo '<div class="filename">' . $file . '</div>';
+	global $debugger;
+	if ($debugger) $debugger->showFilename($file);
 	$include = @include $file;
 	if (!$include) {
 		if (!@include '../../' . $file) @include jp7_doc_root() . $file;
@@ -1738,20 +1630,24 @@ function jp7_include($file){
  * Attempts to find a file on the directories above the current directory and, if it fails, it points to the root.
  *
  * @param string $file Filename.
+ * @global Debug
  * @return string Path to the file.
- * @version (2005/05/01)
+ * @author JP, Carlos
+ * @version (2008/06/13)
  */
-function jp7_path_find($file){
-	$path="";
-	$ok=false;
-	$i=0;
-	while(!$ok&&$i<5){
-		$path.="../";
-		$ok=@file_exists($path.$file);
+function jp7_path_find($file) {
+	global $debugger;
+	$path = '';
+	$ok = FALSE;
+	$i = 0;
+	while(!$ok && $i < 10) {
+		if ($i) $path .= '../';
+		$ok = @file_exists($path . $file);
 		$i++;
 	}
-	if(!$ok)return jp7_doc_root().$file;
-	else return $path.$file;
+	if ($debugger) $debugger->showFilename($path . $file);
+	if ($ok) return $path . $file;
+	else return (strpos($file, '../') !== FALSE) ? jp7_doc_root() . $file : $file;
 }
 
 /**
@@ -1761,10 +1657,10 @@ function jp7_path_find($file){
  * @return string Extension of the file or "---" if no extension is found.
  * @version (2003/08/25)
  */
-function jp7_extension($S){
-	$path_parts=pathinfo($S);
-	$ext=trim($path_parts["extension"]." ");
-	return (!$ext)?"---":$ext;
+function jp7_extension($S) {
+	$path_parts = pathinfo($S);
+	$ext = trim($path_parts['extension'] . ' ');
+	return (!$ext) ? "---" : $ext;
 }
 
 /**
@@ -2096,9 +1992,9 @@ function jp7_index($lang=""){
  * @version (2005/08/10)
  */
 function jp7_host($hosts){
-	$hosts=explode(",",$hosts);
+	$hosts = explode(',', $hosts);
 	foreach($hosts as $host){
-		if(strpos($_SERVER['HTTP_HOST'],$host)!==FALSE){
+		if (strpos($_SERVER['HTTP_HOST'], $host) !== FALSE){
 			return TRUE;
 			exit;
 		}
@@ -2106,30 +2002,27 @@ function jp7_host($hosts){
 }
 
 /**
- * Checks if its c_jp7 to return the string.
+ * Checks if its c_jp7 to return the filename.
  *
  * @param string $filename Input string.
  * @return string If the global variable "c_jpj" is evaluated as <tt>TRUE</tt> it returns the input string, otherwise it returns an empty string.
- * @todo What is this used for?
+ * @deprecated jp7_path_find() has replaced this function when it comes to show filenames for debugging
  */
 function getFileName($filename){
 	return ($GLOBALS["c_jp7"])?$filename:"";
 }
-
 
 /**
  * Gets file size
  *
  * @param string $file Path to the file.
  * @return string Size of the file in KB or MB.
- * @todo Where does $url_size come from?
  */
 function jp7_file_size($file){
-	$file = ceil(@filesize($file)/1000);
-	$file = ($url_size<1000)?ceil($file)."KB":round($file/1000,1)."MB";
+	$file = ceil(@filesize($file) / 1000);
+	$file = ($file < 1000) ? ceil($file) . 'KB' : round($file / 1000, 1) . 'MB';
 	return $file;
 }
-
 
 /**
  * Gets and formats the backtrace of an error, optionally sends it on an e-mail and shows user friendly maintenance screen.
@@ -2139,9 +2032,10 @@ function jp7_file_size($file){
  * @param bool $sendMail If <tt>TRUE</tt> sends an email.
  * @return string HTML formatted backtrace.
  */
-function jp7_debug($msgErro=NULL, $sql=NULL, $sendMail=TRUE){
-	$backtrace=debug_backtrace();krsort($backtrace);
-	$erroDetalhesArray=reset($backtrace);
+function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
+	$backtrace = debug_backtrace();
+	krsort($backtrace);
+	$erroDetalhesArray = reset($backtrace);
 	$S="<pre style=\"background-color:#FFFFFF;font-size:11px;text-align:left;padding:10px;\">";	
 	$S.="<strong style=\"color:red\">       ERRO:</strong> ".$msgErro."\n";
 	$S.="<strong style=\"color:red\">    ARQUIVO:</strong> ".$erroDetalhesArray['file']."\n";	
@@ -2182,8 +2076,8 @@ function jp7_debug($msgErro=NULL, $sql=NULL, $sendMail=TRUE){
 		$html=TRUE;
 		$to='debug+' . $cliente . '@jp7.com.br';
 		jp7_mail($to,$subject,$message,$headers,$parameters,$template,$html);
-		if($GLOBALS['c_server_type']=="Principal"){
-			$S = "Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para <a href=\"debug@jp7.com.br\">debug@jp7.com.br</a>";
+		if($GLOBALS['c_server_type'] == 'Principal'){
+			$S = 'Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header("Location: /em_manutencao.htm");
 			//Caso nao funcione o header, tenta por javascript
 			?>
@@ -2202,35 +2096,25 @@ function jp7_debug($msgErro=NULL, $sql=NULL, $sendMail=TRUE){
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase
- * @return string Encrypted string    
+ * @return string Encrypted string
  */    
 function XOREncryption($InputString, $KeyPhrase){
- 
     $KeyPhraseLength = strlen($KeyPhrase);
- 
-    // Loop trough input string
-    for ($i = 0; $i < strlen($InputString); $i++){
- 
-        // Get key phrase character position
-        $rPos = $i % $KeyPhraseLength;
- 
-        // Magic happens here:
-        $r = ord($InputString[$i]) ^ ord($KeyPhrase[$rPos]);
- 
-        // Replace characters
-        $InputString[$i] = chr($r);
+    for ($i = 0; $i < strlen($InputString); $i++){   // Loop trough input string
+        $rPos = $i % $KeyPhraseLength; // Get key phrase character position
+        $r = ord($InputString[$i]) ^ ord($KeyPhrase[$rPos]); // Magic happens here:
+        $InputString[$i] = chr($r); // Replace characters
     }
- 
     return $InputString;
 }
- 
+
 /**
  * Encrypts a given string with a given key phrase.
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase
- * @return string Encrypted string    
- */    
+ * @return string Encrypted string
+ */
 function XOREncrypt($InputString, $KeyPhrase){
     $InputString = XOREncryption($InputString, $KeyPhrase);
     $InputString = urlencode($InputString);
@@ -2242,8 +2126,8 @@ function XOREncrypt($InputString, $KeyPhrase){
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase
- * @return string Decrypted string    
- */ 
+ * @return string Decrypted string
+ */
 function XORDecrypt($InputString, $KeyPhrase){
     $InputString = urldecode($InputString);
     $InputString = XOREncryption($InputString, $KeyPhrase);
@@ -2283,11 +2167,4 @@ function classFolder($className,$folder="classes") {
   return 0;
 }
 */
-
-// Actions
-jp7_register_globals();
-/*
- * @global bool $c_jp7
- */
-$c_jp7=($REMOTE_ADDR=="201.6.156.39"||$REMOTE_ADDR=="192.168.0.2"||$REMOTE_HOST=="192.168.0.2"||$LOCAL_ADDR=="192.168.0.2"||$SERVER_ADDR=="192.168.0.2");
 ?>
