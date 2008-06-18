@@ -70,7 +70,4 @@ if ($tipos->restrito[1] || $tipos->restrito[$tipos->i-1]) include '../../inc/log
 
 // /PHPMyAdmin
 }
-
-// Publish
-include $c_doc_root . 'inc/7.publish_open.php';
 ?>

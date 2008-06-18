@@ -5,23 +5,31 @@
  * Contains the main custom functions and classes
  * @author JP7 (last update by Carlos)
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version 1.09 (2008/05/08)
+ * @version 1.10 (2008/06/16)
  * @package JP7_Core
- * @todo Use FALSE instead of NULL on default values for bool parameters, "" (or ''?) on strings, and 0 on int.
  */
 
 /**
- * Setting "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
+ * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
  */
-if ($REMOTE_ADDR == '201.6.156.39' || $LOCAL_ADDR = '192.168.0.2') error_reporting(E_ALL ^ E_NOTICE);
-else error_reporting(0);
-if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
-jp7_register_globals();
+if (!$_SERVER['SERVER_ADDR']) $_SERVER['SERVER_ADDR'] = $_SERVER['LOCAL_ADDR'];
+/**
+ * In case $_SERVER['REMOTE_ADDR'] is not set, it gets the value from $_SERVER['REMOTE_HOST'], needed on some Windows servers.
+ */
+if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 
 /*
  * @global bool $c_jp7
  */
-$c_jp7 = ($REMOTE_ADDR == '201.6.156.39' || $REMOTE_ADDR == '192.168.0.2' || $REMOTE_HOST == '192.168.0.2' || $LOCAL_ADDR == '192.168.0.2' || $SERVER_ADDR == '192.168.0.2');
+$c_jp7 = ($_SERVER['REMOTE_ADDR'] == '201.6.156.39' || $_SERVER['SERVER_ADDR'] == '192.168.0.2');
+
+/**
+ * Setting "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
+ */
+if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
+else error_reporting(0);
+if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
+jp7_register_globals();
 
 /*
  * @global Debug $debugger
@@ -31,7 +39,7 @@ $debugger = new Debug();
 /**
  * @global Browser $is
  */
-$is = new Browser($HTTP_USER_AGENT);
+$is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 /**
  * Includes a class in case it hasn't been defined yet.
@@ -40,7 +48,7 @@ $is = new Browser($HTTP_USER_AGENT);
  * @return NULL Nothing is returned
  */
 function __autoload($className){
-	require_once(jp7_path_find('../classes/' . $className . '.class.php'));
+	if (strpos($className, 'PMA_') !== 0) require_once(jp7_path_find('../classes/' . $className . '.class.php'));
 }
 
 /**
@@ -52,23 +60,23 @@ function __autoload($className){
  * @return string Formatted string.
  * @version (2006/01/18)
  */
-function toId($S,$tofile=FALSE,$separador=""){
-	if($separador)$S=str_replace(" ",$separador,$S);
-	$S=preg_replace("([·‡„‚‰¡¿√¬ƒ™])","a",$S);
-	$S=preg_replace("([ÈËÍÎ…» À&])","e",$S);
-	$S=preg_replace("([ÌÏÓÔÕÃŒœ])","i",$S);
-	$S=preg_replace("([ÛÚıÙˆ”“’‘÷∫])","o",$S);
-	$S=preg_replace("([˙˘˚¸⁄Ÿ€‹])","u",$S);
-	$S=preg_replace("([Á«])","c",$S);
-	$S=preg_replace("([Ò—])","n",$S);
+function toId($S,$tofile = FALSE, $separador=''){
+	if ($separador) $S = str_replace(' ', $separador, $S);
+	$S = preg_replace("([·‡„‚‰¡¿√¬ƒ™])", 'a', $S);
+	$S = preg_replace("([ÈËÍÎ…» À&])", 'e', $S);
+	$S = preg_replace("([ÌÏÓÔÕÃŒœ])", 'i', $S);
+	$S = preg_replace("([ÛÚıÙˆ”“’‘÷∫])", 'o', $S);
+	$S = preg_replace("([˙˘˚¸⁄Ÿ€‹])", 'u', $S);
+	$S = preg_replace("([Á«])", 'c', $S);
+	$S = preg_replace("([Ò—])", 'n', $S);
 	if($tofile){
-		$S=preg_replace("([^(\d\w)])","_",$S);
+		$S = preg_replace("([^(\d\w)])", '_', $S);
 	}else{
-		$S=preg_replace("([^(\d\w)])",$separador,$S);
-		$S=strtolower($S);
+		$S = preg_replace("([^(\d\w)])", $separador, $S);
+		$S = strtolower($S);
 	}
-	$S=preg_replace("([\(\)])","",$S);
-	if($separador!="-")$S=preg_replace("([/-])","_",$S);
+	$S = preg_replace("([\(\)])", '', $S);
+	if ($separador != '-') $S = preg_replace("([/-])", '_', $S);
 	return $S;
 }
 
@@ -77,8 +85,8 @@ function toId($S,$tofile=FALSE,$separador=""){
  *
  * @param string $S String to be formatted.
  * @return string Formatted string.
- * @author JP, update by Carlos
- * @version (2008/06/12) 
+ * @author JP
+ * @version (2008/06/12) update by Carlos Rodrigues
  */
 function toSeo($S) {
 	/*$S = str_replace(' - ', '-',$S);
@@ -100,8 +108,8 @@ function toSeo($S) {
 	$S = preg_replace("([˙˘˚¸⁄Ÿ€‹])", 'u', $S);
 	$S = preg_replace("([Á«])", 'c', $S);
 	$S = preg_replace("([Ò—])", 'n', $S);
-	$S = preg_replace("([^\d\w]+)", ' ', $S);
-	$S = str_replace(' ', '-', trim($S));
+	$S = preg_replace("([^\d\w- ])", '', $S);
+	$S = preg_replace("([ -]+)", '-', trim($S));
 	return strtolower($S);
 }
 
@@ -110,26 +118,25 @@ function toSeo($S) {
  *
  * @param string $field Field where the data will be searched, e.g. varchar_key.
  * @param string $str String to be formatted and searched.
- * @param string $regexp Optional REGEXP string, the default value is '[^(\d\w)+]?'.
+ * @param string $regexp Optional REGEXP string, the default value is '[^\d\w]?'.
  * @return string Formatted SQL WHERE statement with a REGEXP.
- * @author Carlos
+ * @author Carlos Rodrigues
  * @version (2008/06/12) 
  */
-function toSeoSearch($field, $str, $regexp = '[^\d\w+]?'){
-	$str = str_replace('-', '', $str);
-	$sqlwhere = $regexp;
+function toSeoSearch($field, $str, $regexp = '[^\d\w]?'){
+	$sql_where = $regexp;
 	for ($i=0; $i < strlen($str); $i++){
 		$char = $str[$i];
-		$char = str_replace('a', '[a·‡„‚‰¡¿√¬ƒ™]', $char);
-		$char =	str_replace('e', '[eÈËÍÎ…» À&]', $char);
-		$char = str_replace('i', '[iÌÏÓÔÕÃŒœ]', $char);
-		$char =	str_replace('o', '[oÛÚıÙˆ”“’‘÷∫]', $char);
-		$char =	str_replace('u', '[u˙˘˚¸⁄Ÿ€‹]', $char);
-		$char =	str_replace('c', '[cÁ«]', $char);
-		$char =	str_replace('n', '[nÒ—]', $char);
-		$sqlwhere .= $char . $regexp;
+		$char = str_replace('a', '[a·‡„‚‰™]', $char);
+		$char =	str_replace('e', '[eÈËÍÎ&]', $char);
+		$char = str_replace('i', '[iÌÏÓÔ]', $char);
+		$char =	str_replace('o', '[oÛÚıÙˆ∫]', $char);
+		$char =	str_replace('u', '[u˙˘˚¸]', $char);
+		$char =	str_replace('c', '[cÁ]', $char);
+		$char =	str_replace('n', '[nÒ]', $char);
+		$sql_where .= $char . $regexp;
 	}
-	return $field . " REGEXP '" . $sqlwhere . "'";
+	return "REPLACE(".$field.",' ','') REGEXP '" . $sql_where . "'";
 }
 
 /**
@@ -666,6 +673,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
  * class jp7_db_pages
  *
  * @version (2007/02/22)
+ * @package JP7_Core
  * @subpackage jp7_db_pages
  * @deprecated Kept as an alias to Pagination class.
  */
@@ -835,7 +843,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 
 	// Debug
-	//$debugger->showSql($sql, $sql_debug, '#FF0000');
+	$debugger->showSql($sql, $sql_debug, '#FFFFFF', '#444444');
 
 	// Split
 	$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
@@ -895,92 +903,6 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	if ($rs && $sql) eval("global \$" . $rs . ";\$" . $rs . "=\$rs_pre;");
 	else return $rs_pre;
 }
-
-// interadmin_mysql_query (2007/01/26 by JP)
-/*
-function interadmin_mysql_query($rs,$sql="",$debug=false){
-	global $c_publish;
-	global $s_interadmin_user;
-	global $s_interadmin_preview;
-	global $db;
-	global $db_prefix;
-	global $lang;
-	global $c_path_upload;
-	if(!$sql){
-		$sql=$rs;
-		$rs="";
-	}
-	$pos1=strpos($sql," FROM ")+6;
-	$pos2=strpos($sql," ",$pos1);
-	$table=substr($sql,$pos1,$pos2-$pos1);
-	// Inner Join
-	$pos2=strpos($sql,$table." AS",$pos1);
-	if($pos1&&$pos2){
-		$pos1=strpos($sql," AS ",$pos2)+4;
-		$pos2=strpos($sql," ",$pos1);
-		$pos3=strpos($sql,",",$pos1);
-		if($pos3!==false&&$pos3<$pos2)$pos2=$pos3;
-		$alias=substr($sql,$pos1,$pos2-$pos1).".";
-		// Alias 2
-		$pos2=strpos($sql,$table." AS",$pos1);
-		if($pos2){
-			$pos1=strpos($sql," AS ",$pos2)+4;
-			$pos2=strpos($sql," ",$pos1);
-			$pos3=strpos($sql,",",$pos1);
-			if($pos3!==false&&$pos3<$pos2)$pos2=$pos3;
-			$alias_2=substr($sql,$pos1,$pos2-$pos1).".";
-		}
-	}
-	// /Inner Join
-	// Upload Path
-	if($c_path_upload){
-		$pos1=strpos($sql," WHERE ");
-		if($pos1){
-			$sql_parte_2=substr($sql,$pos1);
-			$sql=substr($sql,0,$pos1);
-		}
-		$sql=str_replace(" file_1"," REPLACE(file_1,'../../upload/','".$c_path_upload."') AS file_1",$sql);
-		$sql=str_replace(" file_2"," REPLACE(file_2,'../../upload/','".$c_path_upload."') AS file_2",$sql);
-		$sql=str_replace(" file_3"," REPLACE(file_3,'../../upload/','".$c_path_upload."') AS file_3",$sql);
-		$sql=str_replace(" file_4"," REPLACE(file_4,'../../upload/','".$c_path_upload."') AS file_4",$sql);
-		$sql=str_replace(",file_1",",REPLACE(file_1,'../../upload/','".$c_path_upload."') AS file_1",$sql);
-		$sql=str_replace(",file_2",",REPLACE(file_2,'../../upload/','".$c_path_upload."') AS file_2",$sql);
-		$sql=str_replace(",file_3",",REPLACE(file_3,'../../upload/','".$c_path_upload."') AS file_3",$sql);
-		$sql=str_replace(",file_4",",REPLACE(file_4,'../../upload/','".$c_path_upload."') AS file_4",$sql);
-		if($alias){
-			$sql=str_replace(",".$alias."file_1",",REPLACE(".$alias."file_1,'../../upload/','".$c_path_upload."') AS file_1",$sql);
-			$sql=str_replace(",".$alias."file_2",",REPLACE(".$alias."file_2,'../../upload/','".$c_path_upload."') AS file_2",$sql);
-			$sql=str_replace(",".$alias."file_3",",REPLACE(".$alias."file_3,'../../upload/','".$c_path_upload."') AS file_3",$sql);
-			$sql=str_replace(",".$alias."file_4",",REPLACE(".$alias."file_4,'../../upload/','".$c_path_upload."') AS file_4",$sql);
-		}
-		if($sql_parte_2)$sql.=$sql_parte_2;
-	}
-	if($table==$db_prefix||$table==$db_prefix.$lang->prefix){ // Check Table
-		if(
-			$c_publish // Check Publish
-			&&!$s_interadmin_preview // Check Preview
-		){
-			$sql=str_replace("WHERE ","WHERE ".$alias."publish<>'' AND ",$sql);
-		}
-		$sql=str_replace("WHERE ","WHERE ".$alias."date_publish<='".date("Y/m/d H:i:s")."' AND ".$alias."char_key<>'' AND ".$alias."deleted='' AND ",$sql);
-		if($alias_2)$sql=str_replace("WHERE ","WHERE ".$alias_2."date_publish<='".date("Y/m/d H:i:s")."' AND ".$alias_2."char_key<>'' AND ".$alias_2."deleted='' AND ",$sql);
-		if(strpos($sql,$db_prefix."_tipos AS")!==false)$sql=str_replace("WHERE ","WHERE mostrar<>'' AND deleted_tipo='' AND ",$sql);
-	}elseif($table==$db_prefix."_tipos"){
-		$sql=str_replace("WHERE ","WHERE mostrar<>'' AND deleted_tipo='' AND ",$sql);
-	}elseif(strpos($table,$db_prefix)===0&&strpos($table,"_arquivos")===false){
-		$sql=str_replace("WHERE ","WHERE ".$alias."date_publish<='".date("Y/m/d H:i:s")."' AND ".$alias."char_key<>'' AND ".$alias."deleted='' AND ",$sql);
-	}elseif($table==$db_prefix.$lang->prefix."_arquivos"){
-		$sql=str_replace("WHERE ","WHERE mostrar<>'' AND deleted='' AND ",$sql);
-	}
-	if($GLOBALS[debug_sql]&&$GLOBALS[c_jp7])echo "<hr>".$sql."<hr>";
-	$rs_pre=mysql_query($sql,$db)or print(mysql_error());
-	// Old Way (2003/04/08)
-	//$rs_pre=mysql_query((!$c_publish||($s_interadmin_preview&&$s_interadmin_user)||($table!=$db_prefix&&$table!=$db_prefix.$lang->prefix))?$sql:str_replace("WHERE ","WHERE publish<>'' AND ",$sql),$db)or die(mysql_error());
-	// /Old Way (2003/04/08)
-	if($rs&&$sql)eval("global \$".$rs.";\$".$rs."=\$rs_pre;");
-	else return $rs_pre;
-}
-*/
 
 /**
  * Gets the name of a type from its ID.
@@ -1189,6 +1111,7 @@ function jp7_id_value($varchar_key,$id_tipo=0){
  *
  * @author JP
  * @version (2007/08/08)
+ * @package JP7_Core
  * @subpackage jp7_lang
  */
 class jp7_lang{
@@ -1202,7 +1125,7 @@ class jp7_lang{
 	 * @author JP
 	 * @version (2006/09/12)
 	 */
-	function jp7_lang($lang="pt-br",$force=FALSE){
+	function jp7_lang($lang = 'pt-br', $force = FALSE){
 		if($force)$this->lang=$lang;
 		else{
 			global $c_path;
@@ -1241,6 +1164,7 @@ class jp7_lang{
  *
  * @author Thiago
  * @version (2007/07/10)
+ * @package JP7_Core
  * @subpackage interadmin_tipos
  * @deprecated It will be incorporated and suplanted by InterAdminTipos
  */
@@ -1391,6 +1315,7 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
  * class interadmin_cabecalho
  *
  * @version (2006/11/29)
+ * @package JP7_Core
  * @subpackage interadmin_cabecalho
  */
 class interadmin_cabecalho{
@@ -1515,52 +1440,33 @@ function jp7_flash($src,$w,$h,$alt="",$id="",$xtra="",$parameters=""){
 	}
 }
 
-// jp7_interlog (2003/08/25)
-/*
-function jp7_interlog($id_cliente){
-	global $SERVER_ADDR;
-	global $REMOTE_ADDR;
-	global $HTTP_USER_AGENT;
-	if($REMOTE_ADDR!="127.0.0.1"&&strpos($REMOTE_ADDR,"192.168")!==0){
-		ob_start();
-		readfile("http://jp7.com.br/interlog/site/aplicacao/acessos_inserir_ok.php?id_cliente=".$id_cliente."&servidor_ip=".$SERVER_ADDR."&visitante_ip=".$REMOTE_ADDR."&visitante_useragent=".urlencode($HTTP_USER_AGENT));
-		ob_end_clean();
-	}
-}
-*/
-
 // jp7_interlog (2005/06/09)
-function jp7_interlog($id_cliente,$host="jp7.com.br",$db_name_interlog="interlog"){
-	global $SERVER_ADDR;
-	global $LOCAL_ADDR;
-	global $REMOTE_ADDR;
-	global $HTTP_HOST;
-	global $HTTP_USER_AGENT;
+function jp7_interlog($id_cliente, $host = 'jp7.com.br', $db_name_interlog = 'interlog'){
 	global $c_site;
 	global $c_server_type;
 	global $db;
 	global $db_name;
-	if(!$SERVER_ADDR)$SERVER_ADDR=$LOCAL_ADDR;
-	if($REMOTE_ADDR!="127.0.0.1"&&strpos($REMOTE_ADDR,"192.168")!==0){
+	//if(!$SERVER_ADDR)$SERVER_ADDR=$LOCAL_ADDR;
+	if($_SERVER['REMOTE_ADDR'] != '127.0.0.1' && strpos($REMOTE_ADDR, '192.168') !== 0) {
 	//if($REMOTE_ADDR!="127.0.0.1"&&strpos($REMOTE_ADDR,"192.168")!==0&&($c_server_type=="Principal"||$host=="localhost")){
-		if($host=="localhost"){
+		if($host == "localhost"){
 			if(!$db){
 				$only_info=true;
 				include "inc/connection_open.php";
-				$db=mysql_connect($db_host,$db_user,$db_pass)or print(mysql_error());
+				$db = mysql_connect($db_host, $db_user, $db_pass) or print(mysql_error());
 			}
 			if($db){
-				$servidor_date=date("Y/m/d H:i:s");
-				$separador="{;}";
-				$dados=$id_cliente.$separador.$SERVER_ADDR.$separador.$servidor_date.$separador.$REMOTE_ADDR.$separador.$HTTP_USER_AGENT;
-				mysql_select_db($db_name_interlog,$db);
-				mysql_query("INSERT INTO interlog_".$c_site." (dados) VALUES ('".$dados."')",$db)or print(mysql_error());
-				mysql_select_db($db_name,$db);
+				$servidor_date = date("Y/m/d H:i:s");
+				$separador = "{;}";
+				$dados = $id_cliente . $separador . $_SERVER['SERVER_ADDR'] . $separador . $servidor_date . $separador . $_SERVER['REMOTE_ADDR'] . $separador . $_SERVER['HTTP_USER_AGENT'];
+				mysql_select_db($db_name_interlog, $db);
+				mysql_query("INSERT INTO interlog_" . $c_site . " (dados) VALUES ('".$dados."')", $db)or print(mysql_error());
+				mysql_select_db($db_name, $db);
 			}
-			if($only_info)mysql_close($db);
+			if ($only_info) mysql_close($db);
 		}else{
 			ob_start();
-			readfile("http://".$host."/interlog/site/aplicacao/acessos_inserir_ok.php?id_cliente=".$id_cliente."&servidor_ip=".$SERVER_ADDR."&visitante_ip=".$REMOTE_ADDR."&visitante_useragent=".urlencode($HTTP_USER_AGENT));
+			readfile('http://' . $host . '/interlog/site/aplicacao/acessos_inserir_ok.php?id_cliente=' . $id_cliente . '&servidor_ip=' . $_SERVER['SERVER_ADDR'] . '&visitante_ip=' . $_SERVER['REMOTE_ADDR'] . '&visitante_useragent=' . urlencode($_SERVER['HTTP_USER_AGENT']));
 			ob_end_clean();
 		}
 	}
@@ -1590,21 +1496,21 @@ function jp7_path($S, $reverse = FALSE){
  */
 function jp7_doc_root(){
  	global $PATH_INFO, $c_jp7, $c_path;
-	$S=$_SERVER['DOCUMENT_ROOT'];
-	if(!$S)$S=@ini_get('doc_root');
+	$S = $_SERVER['DOCUMENT_ROOT'];
+	if(!$S) $S = @ini_get('doc_root');
 	if(!$S){
-		$S=dirname($_SERVER['PATH_TRANSLATED']);
+		$S = dirname($_SERVER['PATH_TRANSLATED']);
 		if($c_jp7){
-			$S=str_replace("\\","/",$S);
-			$S=str_replace("//","/",$S);
-			$S=substr($S,0,strpos($S,dirname($PATH_INFO)));
+			$S = str_replace("\\","/",$S);
+			$S = str_replace("//","/",$S);
+			$S = substr($S,0,strpos($S,dirname($PATH_INFO)));
 		}
 	}
 	if(!$S){
-		$S=realpath("./");
-		$S=substr($c_root,0,($c_path)?strpos($S,$c_path):strpos($S,"site"));
+		$S = realpath("./");
+		$S = substr($c_root,0, ($c_path) ? strpos($S,$c_path) : strpos($S,"site"));
 	}
-	$S=jp7_path($S);
+	$S = jp7_path($S);
 	return $S;
 }
 
@@ -1631,23 +1537,24 @@ function jp7_include($file){
  *
  * @param string $file Filename.
  * @global Debug
+ * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
- * @version (2008/06/13)
+ * @version (2008/06/16)
  */
 function jp7_path_find($file) {
 	global $debugger;
-	$path = '';
-	$ok = FALSE;
-	$i = 0;
-	while(!$ok && $i < 10) {
-		if ($i) $path .= '../';
-		$ok = @file_exists($path . $file);
-		$i++;
+	static $path_levels;
+	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
+	for ($i = 0; $i < $path_levels; $i++) {
+		($i) ? $path .= '../' : $path = '';
+		if ($ok = @file_exists($path . $file)) break;	
 	}
-	if ($debugger) $debugger->showFilename($path . $file);
-	if ($ok) return $path . $file;
-	else return (strpos($file, '../') !== FALSE) ? jp7_doc_root() . $file : $file;
+	if (!$ok){
+		$path = '';
+		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
+	}
+	return ($debugger) ? $debugger->showFilename($path . $file) : $path . $file;
 }
 
 /**
@@ -2030,57 +1937,34 @@ function jp7_file_size($file){
  * @param string $msgErro Error message, the default is <tt>NULL</tt>.
  * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
  * @param bool $sendMail If <tt>TRUE</tt> sends an email.
+ * @global Debug
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
-	$backtrace = debug_backtrace();
-	krsort($backtrace);
-	$erroDetalhesArray = reset($backtrace);
-	$S="<pre style=\"background-color:#FFFFFF;font-size:11px;text-align:left;padding:10px;\">";	
-	$S.="<strong style=\"color:red\">       ERRO:</strong> ".$msgErro."\n";
-	$S.="<strong style=\"color:red\">    ARQUIVO:</strong> ".$erroDetalhesArray['file']."\n";	
-	$S.="<strong style=\"color:red\">      LINHA:</strong> ".$erroDetalhesArray['line']."\n";	
-	$S.="<strong style=\"color:red\">        URL:</strong> ".(($_SERVER['HTTPS']=='on')?"https://":"http://").$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]."\n";	
-	if($_SERVER["HTTP_REFERER"])	
-	$S.="<strong style=\"color:red\">    REFERER:</strong> ".$_SERVER["HTTP_REFERER"]."\n";	
-	$S.="<strong style=\"color:red\">         IP:</strong> ".$_SERVER["REMOTE_ADDR"]."\n";
-	$S.="<strong style=\"color:red\"> USER_AGENT:</strong> ".$_SERVER['HTTP_USER_AGENT']."\n";
-	if($sql) 
-	$S.="<strong style=\"color:red\">        SQL:</strong> ".$sql."\n";
-	$S.="<strong style=\"color:red\">  BACKTRACE:</strong> ".print_r($backtrace,true);
-	if(count($_POST))
-	$S.="<strong style=\"color:red\">       POST:</strong> ".print_r($_POST,true);	
-	if(count($_GET))
-	$S.="<strong style=\"color:red\">        GET:</strong> ".print_r($_GET,true);
-	if(count($_SESSION))
-	$S.="<strong style=\"color:red\">    SESSION:</strong> ".print_r($_SESSION,true);
-	if(count($_COOKIE))
-	$S.="<strong style=\"color:red\">     COOKIE:</strong> ".print_r($_COOKIE,true);
-
-	$S.="</pre>";
-	
-	//Envia email
-	if($GLOBALS['c_server_type']=="Principal"){
-		if(trim($GLOBALS['c_site']))
+	global $debugger;
+	$backtrace = $debugger->getBacktrace($msgErro, $sql);
+	$nome_app = ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site';
+	//Envia email e exibe tela de manutenÁ„o
+	if($GLOBALS['c_server_type'] == 'Principal') {
+		if (trim($GLOBALS['c_site']))
 			$cliente = $GLOBALS['c_site'] . ']';
-		elseif(trim($_SESSION['s_interadmin_cliente']))
+		elseif (trim($_SESSION['s_interadmin_cliente']))
 			$cliente = $_SESSION['s_interadmin_cliente'] . ']';
-		elseif(trim($_COOKIE['cookie_interadmin_cliente']))
+		elseif (trim($_COOKIE['cookie_interadmin_cliente']))
 			$cliente = $_COOKIE['cookie_interadmin_cliente'];
-		$subject = '['. $cliente . '][' . ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site' . '][Erro]';
-		$message = "Ocorreram erros no InterAdmin<br />" . $S;
-		$headers = "To: " . $to . " <" . $to . ">\r\n";
-		$headers .= "From: " . $to . " <" . $to . ">\r\n";
-		$parameters = "";
+		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
+		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
+		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
+		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
+		$parameters = '';
 		//$template="form_htm.php";
-		$html=TRUE;
-		$to='debug+' . $cliente . '@jp7.com.br';
-		jp7_mail($to,$subject,$message,$headers,$parameters,$template,$html);
-		if($GLOBALS['c_server_type'] == 'Principal'){
-			$S = 'Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
-			header("Location: /em_manutencao.htm");
-			//Caso nao funcione o header, tenta por javascript
-			?>
+		$html = TRUE;
+		$to = 'debug+' . $cliente . '@jp7.com.br';
+		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
+		if($GLOBALS['c_server_type'] == 'Principal') {
+			$backtrace = 'Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
+			header('Location: /em_manutencao.htm');
+			//Caso nao funcione o header, tenta por javascript	?>
             <script language="javascript" type="text/javascript">
 			document.location.href="/em_manutencao.htm";
 			</script>
@@ -2088,7 +1972,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 			exit();
 		}
 	}
-	return $S;	
+	return $backtrace;	
 }
 
 /**
@@ -2133,38 +2017,4 @@ function XORDecrypt($InputString, $KeyPhrase){
     $InputString = XOREncryption($InputString, $KeyPhrase);
     return $InputString;
 }
-
-// Autoload
-/*
-// Carrega Classes
-define("ROOT_DIR",dirname(__FILE__)."/");
-
-function __autoload($className){
-   //$folder=classFolder($className);
-   //if($folder)require_once($folder."/".$className.".php")
-	 $include = require_once(jp7_doc_root().'classes/'.$className.".class.php");
-	 //if(!$include) require_once(jp7_doc_root().'interaccount/classes/'.$className."class.php");
-}
-
-function classFolder($className,$folder="classes") {
-   $dir=dir(ROOT_DIR.$folder);
-   if($folder=="classes"&&file_exists(ROOT_DIR.$folder."/".$className.".php"))return $folder;
-	 else{
-	 	while(false!==($entry=$dir->read())){
-			$checkFolder=$folder."/".$entry;
-			if(strlen($entry)>2){
-				if(is_dir(ROOT_DIR.$checkFolder)){
-					if(file_exists(ROOT_DIR.$checkFolder."/".$className.".php"))return $checkFolder;
-					else{
-						$subFolder=classFolder($className,$checkFolder);
-						if($subFolder)return $subFolder;
-					}
-				}
-			}
-		}
-	}
-	$dir->close();
-  return 0;
-}
-*/
 ?>
