@@ -20,7 +20,11 @@ if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br"
 }else{
 	// JP7 (Local)
 	$c_server_type="Local";
-	$db_host=($db_type=="mssql")?"jp":"localhost";
+	if ($_SERVER['SERVER_ADDR'] != '192.168.0.2') {
+		$db_host = '192.168.0.2';
+	} else {
+		$db_host=($db_type=="mssql")?"jp":"localhost";
+	}
 	if(!$db_name)$db_name=(strpos($REQUEST_URI,"_outros")!==false)?"interadmin_outros":"interadmin";
 	$db_user=($db_type=="mssql")?"sa":"root";
 	$db_pass="123";
