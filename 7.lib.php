@@ -1548,9 +1548,9 @@ function jp7_path_find($file) {
 	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
 	for ($i = 0; $i < $path_levels; $i++) {
 		($i) ? $path .= '../' : $path = '';
-		if ($ok = @file_exists($path . $file)) break;	
+		if ($ok = @file_exists($path . $file)) break;
 	}
-	if (!$ok){
+	if (!$ok) {
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}
@@ -1942,7 +1942,7 @@ function jp7_file_size($file){
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 	global $debugger;
-	$backtrace = $debugger->getBacktrace($msgErro, $sql);
+	$backtrace = $debugger->getBacktrace($msgErro, $sql, debug_backtrace());
 	$nome_app = ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site';
 	//Envia email e exibe tela de manutenção
 	if($GLOBALS['c_server_type'] == 'Principal') {
