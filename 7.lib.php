@@ -108,8 +108,8 @@ function toSeo($S) {
 	$S = preg_replace("([˙˘˚¸⁄Ÿ€‹])", 'u', $S);
 	$S = preg_replace("([Á«])", 'c', $S);
 	$S = preg_replace("([Ò—])", 'n', $S);
-	$S = preg_replace("([^\d\w- ])", '', $S);
-	$S = preg_replace("([ -]+)", '-', trim($S));
+	$S = preg_replace("([^\d\w- /])", '', $S);
+	$S = preg_replace("([ -/]+)", '-', trim($S));
 	return strtolower($S);
 }
 
@@ -1947,19 +1947,19 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 	//Envia email e exibe tela de manutenÁ„o
 	if($GLOBALS['c_server_type'] == 'Principal') {
 		if (trim($GLOBALS['c_site']))
-			$cliente = $GLOBALS['c_site'] . ']';
+			$cliente = $GLOBALS['c_site'];
 		elseif (trim($_SESSION['s_interadmin_cliente']))
-			$cliente = $_SESSION['s_interadmin_cliente'] . ']';
+			$cliente = $_SESSION['s_interadmin_cliente'];
 		elseif (trim($_COOKIE['cookie_interadmin_cliente']))
 			$cliente = $_COOKIE['cookie_interadmin_cliente'];
 		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
 		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
+		$to = 'debug+' . $cliente . '@jp7.com.br';
 		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
 		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 		$parameters = '';
 		//$template="form_htm.php";
 		$html = TRUE;
-		$to = 'debug+' . $cliente . '@jp7.com.br';
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
 		if($GLOBALS['c_server_type'] == 'Principal') {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
