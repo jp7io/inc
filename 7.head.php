@@ -1,6 +1,6 @@
 <meta name="author" content="JP7 - http://jp7.com.br<? if($c_parceiro){?> | <?=$c_parceiro?><? }?>" />
 <meta name="generator" content="JP7 InterAdmin" />
-<title><?=($s_interadmin_preview)?"PREVIEW | ":""?><?if($p_title){?><?=$p_title?><?}else{?><?=$c_site_title?><?if($secao&&$secao!="home"){?> | <?=$secaoTitle?><?if($subsecao&&$subsecao!="home"){?> | <?=$subsecaoTitle?><?}?><?}?><?}?></title>
+<title><?=($s_interadmin_preview)?"PREVIEW | ":""?><? if($p_title){ ?><?=$p_title?><? }else{ ?><?=$c_site_title?><? if($secao&&$secao!="home"){ ?> | <?=$secaoTitle?><?if($subsecao&&$subsecao!="home"){?> | <?=$subsecaoTitle?><?}?><?}?><?}?></title>
 <? if ($seo_baseurl) { ?>
 	<base href="<?=$seo_baseurl?>" />
 <? } else { ?>
