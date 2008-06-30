@@ -1157,6 +1157,21 @@ class jp7_lang{
 			$this->path_2=$this->path;
 		}
 	}
+	/**
+	 * Creates a link for the current page on another language.
+	 *
+	 * @param string $new_lang Language the link will use.
+	 * @global string
+	 * @return string Link pointing to the current page on the given language.
+	 * @author Carlos
+	 * @version (2008/06/26)
+	 */
+	function getUri($new_lang) {
+		global $c_wwwroot;
+		if ($new_lang == 'pt-br') $new_lang = 'site';
+		if ($this->lang == $newlang) return 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		else return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+	}
 }
 
 /**
@@ -1880,12 +1895,12 @@ function jp7_index($lang=""){
 	$index_time=@filemtime("site/home/index_P.htm");
 	if($admin_time>$index_time||date("d")!=date("d",$index_time))$publish=true;
 	// Redirect
-	//if(strpos($HTTP_ACCEPT,"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
+	//if(strpos($_SERVER['HTTP_ACCEPT'],"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
 	//elseif($is->v<4&&!$is->robot)header("Location: /_default/oldbrowser.htm");
 	//else{
 		$path=$path.(($lang&&$lang!="pt-br")?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_interadmin_preview)?"?s_interadmin_preview=".$s_interadmin_preview:"");
 		@ini_set("allow_url_fopen","1");
-		//if(!@include $path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($HTTP_USER_AGENT))header("Location: ".$path);
+		//if(!@include $path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
 		if(!@readfile($path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
 	//}
 }
@@ -1976,7 +1991,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 }
 
 /**
- * Encrypts a given string with a given key phrase.
+ * XOR Encrypts a given string with a given key phrase.
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase
