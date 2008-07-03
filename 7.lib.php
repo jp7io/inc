@@ -948,7 +948,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @author JP
  * @version (2007/01/27)
  */
-function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=false){
+function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=FALSE) {
 	global $db, $s_interadmin_preview, $l_selecione;
 	//global $id;
 	if($type=="list"){
@@ -1169,8 +1169,17 @@ class jp7_lang{
 	function getUri($new_lang) {
 		global $c_wwwroot;
 		if ($new_lang == 'pt-br') $new_lang = 'site';
-		if ($this->lang == $newlang) return 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		else return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+		
+		$currentpage = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+		$querystring = explode('?',$currentpage);
+		if ($querystring) {
+				$currentpage = $querystring[0];
+				$querystring = '?' . $querystring[1];
+		}
+		$currentpage = jp7_path($currentpage, TRUE);
+		if ($c_wwwroot == $currentpage) $currentpage .= '/site/home/index.php';
+		
+		return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', $currentpage . $querystring);
 	}
 }
 
@@ -1228,11 +1237,8 @@ class interadmin_tipos{
 	 * @todo Check if the "Parent Id" and "Grand Parent Id" code are working properly, since they are replacing $id_tipo it might not bring the children data.
 	 * @return interadmin_tipos
 	 */
-	function interadmin_tipos($id_tipo,$id=0,$replaceGlobals=FALSE){
-		global $db;
-		global $db_prefix;
-		global $lang;
-		global $id_nome;
+	function __construct($id_tipo,$id=0,$replaceGlobals=FALSE){
+		global $db, $db_prefix, $lang, $id_nome, $implicit_parents_names;
 		// Id
 		if($id&&is_numeric($id)){
 			$sql="SELECT id_tipo,parent_id,varchar_key FROM ".$db_prefix.$lang->prefix." WHERE id=".$id;
@@ -1286,9 +1292,13 @@ class interadmin_tipos{
 		$path_seo = '';
 		$path_seo_arr = array();
 		foreach ((array) $this->nome as $key=>$nome) {
-			$path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
-			$path_seo_arr[] = $path_seo;
-			$this->path_seo[] = '/' . $GLOBALS['c_path'] . implode('/', $path_seo_arr);
+			if (!in_array($nome, (array)$implicit_parents_names)) {
+				$path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
+				$path_seo_arr[] = $path_seo;
+				$this->path_seo[] = '/' . $GLOBALS['c_path'] . implode('/', $path_seo_arr);
+			} else {
+				$this->path_seo[] = '/' . $GLOBALS['c_path'] . toSeo($nome);
+			}
 		}
 	}
 }
@@ -1555,13 +1565,13 @@ function jp7_include($file){
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
- * @version (2008/06/16)
+ * @version (2008/07/03)
  */
 function jp7_path_find($file) {
 	global $debugger;
 	static $path_levels;
 	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
-	for ($i = 0; $i < $path_levels; $i++) {
+	for ($i = 0; $i <= $path_levels; $i++) {
 		($i) ? $path .= '../' : $path = '';
 		if ($ok = @file_exists($path . $file)) break;
 	}
