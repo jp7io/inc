@@ -37,7 +37,7 @@ function interadmin_returnCampo($campo){
 	}
 	$valor=$GLOBALS[$campo];
 	if(!$valor&&!$id)$valor=$valor_default;
-	$_th="<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+	$_th="<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 	if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\">";
 	if($readonly=="hidden")$readonly_hidden=true;
 	if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_interadmin_user_tipo&&!$s_interadmin_user_sa))$readonly=" disabled";
@@ -47,7 +47,7 @@ function interadmin_returnCampo($campo){
 			echo "</tbody>";
 			$tit_start=false;
 		}
-		echo "<tr><th colspan=4 class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
+		echo "<tr><th colspan=4 class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"//interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 		$tit_start=true;
 	}elseif(strpos($campo,"text_")===0){
 		$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").">".$valor."</textarea>";
@@ -185,14 +185,14 @@ function interadmin_returnCampo($campo){
 			if(!$readonly_hidden){
 				echo "".
 				"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-					"<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
+					"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 					"<td colspan=2>".$form."</td>".
 					"<td>".$S_ajuda."</td>".
 				"</tr>\n";
 				if(strpos($campo,"password_")===0){
 					echo "".
 					"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-						"<th title=\"".$campo."_check\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>".
+						"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>".
 						"<td colspan=2><input type=\"password\" xtype=\"password\" name=\"".$campo."[]\" label=\"Confirmação de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>".
 						"<td>".$S_ajuda."</td>".
 					"</tr>\n";
@@ -271,7 +271,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		else $S.='> ';
 	}
 	$numRows=($db_type)?$rs->RecordCount():mysql_num_rows($rs);
-	if($style=="checkbox")$R.="<input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">TODOS</label><br>\n";
+	if($style=="checkbox")$R.="<input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".strtoupper($GLOBALS['l_todos'])."</label><br>\n";
 	elseif($style=="combo"){
 		$R.="<option value=\"\" style=\"color:#ccc\">".$select_campos_2_nomes."</option>";
 	}

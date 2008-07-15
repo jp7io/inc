@@ -50,47 +50,68 @@ function jp7_app_checkPermission(){
 function jp7_app_createSelect($name,$label,$div,$start,$finish,$value,$xtra=""){
 	$S="".
 	"<select name=\"".$name."\"".(($xtra)?" ".$xtra:"").">".
-	"<option>".$label."</option>".
-	"<option>".$div."</option>";
+	"<option value=\"\">".$label."</option>".
+	"<option value=\"\">".$div."</option>";
 	for($i=$start;$i<=$finish;$i++){
 		if($i<10)$i="0".$i;
-		$S.="<option value=\"".$i."\"".(($i==$value)?" selected":"").">".$i."</option>";
+		$S.="<option value=\"".$i."\"".(($i==$value)?" selected=\"selected\"":"").">".$i."</option>";
 	}
 	$S.="</select>";
 	return $S;
 }
 
-// jp7_app_createSelect_date() (2007/05/23 by JP)
+// jp7_app_createSelect_date() (2007/05/25 by JP)
 function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonly="",$xtra=""){
 	$date=jp7_date_split($GLOBALS[$var]);
 	if($i!==false)$i="[".$i."]";
-	if(strpos("nocombo_",$xtra)===0){
+	if($GLOBALS["interadmin_visualizar"]){
+		if($date[d]!="00"){
+			return "".
+			"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
+				"<tr>".
+					"<td>".(($date[d]!="00")?$date[d]:"")."</td>".
+					"<td>&nbsp;/&nbsp;</td>".
+					"<td>".(($date[m]!="00")?$date[m]:"")."</td>".
+					"<td>&nbsp;/&nbsp;</td>".
+					"<td>".(($date[Y]!="0000")?$date[Y]:"")."</td>".
+					"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>".
+					"<td".(($time_xtra)?" ".$time_xtra:"").">".(($date[H])?$date[H]:"")."</td>".
+					"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
+					"<td".(($time_xtra)?" ".$time_xtra:"").">".(($date[i])?$date[i]:"")."</td>".
+					(($s)?"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>":"").
+					(($s)?"<td><input type=\"text\" name=\"".$var."_s".$i."\" value=\"".$date[s]."\" style=\"color:#ccc;width:20px\"></td>":"").
+				"</tr>".
+			"</table>";
+		}else{
+			return "N/D";
+		}
+	}elseif(strpos($xtra,"nocombo_")!==false){
 		return "".
-		"<table border=0 cellspacing=0 cellpadding=0>".
+		"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
 			"<tr>".
-				"<td><input type=\"text\" name=\"".$var."_d".$i."\" value=\"".$date[d]."\" ".$readonly."></td>".
+				"<td><input type=\"text\" name=\"".$var."_d".$i."\" maxlength=\"2\" value=\"".(($date[d]!="00"&&$GLOBALS[$var])?$date[d]:"Dia")."\" ".$readonly." helpvalue=\"Dia\" style=\"width:3em".(($date[d]=="00"||!$GLOBALS[$var])?";color:#ccc;font-style:italic":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this)\" /></td>".
 				"<td>&nbsp;/&nbsp;</td>".
-				"<td><input type=\"text\" name=\"".$var."_m".$i."\" value=\"".$date[m]."\" ".$readonly."></td>".
+				"<td><input type=\"text\" name=\"".$var."_m".$i."\" maxlength=\"2\" value=\"".(($date[m]!="00"&&$GLOBALS[$var])?$date[m]:"Mês")."\" ".$readonly." helpvalue=\"Mês\" style=\"width:3em".(($date[m]=="00"||!$GLOBALS[$var])?";color:#ccc;font-style:italic":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this)\" /></td>".
 				"<td>&nbsp;/&nbsp;</td>".
-				"<td><input type=\"text\" name=\"".$var."_Y".$i."\" value=\"".$date[Y]."\" ".$readonly."></td>".
-				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;-&nbsp;</td>".
-				"<td><input type=\"text\" name=\"".$var."_H".$i."\" value=\"".$date[d]."\" ".$readonly."></td>".
+				"<td><input type=\"text\" name=\"".$var."_Y".$i."\" maxlength=\"4\" value=\"".(($date[Y]!="0000"&&$GLOBALS[$var])?$date[Y]:"Ano")."\" ".$readonly." helpvalue=\"Ano\" style=\"width:5em".(($date[Y]=="0000"||!$GLOBALS[$var])?";color:#ccc;font-style:italic":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this)\" /></td>".
+				"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>".
+				"<td><input type=\"text\" name=\"".$var."_H".$i."\" maxlength=\"2\" value=\"".(($date[H]&&$GLOBALS[$var]!="0000-00-00 00:00:00")?$date[H]:"Hora")."\" ".$readonly." helpvalue=\"Hora\" style=\"width:3em".((!$date[H]||$GLOBALS[$var]=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this)\" /></td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
-				"<td><input type=\"text\" name=\"".$var."_i".$i."\" value=\"".$date[d]."\" ".$readonly."></td>".
+				"<td><input type=\"text\" name=\"".$var."_i".$i."\" maxlength=\"2\" value=\"".(($date[i]&&$GLOBALS[$var]!="0000-00-00 00:00:00")?$date[i]:"Min.")."\" ".$readonly." helpvalue=\"Min.\" style=\"width:3em".((!$date[i]||$GLOBALS[$var]=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" /></td>".
 				(($s)?"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>":"").
 				(($s)?"<td><input type=\"text\" name=\"".$var."_s".$i."\" value=\"".$date[s]."\" style=\"color:#ccc;width:20px\"></td>":"").
 			"</tr>".
 		"</table>";
 	}else{
 		return "".
-		"<table border=0 cellspacing=0 cellpadding=0>".
+		"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
 			"<tr>".
 				"<td>".jp7_app_createSelect($var."_d".$i,"Dia","---",1,31,$date[d],$readonly)."</td>".
 				"<td>&nbsp;/&nbsp;</td>".
 				"<td>".jp7_app_createSelect($var."_m".$i,"Mês","---",1,12,$date[m],$readonly)."</td>".
 				"<td>&nbsp;/&nbsp;</td>".
 				"<td>".jp7_app_createSelect($var."_Y".$i,"Ano","---",date(Y)-100,date(Y)+20,$date[Y],$readonly)."</td>".
-				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;-&nbsp;</td>".
+				"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>".
 				"<td>".jp7_app_createSelect($var."_H".$i,"H","---",0,23,$date[H],$time_xtra)."</td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
 				"<td>".jp7_app_createSelect($var."_i".$i,"M","---",0,59,$date[i],$time_xtra)."</td>".
@@ -124,14 +145,14 @@ function jp7_app_log($log,$S){
 		ob_end_clean();
 	}
 	$file=fopen($file_path.$log.".log","w");
-	fwrite($file,$file_data.date("d/m H:i")." - ".$app_user." - ".$REMOTE_ADDR." - ".$S."\r\n");
+	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$REMOTE_ADDR." - ".$S."\r\n");
 	fclose($file);
 	copy($file_path.$log.".log",$file_path.$log."_".date(d).".log");
 }
 
 // jp7_msg (2003/XX/XX)
 function jp7_msg($S,$type){
-	include "../../inc/msg.php";
+	include jp7_path_find("../../inc/msg.php");
 }
 
 // jp7_phpmyadmin_path (2004/06/23)
@@ -140,12 +161,12 @@ function jp7_phpmyadmin_path($path="../../_admin/phpmyadmin/",$i=0){
 	else return jp7_phpmyadmin_path("../".$path,$i++);
 }
 
-// jp7_phpmyadmin_aplicacao_path (2004/06/23)
+// jp7_phpmyadmin_aplicacao_path (2007/07/19)
 function jp7_phpmyadmin_aplicacao_path($path="../../_admin/phpmyadmin/",$path2="../"){
 	if(is_dir($path)||$i>3){
 		global $SCRIPT_NAME;
 		global $jp7_app;
-		return $path2.((strpos($SCRIPT_NAME,$jp7_app)===false)?"../":$jp7_app."/");
+		return $path2.((strpos($SCRIPT_NAME,($jp7_app=="intertime"||$jp7_app=="interaccount")?"interadmin":$jp7_app)===false)?"../":(($jp7_app=="intertime"||$jp7_app=="interaccount")?"interadmin":$jp7_app)."/");
 	}
 	else return jp7_phpmyadmin_aplicacao_path("../".$path,"../".$path2);
 }

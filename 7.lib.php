@@ -123,7 +123,7 @@ function toSeo($S) {
  * @author Carlos Rodrigues
  * @version (2008/06/12) 
  */
-function toSeoSearch($field, $str, $regexp = '[^\d\w]?'){
+function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*'){
 	$sql_where = $regexp;
 	for ($i=0; $i < strlen($str); $i++){
 		$char = $str[$i];
@@ -136,7 +136,7 @@ function toSeoSearch($field, $str, $regexp = '[^\d\w]?'){
 		$char =	str_replace('n', '[nñ]', $char);
 		$sql_where .= $char . $regexp;
 	}
-	return "REPLACE(".$field.",' ','') REGEXP '" . $sql_where . "'";
+	return "REPLACE(".$field.",' ','') REGEXP '^" . $sql_where . "$'";
 }
 
 /**
@@ -181,7 +181,7 @@ function wap_toHTML($S){
 function toBase($S){
 	global $db;
 	if($S){
-		$S=$db->qstr($S,get_magic_quotes_gpc());
+		$S=$db->qstr($S,get_magic_quotes_gpc()); //trata as aspas. Ex.: mysql fica \' sqlserver ''
 		$S=trim($S);
 	}else{
 		$S="''";
@@ -357,16 +357,15 @@ function checkReferer($S, $protocol="http"){
  * @param string $S Input string.
  * @param int $length Max. lenght of the output string.
  * @return string Shrunk string.
- * @version (2004/02/28)
+ * @version (2008/07/04)
  * @global string
  * @global string
- * @todo Check if the lines inside the block "if ($c_lang){  ...  }" are used or not.
  */
 function jp7_string_left($S, $length){
 	global $s_interadmin_lang, $c_lang;
 	if ($c_lang){
 		foreach($c_lang as $item){
-			if ($item[0] == $s_interadmin_lang && $item[2]) $length = $length * 8;
+			if ($item[0] == $s_interadmin_lang && $item[2]) $length = $length * 8; // Check if language uses entities for characters (eg.: japanese)
 		}
 	}
 	return (strlen($S) > $length) ? substr($S, 0, $length) . "..." : $S;
@@ -1118,15 +1117,18 @@ class jp7_lang{
 	/**
 	 * Checks the current language.
 	 *
-	 * @param string $lang Current language, the default value is "pt-br".
+	 * @param string $lang Current language, the default value is "".
 	 * @param bool $force If <tt>TRUE</tt> it skips the check and $lang becomes the current language, the default value is <tt>FALSE</tt>.
+	 * @global string
 	 * @global string
 	 * @return jp7_lang Object with the following properties: $this->lang, $this->prefix, $this->path and $this->path_2.
 	 * @author JP
 	 * @version (2006/09/12)
 	 */
-	function jp7_lang($lang = 'pt-br', $force = FALSE){
-		if($force)$this->lang=$lang;
+	function jp7_lang($lang = '', $force = FALSE){
+		global $c_lang_default;
+		if (!$lang) $lang = $c_lang_default;
+		if ($force) $this->lang = $lang;
 		else{
 			global $c_path;
 			//global $c_site;
@@ -1144,9 +1146,9 @@ class jp7_lang{
 			//}else $this->lang=$this->lang[1]; // Old Way
 			$this->lang=str_replace("_","",$this->lang); // Apache Redirect
 		}
-		$langs=Array('en','es','pt-br','pt','fr','jp'); 
+		$langs = Array('en','es','pt-br','pt','fr','jp'); 
 		//if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$c_site||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
-		if(!in_array($this->lang,$langs)||$this->lang=='pt-br'){
+		if(!in_array($this->lang,$langs)||$this->lang==$c_lang_default||!$c_lang_default){
 			$this->lang=$lang;
 			$this->prefix="";
 			$this->path="";
@@ -1162,24 +1164,29 @@ class jp7_lang{
 	 *
 	 * @param string $new_lang Language the link will use.
 	 * @global string
+	 * @global string
 	 * @return string Link pointing to the current page on the given language.
 	 * @author Carlos
 	 * @version (2008/06/26)
 	 */
-	function getUri($new_lang) {
-		global $c_wwwroot;
-		if ($new_lang == 'pt-br') $new_lang = 'site';
+	function getUri($new_lang, $uri = '') {
+		global $c_wwwroot, $c_lang_default;
+		$langs = Array('en','es','pt-br','pt','fr','jp'); 
+		if ($new_lang == $c_lang_default) $new_lang = 'site';
+		if (!$uri) $uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		
-		$currentpage = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		$querystring = explode('?',$currentpage);
-		if ($querystring) {
-				$currentpage = $querystring[0];
-				$querystring = '?' . $querystring[1];
+		$uri_parts = explode('?', $uri);
+		if ($uri_parts[1]) {
+				$uri = $uri_parts[0];
+				$querystring = '?' . $uri_parts[1];
 		}
-		$currentpage = jp7_path($currentpage, TRUE);
-		if ($c_wwwroot == $currentpage) $currentpage .= '/site/home/index.php';
+		$uri = jp7_path($uri, TRUE);
+		if ($c_wwwroot == $uri) $uri .= '/site/home/index.php';
 		
-		return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', $currentpage . $querystring);
+		$uri_lang = str_replace(jp7_path($c_wwwroot),'',$uri);
+		if (in_array($uri_lang, $langs) || $uri_lang == 'site') $uri .= '/';
+		
+		return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', $uri . $querystring);
 	}
 }
 
@@ -1199,15 +1206,14 @@ class interadmin_tipos{
 	 * @param int $id_tipo ID of the type.
 	 * @global ADOConnection
 	 * @global string
+	 * @global jp7_lang
 	 * @global string
 	 * @return NULL
 	 */
 	function interadmin_tipos_tipos($id_tipo){
-		global $db;
-		global $db_prefix;
-		global $lang;
+		global $db, $db_prefix, $lang, $c_lang_default;
 		settype($id_tipo,'integer');
-		$sql="SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!="pt-br")?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
+		$sql="SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!=$c_lang_default)?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
 		$rs=interadmin_query($sql);
 		while($row=$rs->FetchNextObj()){
 			$this->id_tipo[]=$id_tipo;
@@ -1823,7 +1829,10 @@ function jp7_resizeImage($im_src,$src,$dst,$w,$h,$q=90,$s=10000000){
 	}
 	if(!$q)$q=90;
 	if(!$s)$s=10000000;// 10 MB
-	if($w==$h){
+	if($src_w==$w&&$src_h==$h){
+		$dst_w=$w;
+		$dst_h=$h;
+	}elseif($w==$h){
 		$dst_w=$w;
 		$dst_h=$h;
 		if($src_w>$src_h)$src_w=$src_h;
@@ -1890,14 +1899,16 @@ function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
  * @global string
  * @global bool
  * @global bool
+ * @global string
  * @return NULL
  * @author JP
  * @version (2008/01/11)
+ * @deprecated jp7_index() is not needed since the redirects are managed by RewriteRule in .htaccess
  */
 function jp7_index($lang=""){
 	session_start();
 	//global $HTTP_ACCEPT;
-	global $is, $path, $publish, $s_interadmin_preview;
+	global $is, $path, $publish, $s_interadmin_preview, $c_lang_default;
 	$path=dirname($_SERVER["SCRIPT_NAME"]);
 	$path=jp7_path("http://".$_SERVER['HTTP_HOST'].$path);
 	// Publish Check
@@ -1908,7 +1919,7 @@ function jp7_index($lang=""){
 	//if(strpos($_SERVER['HTTP_ACCEPT'],"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
 	//elseif($is->v<4&&!$is->robot)header("Location: /_default/oldbrowser.htm");
 	//else{
-		$path=$path.(($lang&&$lang!="pt-br")?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_interadmin_preview)?"?s_interadmin_preview=".$s_interadmin_preview:"");
+		$path=$path.(($lang&&$lang!=$c_lang_default)?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_interadmin_preview)?"?s_interadmin_preview=".$s_interadmin_preview:"");
 		@ini_set("allow_url_fopen","1");
 		//if(!@include $path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
 		if(!@readfile($path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
@@ -1986,7 +1997,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 		//$template="form_htm.php";
 		$html = TRUE;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if($GLOBALS['c_server_type'] == 'Principal') {
+		if($GLOBALS['c_server_type'] == 'Principal'/* && !$GLOBALS['c_jp7']*/) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /em_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>

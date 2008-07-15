@@ -43,6 +43,7 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?=$c_path_js?>interdyn.js"></script>
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_checkflash.js"></script>
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_form.js"></script>
+<script type="text/javascript" src="<?=$c_path_js?>interdyn_form_lang_<?= $lang->lang ?>.js"></script>
 <? if($c_menu!="none"){?>
 	<? if(strpos($c_menu,"../")!==false){?>
 		<script type="text/javascript" src="<?=$c_menu?>"></script>
