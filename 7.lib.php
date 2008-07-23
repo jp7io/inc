@@ -841,8 +841,8 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 
 	$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 
-	// Debug
-	$debugger->showSql($sql, $sql_debug, '#FFFFFF', '#444444');
+	// Debug - Before SQL injection
+	$debugger->showSql($sql, $sql_debug, 'color:#FFFFFF;background:#444444;');
 
 	// Split
 	$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
@@ -876,29 +876,24 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	}
 	// Join
 	$sql = $sql_select . $sql_from . $sql_where . $sql_final;
-	// Debug
+	// Debug - After SQL injection
 	$debugger->showSql($sql, $sql_debug);
-
+	
 	// Return
-	//if($db_type){
-		if($sql_db){
-			if(isset($numrows) && isset($offset))
-				$rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
-			else
-				$rs_pre = $sql_db->Execute($sql) or die(jp7_debug($sql_db->ErrorMsg(), $sql));
-		} else{
-			if (isset($numrows) && isset($offset))
-				$rs_pre = $db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
-			else
-				$rs_pre = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		}
-	/*}else{
-		if($sql_db)
-			$rs_pre=mysql_query($sql,$sql_db) or die(jp7_debug(mysql_error(), $sql));
+	if ($debugger->active) $debugger->startTime();
+	if($sql_db){
+		if(isset($numrows) && isset($offset))
+			$rs_pre = $sql_db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
 		else
-			$rs_pre=mysql_query($sql,$db) or die(jp7_debug(mysql_error(), $sql));
-	}*/
-			
+			$rs_pre = $sql_db->Execute($sql) or die(jp7_debug($sql_db->ErrorMsg(), $sql));
+	} else{
+		if (isset($numrows) && isset($offset))
+			$rs_pre = $db->SelectLimit($sql, $numrows, $offset) or die(jp7_debug($db->ErrorMsg(), $sql));
+		else
+			$rs_pre = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+	}
+	if ($debugger->active) $debugger->addLog($sql, 'sql', $debugger->getTime($_GET['debug_sql']));
+	
 	if ($rs && $sql) eval("global \$" . $rs . ";\$" . $rs . "=\$rs_pre;");
 	else return $rs_pre;
 }
@@ -1045,7 +1040,7 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 	if ($table_id_value) {
 		$sql = "SELECT ".$fields.
 		" FROM ".$table.
-		" WHERE ".$table_id_name."=".$table_id_value;
+		" WHERE ".$table_id_name."='".$table_id_value."'";
 		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
 			$sql .=	" AND publish <> ''" .
 			" AND (deleted = '' OR deleted IS NULL)" .
@@ -1929,13 +1924,13 @@ function jp7_index($lang=""){
 /**
  * Checks if one of the specified hosts is the current host.
  *
- * @param string $hosts List of hosts separated by comma (,).
+ * @param mixed $hosts List of hosts as array or as a string separated by comma (,).
  * @return bool Returns <tt>TRUE</tt> if the current host is found.
  * @author JP
- * @version (2005/08/10)
+ * @version (2008/07/22)
  */
 function jp7_host($hosts){
-	$hosts = explode(',', $hosts);
+	if (!is_array($hosts)) $hosts = explode(',', $hosts);
 	foreach($hosts as $host){
 		if (strpos($_SERVER['HTTP_HOST'], $host) !== FALSE){
 			return TRUE;
@@ -2029,7 +2024,7 @@ function XOREncryption($InputString, $KeyPhrase){
 }
 
 /**
- * Encrypts a given string with a given key phrase.
+ * Encrypts a given string with a given key phrase using XOR.
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase
@@ -2042,7 +2037,7 @@ function XOREncrypt($InputString, $KeyPhrase){
 }
 
 /**
- * Decrypts a given string with a given key phrase.
+ * Decrypts a given string with a given key phrase using XOR.
  *
  * @param string $InputString Input string
  * @param string $KeyPhrase Key phrase

@@ -11,7 +11,6 @@
 <? if($c_template){?>
 	<link rel="stylesheet" type="text/css" href="/_templates/<?=$c_template?>/css/style.css" />
 <? }?>
-<?= $debugger->debugStyle; ?>
 <? if(!$c_w3c){?><script type="text/javascript">if(document.getElementById&&!document.all)document.write('<link rel="stylesheet" href="../../css/<?=$c_site?>_ns.css">')</script><?}?>
 <script type="text/javascript">
 var d=document
@@ -44,6 +43,8 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_checkflash.js"></script>
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_form.js"></script>
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_form_lang_<?= $lang->lang ?>.js"></script>
+<script type="text/javascript" src="<?=$c_path_js?>swfobject.js"></script>
+<script type="text/javascript" src="<?=$c_path_js?>jquery/jquery-1.2.6.pack.js"></script>
 <? if($c_menu!="none"){?>
 	<? if(strpos($c_menu,"../")!==false){?>
 		<script type="text/javascript" src="<?=$c_menu?>"></script>
@@ -55,3 +56,4 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?=$c_path_js?>interdyn_menu.js"></script>
 <script type="text/javascript" src="../../js/functions.js"></script>
 <script type="text/javascript" src="../../js/init.js"></script>
+<? $debugger->safePoint = TRUE; ?>

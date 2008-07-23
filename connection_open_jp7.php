@@ -1,6 +1,6 @@
 <?
 if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br")!==false||$c_server_type=="Default"||$c_server_type=="Principal")&&$c_server_type!="JPSete"){
-	// JP7 (LocaWeb)
+	// JP7 (Locaweb)
 	$c_server_type="Principal";
 	$db_host="mysql01.jp7.com.br";
 	if(!$db_name)$db_name="jp71";
@@ -33,7 +33,7 @@ if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br"
 		//echo "<pre>".dirname($SCRIPT_NAME);
 		$path_size=explode("/",dirname($SCRIPT_NAME));
 		//print_r($path_size)."\n";
-		$path_arr=array_slice($path_size,1,count($path_size)-3);
+		$path_arr=array_slice($path_size,1,count($path_size)-3);//-3
 		//print_r($path_arr)."\n";
 		$c_path=implode("/",$path_arr)."/";
 		//echo $c_path."\n";

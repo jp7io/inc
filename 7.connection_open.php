@@ -22,7 +22,11 @@ foreach ($_REQUEST as $key => $value) {
 // Templates
 if($c_template)include $c_doc_root . '_templates/' . $c_template . '/config.php';
 
-@session_start();
+// Session (Precisa para o Preview e pode ser usado para outros fins)
+if (!session_id()) {
+	session_name($c_site);
+	session_start();
+}
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === FALSE && !$only_info) {
