@@ -5,7 +5,7 @@
 	<base href="<?=$seo_baseurl?>" />
 <? } else { ?>
 	<base href="http://<?=$HTTP_HOST?><?=($REQUEST_URI&&!$baseurl)?$REQUEST_URI:$SCRIPT_NAME?>" />
-<? } ?>
+<? }?>
 <link rel="stylesheet" type="text/css" href="<?=$c_path_css?>7<? if($c_w3c){?>_w3c<? }?>.css" />
 <link rel="stylesheet" type="text/css" href="../../css/<?=$c_site?>.css" />
 <? if($c_template){?>

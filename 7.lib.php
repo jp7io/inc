@@ -24,8 +24,9 @@ if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 $c_jp7 = ($_SERVER['REMOTE_ADDR'] == '201.6.156.39' || $_SERVER['SERVER_ADDR'] == '192.168.0.2');
 
 /**
- * Setting "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
+ * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
  */
+if (!setlocale(LC_CTYPE, 'pt_BR')) setlocale(LC_CTYPE, 'pt_BR.ISO8859-1');
 if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
@@ -1165,7 +1166,7 @@ class jp7_lang{
 	 * @version (2008/06/26)
 	 */
 	function getUri($new_lang, $uri = '') {
-		global $c_wwwroot, $c_lang_default;
+		global $c_url, $c_lang_default;
 		$langs = Array('en','es','pt-br','pt','fr','jp'); 
 		if ($new_lang == $c_lang_default) $new_lang = 'site';
 		if (!$uri) $uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -1175,13 +1176,13 @@ class jp7_lang{
 				$uri = $uri_parts[0];
 				$querystring = '?' . $uri_parts[1];
 		}
-		$uri = jp7_path($uri, TRUE);
-		if ($c_wwwroot == $uri) $uri .= '/site/home/index.php';
+		$uri = jp7_path($uri);
+		if ($c_url == $uri) $uri .= 'site/home/index.php';
 		
-		$uri_lang = str_replace(jp7_path($c_wwwroot),'',$uri);
+		$uri_lang = str_replace($c_url,'',$uri);
 		if (in_array($uri_lang, $langs) || $uri_lang == 'site') $uri .= '/';
 		
-		return str_replace($c_wwwroot . '/' . $this->path_2, $c_wwwroot . '/' . $new_lang . '/', $uri . $querystring);
+		return str_replace($c_url . $this->path_2, $c_url . $new_lang . '/', $uri . $querystring);
 	}
 }
 
