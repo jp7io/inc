@@ -179,10 +179,10 @@ function wap_toHTML($S){
  * @return string Quoted string.
  * @version (2003/08/25)
  */
-function toBase($S){
+function toBase($S,$force_magic_quotes_gpc=FALSE){
 	global $db;
 	if($S){
-		$S=$db->qstr($S,get_magic_quotes_gpc()); //trata as aspas. Ex.: mysql fica \' sqlserver ''
+		$S=$db->qstr($S,get_magic_quotes_gpc()&&!$force_magic_quotes_gpc); //trata as aspas. Ex.: mysql fica \' sqlserver ''
 		$S=trim($S);
 	}else{
 		$S="''";
@@ -601,7 +601,7 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
  * @author JP, Cristiano
  * @version (2007/12/17)
  */
-function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=TRUE){
+function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=TRUE,$force_magic_quotes_gpc=FALSE){
 	global $db;
 	
 	$table_columns=$db->MetaColumnNames($table);
@@ -623,7 +623,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
 			if(!$var_check||$var_isset){
 				//se for definido valor ou campo for inteiro
 				if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
-					$sql.=((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value);
+					$sql.=((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value,$force_magic_quotes_gpc);
 				//se não for definido valor e for mysql salva branco
 				}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
 					$sql.=((!$j)?" ":",")."".$table_field_name."=''";
@@ -650,7 +650,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
 			$sql_campos.=" ".$table_field_name." ".(($i==$table_columns_num)?") ":",\n");
 			//se for definido valor
 			if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
-				$valores.=toBase($table_field_value).(($i==$table_columns_num)?")":",\n");
+				$valores.=toBase($table_field_value,$force_magic_quotes_gpc).(($i==$table_columns_num)?")":",\n");
 			//se não for definido valor e for mysql salva branco
 			}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
 				$valores.="''".(($i==$table_columns_num)?")":",\n");
@@ -760,7 +760,7 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
  * @version (2007/03/10)
  */
 function interadmin_tipos_campos($campos){
-	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default");
+	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default","nome_id");
 	$campos=split("{;}",$campos);
 	for($i=0;$i<count($campos);$i++){
 		$parameters=split("{,}",$campos[$i]);
@@ -1972,7 +1972,7 @@ function jp7_file_size($file){
  * @global Debug
  * @return string HTML formatted backtrace.
  */
-function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
+function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE) {
 	global $debugger;
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, debug_backtrace());
 	$nome_app = ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site';
@@ -1993,12 +1993,12 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE){
 		//$template="form_htm.php";
 		$html = TRUE;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if($GLOBALS['c_server_type'] == 'Principal'/* && !$GLOBALS['c_jp7']*/) {
+		if($GLOBALS['c_server_type'] == 'Principal' && (!$GLOBALS['c_jp7'] || $jp7_cache)) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
-			header('Location: /em_manutencao.htm');
+			header('Location: /_default/em_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>
             <script language="javascript" type="text/javascript">
-			document.location.href="/em_manutencao.htm";
+			document.location.href="/_default/em_manutencao.htm";
 			</script>
             <?
 			exit();
