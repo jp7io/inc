@@ -487,6 +487,8 @@ function jp7_date_week($w,$sigla=FALSE){
 	global $lang;
 	switch($lang->lang){
 		case "en":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
+		case "de":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
+		case "es":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
 		default:$W=array("Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado");break;
 	}
 	if(!is_int($w))$w=date("w",strtotime($w));
@@ -507,6 +509,8 @@ function jp7_date_month($m,$sigla=FALSE){
 	global $lang;
 	switch($lang->lang){
 		case "en":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
+		case "de":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
+		case "es":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
 		default:$M=array("Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro");break;
 	}
 	$return=$M[$m-1];
@@ -1031,6 +1035,7 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 		$table_id_value=$param_2;
 		$fields=$param_3;
 	}
+	
 	if(!$fields)$fields="varchar_key";
 	if(is_array($fields)){
 		$fields_arr = $fields;
@@ -1043,7 +1048,8 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 		" FROM ".$table.
 		" WHERE ".$table_id_name."='".$table_id_value."'";
 		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
-			$sql .=	" AND publish <> ''" .
+			$sql .= "" .
+			(($GLOBALS['c_publish']) ? " AND publish <> ''" : "") .
 			" AND (deleted = '' OR deleted IS NULL)" .
 			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
 		}
@@ -1578,6 +1584,7 @@ function jp7_path_find($file) {
 		if ($ok = @file_exists($path . $file)) break;
 	}
 	if (!$ok) {
+		if (strpos($file,'/head.php')) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}
