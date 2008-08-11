@@ -36,7 +36,7 @@ if(!$wap_style_text)$wap_style_link="#000000";
 if(!$wap_style_link)$wap_style_link="#0000FF";
 ?>
 
-<?if($html){?>
+<? if ($html) { ?>
 	<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 	<html>
 	<head>
@@ -49,11 +49,11 @@ if(!$wap_style_link)$wap_style_link="#0000FF";
 	</head>
 	<body bgcolor="<?=$wap_style_bg?>" text="<?=$wap_style_text?>" link="<?=$wap_style_link?>" vlink="<?=$wap_style_link?>" alink="<?=$wap_style_link?>">
 	<table border=0 cellpadding=5><tr><td>
-<?}else{?>
+<? } else { ?>
 	<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.2//EN" "http://www.wapforum.org/DTD/wml_1.2.xml">
 	<wml>
 	<card id="<?=toId($secaoTitle)?>_<?=toId($subsecaoTitle)?>" title="<?=$c_site_title?><?=($secaoTitle!="Home")?" - ".$secaoTitle:""?>">
-	<?if($secaoTitle!="Home"||$subsecaoTitle!="Home"){?>
+	<? if ($secaoTitle!="Home"||$subsecaoTitle!="Home") { ?>
 		<p><small>
-	<?}?>
-<?}?>
+	<? } ?>
+<? } ?>

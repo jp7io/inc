@@ -7,14 +7,13 @@
 
 // jp7_app_checkPermission (2006/08/17)
 function jp7_app_checkPermission(){
-	global $HTTP_HOST;
 	global $jp7_app;
 	global $c_cliente_domains;
 	eval("global \$s_".$jp7_app."_cliente;");
 	eval("\$cliente=\"\$s_".$jp7_app."_cliente\";");
 	$ok=false;
 	for($i=0;$i<count($c_cliente_domains);$i++){
-		switch($HTTP_HOST){
+		switch($_SERVER['HTTP_HOST']){
 			case $c_cliente_domains[$i]:
 			case "www.".$c_cliente_domains[$i]:
 			case "www.".toId($c_cliente_domains[$i]):
@@ -27,7 +26,7 @@ function jp7_app_checkPermission(){
 				break;
 		}
 	}
-	switch($HTTP_HOST){
+	switch($_SERVER['HTTP_HOST']){
 		case "192.168.0.2":
 		case "localhost":
 		case "jp":
@@ -166,7 +165,7 @@ function jp7_phpmyadmin_aplicacao_path($path="../../_admin/phpmyadmin/",$path2="
 	if(is_dir($path)||$i>3){
 		global $SCRIPT_NAME;
 		global $jp7_app;
-		return $path2.((strpos($SCRIPT_NAME,($jp7_app=="intertime"||$jp7_app=="interaccount")?"interadmin":$jp7_app)===false)?"../":(($jp7_app=="intertime"||$jp7_app=="interaccount")?"interadmin":$jp7_app)."/");
+		return $path2.((strpos($SCRIPT_NAME,($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite")?"interadmin":$jp7_app)===false)?"../":(($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite")?"interadmin":$jp7_app)."/");
 	}
 	else return jp7_phpmyadmin_aplicacao_path("../".$path,"../".$path2);
 }

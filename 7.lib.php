@@ -483,17 +483,17 @@ function jp7_date_format($date,$format="d/m/Y"){
  * @return string Textual representation for the day of the week.
  * @version (2006/04/27)
  */
-function jp7_date_week($w,$sigla=FALSE){
+function jp7_date_week($w, $sigla = FALSE) {
 	global $lang;
-	switch($lang->lang){
-		case "en":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
-		case "de":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
-		case "es":$W=array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday");break;
-		default:$W=array("Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado");break;
+	switch($lang->lang) {
+		case "en": $W = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"); break;
+		case "de": $W = array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"); break;
+		case "es": $W = array("Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"); break;
+		default: $W = array("Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"); break;
 	}
-	if(!is_int($w))$w=date("w",strtotime($w));
-	$return=$W[$w];
-	return ($sigla)?substr($return,0,3):$return;
+	if (!is_int($w)) $w = date("w", strtotime($w));
+	$return = $W[$w];
+	return ($sigla) ? substr($return, 0, 3) : $return;
 }
 
 /**
@@ -505,16 +505,16 @@ function jp7_date_week($w,$sigla=FALSE){
  * @return string Textual representation of a month.
  * @version (2004/06/14)
  */
-function jp7_date_month($m,$sigla=FALSE){
+function jp7_date_month($m, $sigla = FALSE) {
 	global $lang;
-	switch($lang->lang){
-		case "en":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
-		case "de":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
-		case "es":$M=array("January","February","March","April","May","June","July","August","September","October","November","December");break;
-		default:$M=array("Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro");break;
+	switch($lang->lang) {
+		case "en": $M = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"); break;
+		case "de": $M = array("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"); break;
+		case "es": $M = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"); break;
+		default: $M = array("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"); break;
 	}
-	$return=$M[$m-1];
-	return ($sigla)?substr($return,0,3):$return;
+	$return = $M[$m - 1];
+	return ($sigla) ? substr($return, 0, 3) : $return;
 }
 
 /**
@@ -1127,7 +1127,7 @@ class jp7_lang{
 	 * @author JP
 	 * @version (2006/09/12)
 	 */
-	function jp7_lang($lang = '', $force = FALSE){
+	function jp7_lang($lang = '', $force = FALSE) {
 		global $c_lang_default;
 		if (!$lang) $lang = $c_lang_default;
 		if ($force) $this->lang = $lang;
@@ -1139,27 +1139,28 @@ class jp7_lang{
 				$pos1=strpos($this->lang,$_SERVER['QUERY_STRING']);
 				if($pos1!==false)$this->lang=substr($this->lang,0,$pos1);
 			}
-			$this->lang=explode("/",$this->lang);
+			$this->lang = explode("/",$this->lang);
 			//if($c_path){ // Old Way
-				$path_size=explode("/",$c_path);
-				$path_size=count($path_size);
+				$path_size = explode("/",$c_path);
+				$path_size = count($path_size);
 				//$this->lang=$this->lang[$path_size]; // Old Way
-				$this->lang=$this->lang[count($this->lang)-3]; // For Hotsites
+				$this->lang = $this->lang[count($this->lang)-3]; // For Hotsites
 			//}else $this->lang=$this->lang[1]; // Old Way
-			$this->lang=str_replace("_","",$this->lang); // Apache Redirect
+			$this->lang = str_replace("_","",$this->lang); // Apache Redirect
 		}
-		$langs = Array('en','es','pt-br','pt','fr','jp'); 
+		$langs = array('de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'); 
 		//if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$c_site||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
-		if(!in_array($this->lang,$langs)||$this->lang==$c_lang_default||!$c_lang_default){
-			$this->lang=$lang;
-			$this->prefix="";
-			$this->path="";
-			$this->path_2="site/";
-		}else{
-			$this->prefix="_".$this->lang;
-			$this->path=$this->lang."/";
-			$this->path_2=$this->path;
+		if (!in_array($this->lang, $langs) || $this->lang == $c_lang_default || !$c_lang_default) {
+			$this->lang = $lang;
+			$this->prefix = "";
+			$this->path = "";
+			$this->path_url = "site/";
+		} else {
+			$this->prefix = "_" . $this->lang;
+			$this->path = $this->lang . "/";
+			$this->path_url = $this->path;
 		}
+		$this->path_2 = $this->path_url; // Replace later (?)
 	}
 	/**
 	 * Creates a link for the current page on another language.
@@ -1173,22 +1174,47 @@ class jp7_lang{
 	 */
 	function getUri($new_lang, $uri = '') {
 		global $c_url, $c_lang_default;
-		$langs = Array('en','es','pt-br','pt','fr','jp'); 
-		if ($new_lang == $c_lang_default) $new_lang = 'site';
+		$newLang = new jp7_lang($new_lang, TRUE);
 		if (!$uri) $uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		
+		// Separates Query String from Uri
 		$uri_parts = explode('?', $uri);
 		if ($uri_parts[1]) {
-				$uri = $uri_parts[0];
-				$querystring = '?' . $uri_parts[1];
+			$uri = $uri_parts[0];
+			$querystring = '?' . $uri_parts[1];
 		}
-		$uri = jp7_path($uri);
-		if ($c_url == $uri) $uri .= 'site/home/index.php';
-		
-		$uri_lang = str_replace($c_url,'',$uri);
-		if (in_array($uri_lang, $langs) || $uri_lang == 'site') $uri .= '/';
-		
-		return str_replace($c_url . $this->path_2, $c_url . $new_lang . '/', $uri . $querystring);
+		// Home
+		$uri_lang = jp7_path(str_replace($c_url, '', $uri));
+		if ($c_url == $uri || $uri_lang == $this->path_url) return $c_url . (($newLang->path_url == 'site/') ? '' : $newLang->path_url) . $querystring;
+		// Default
+		else return str_replace($c_url . $this->path_url, $c_url . $newLang->path_url, $uri . $querystring);
+/*
+// Check newLang
+if(!newLang)newLang=(lang=='pt-br')?'en':'pt-br';
+oldLang=lang.replace('pt-br','site');
+newLang=newLang.replace('pt-br','site');
+// Check and Parser Querystring
+var oldLocation=location.toString();
+var query_i=oldLocation.indexOf('?');
+if(query_i!=-1){
+	oldLocation=oldLocation.substring(0,query_i+1);
+	var queries=location.search;
+	queries=queries.substr(1);
+	queries=queries.split('&');
+	var query_key_id=null;
+	var query_attribute=null;
+	for(var query_key in queries){
+		query_attribute=queries[query_key].split('=');
+		if(query_attribute[0]=='id')query_key_id=query_key;
+	}
+	// Check and Replace "id" with "id_tipo"
+	if(query_key_id!==null)queries[query_key_id]='id_tipo='+tipos[tipos.length-1];
+	queries=queries.join('&');
+}
+// Mount newLocation
+var newLocation=oldLocation.replace('/'+oldLang,'/'+newLang)
+if(newLocation==oldLocation)newLocation='http://'+location.host+'/'+path+newLang+'/'
+location.replace(newLocation+((queries)?queries:''))
+*/
 	}
 }
 
@@ -1584,7 +1610,8 @@ function jp7_path_find($file) {
 		if ($ok = @file_exists($path . $file)) break;
 	}
 	if (!$ok) {
-		if (strpos($file,'/head.php')) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
+		if (strpos($file,'/head.php') !== FALSE) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
+		if ($GLOBALS['c_template'] && strpos($file,'../../inc/') !== FALSE) return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}

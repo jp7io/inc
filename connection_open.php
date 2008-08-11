@@ -39,5 +39,5 @@ if(strpos($_SERVER['REQUEST_URI'],"/qa/")!==false){
 	$c_email_oportunidades="debug+oportunidades@sites.jp7.com.br";
 }
 include $c_doc_root."inc/connection_open_jp7.php";
-include jp7_path_find("inc/7.connection_open.php");
+include jp7_path_find('inc/7.connection_open.php');
 ?>

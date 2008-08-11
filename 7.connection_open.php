@@ -1,4 +1,8 @@
 <?
+if (!$db_host) {
+	include $c_doc_root . 'inc/connection_open_jp7.php';
+}
+
 // Paths
 $c_path = jp7_path($c_path);
 $c_root = $c_doc_root . $c_path;
@@ -6,7 +10,8 @@ if (!$c_path_js) $c_path_js = '/_default/js/';
 if (!$c_path_css) $c_path_css = '/_default/css/';
 if (!$c_path_default) $c_path_default = '/_default/';
 if (!$c_lang_default) $c_lang_default = 'pt-br';
-$c_url = 'http://' . $HTTP_HOST. '/' .$c_path;
+$config->server->url = 'http://' . $HTTP_HOST . '/' . $c_path; // Temp - Delete it when InterSite Class get finished
+$c_url = $config->server->url;
 
 // Check IDs
 foreach ($_REQUEST as $key => $value) {
@@ -33,10 +38,12 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === FALSE && !$only_info) 
 
 // Language
 $lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
+$config->lang = $config->langs[$lang->lang];
+if  (!$c_site_title) $c_site_title = $config->lang->title;
+
 @include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 @include $c_root . 'inc/lang_' . $lang->lang . '.php';
 
-// DB Connection
 if (!$db_type) $db_type = 'mysql';
 include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;

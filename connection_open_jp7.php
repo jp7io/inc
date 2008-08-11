@@ -46,4 +46,9 @@ if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br"
 $c_path_default="/_default/";
 $c_path_js="/_default/js/";
 $c_path_css="/_default/css/";
+
+$config->server->db->host = $db_host;
+$config->server->db->name = $db_name;
+$config->server->db->user = $db_user;
+$config->server->db->pass = $db_pass;
 ?>
