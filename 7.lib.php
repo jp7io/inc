@@ -1180,41 +1180,18 @@ class jp7_lang{
 		$uri_parts = explode('?', $uri);
 		if ($uri_parts[1]) {
 			$uri = $uri_parts[0];
-			$querystring = '?' . $uri_parts[1];
+			$querystring_arr = explode('&', $uri_parts[1]);
+			foreach($querystring_arr as $value) {
+				$arr = explode('=', $value);
+				if ($arr[0] != 'id') $values[] = $arr[0] . '=' . $arr[1];
+			}
+			if ($values) $querystring = '?' . implode('&', (array) $values);
 		}
 		// Home
 		$uri_lang = jp7_path(str_replace($c_url, '', $uri));
 		if ($c_url == $uri || $uri_lang == $this->path_url) return $c_url . (($newLang->path_url == 'site/') ? '' : $newLang->path_url) . $querystring;
 		// Default
 		else return str_replace($c_url . $this->path_url, $c_url . $newLang->path_url, $uri . $querystring);
-/*
-// Check newLang
-if(!newLang)newLang=(lang=='pt-br')?'en':'pt-br';
-oldLang=lang.replace('pt-br','site');
-newLang=newLang.replace('pt-br','site');
-// Check and Parser Querystring
-var oldLocation=location.toString();
-var query_i=oldLocation.indexOf('?');
-if(query_i!=-1){
-	oldLocation=oldLocation.substring(0,query_i+1);
-	var queries=location.search;
-	queries=queries.substr(1);
-	queries=queries.split('&');
-	var query_key_id=null;
-	var query_attribute=null;
-	for(var query_key in queries){
-		query_attribute=queries[query_key].split('=');
-		if(query_attribute[0]=='id')query_key_id=query_key;
-	}
-	// Check and Replace "id" with "id_tipo"
-	if(query_key_id!==null)queries[query_key_id]='id_tipo='+tipos[tipos.length-1];
-	queries=queries.join('&');
-}
-// Mount newLocation
-var newLocation=oldLocation.replace('/'+oldLang,'/'+newLang)
-if(newLocation==oldLocation)newLocation='http://'+location.host+'/'+path+newLang+'/'
-location.replace(newLocation+((queries)?queries:''))
-*/
 	}
 }
 
@@ -1599,7 +1576,7 @@ function jp7_include($file){
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
- * @version (2008/07/03)
+ * @version (2008/08/11)
  */
 function jp7_path_find($file) {
 	global $debugger;
@@ -1608,6 +1585,11 @@ function jp7_path_find($file) {
 	for ($i = 0; $i <= $path_levels; $i++) {
 		($i) ? $path .= '../' : $path = '';
 		if ($ok = @file_exists($path . $file)) break;
+	}
+	if (!$ok) {
+		// Necessário para localização de includes em templates
+		$path = jp7_path($GLOBALS['c_doc_root'], TRUE) . dirname($_SERVER['REQUEST_URI']) . '/';
+		$ok = @file_exists($path . $file);
 	}
 	if (!$ok) {
 		if (strpos($file,'/head.php') !== FALSE) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
