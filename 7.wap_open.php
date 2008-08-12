@@ -40,19 +40,19 @@ if(!$wap_style_link)$wap_style_link="#0000FF";
 	<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.0//EN" "http://www.wapforum.org/DTD/xhtml-mobile10.dtd">
 	<html>
 	<head>
-	<title><?=$c_site_title?><?=($secaoTitle!="Home")?" - ".$secaoTitle:""?></title>
+	<title><?= $c_site_title ?><?=($secaoTitle!="Home")?" - ".$secaoTitle:""?></title>
 	<style>
 	a:link,
 	a:active,
-	a:visited{color:<?=$wap_style_link?>}
+	a:visited{color:<?= $wap_style_link ?>}
 	</style>
 	</head>
-	<body bgcolor="<?=$wap_style_bg?>" text="<?=$wap_style_text?>" link="<?=$wap_style_link?>" vlink="<?=$wap_style_link?>" alink="<?=$wap_style_link?>">
+	<body bgcolor="<?= $wap_style_bg ?>" text="<?= $wap_style_text ?>" link="<?= $wap_style_link ?>" vlink="<?= $wap_style_link ?>" alink="<?= $wap_style_link ?>">
 	<table border=0 cellpadding=5><tr><td>
 <? } else { ?>
 	<!DOCTYPE wml PUBLIC "-//WAPFORUM//DTD WML 1.2//EN" "http://www.wapforum.org/DTD/wml_1.2.xml">
 	<wml>
-	<card id="<?=toId($secaoTitle)?>_<?=toId($subsecaoTitle)?>" title="<?=$c_site_title?><?=($secaoTitle!="Home")?" - ".$secaoTitle:""?>">
+	<card id="<?=toId($secaoTitle)?>_<?=toId($subsecaoTitle)?>" title="<?= $c_site_title ?><?=($secaoTitle!="Home")?" - ".$secaoTitle:""?>">
 	<? if ($secaoTitle!="Home"||$subsecaoTitle!="Home") { ?>
 		<p><small>
 	<? } ?>

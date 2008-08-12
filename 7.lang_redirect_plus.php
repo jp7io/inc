@@ -24,16 +24,16 @@ if($id_tipo){
 	include "../../inc/connection_open_light.php";
 	
 	// Selects
-	$sql="SELECT parent_id_tipo,nome,nome_en FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
-	$rs=mysql_query($sql,$db)or die(mysql_error());
-	if($row=mysql_fetch_object($rs)){
+	$sql = "SELECT parent_id_tipo,nome,nome_en FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
+	$rs = mysql_query($sql,$db)or die(mysql_error());
+	if ($row=mysql_fetch_object($rs)){
 		$parent_id_tipo=$row->parent_id_tipo;
 		if($parent_id_tipo){
 			$basename=toId_2($row->nome).".php";
 			$basename_en=toId_2($row->nome_en).".php";
-			$sql2="SELECT parent_id_tipo,nome,nome_en FROM ".$db_prefix."_tipos WHERE id_tipo=".$parent_id_tipo;
+			$sql2 = "SELECT parent_id_tipo,nome,nome_en FROM ".$db_prefix."_tipos WHERE id_tipo=".$parent_id_tipo;
 			$rs2=mysql_query($sql2,$db)or die(mysql_error());
-			if($row2=mysql_fetch_object($rs2)){
+			if ($row2=mysql_fetch_object($rs2)){
 				$dirname="/".toId_2($row2->nome);
 				$dirname_en="/".toId_2($row2->nome_en);
 			}

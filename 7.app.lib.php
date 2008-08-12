@@ -12,7 +12,7 @@ function jp7_app_checkPermission(){
 	eval("global \$s_".$jp7_app."_cliente;");
 	eval("\$cliente=\"\$s_".$jp7_app."_cliente\";");
 	$ok=false;
-	for($i=0;$i<count($c_cliente_domains);$i++){
+	for($i = 0;$i<count($c_cliente_domains);$i++){
 		switch($_SERVER['HTTP_HOST']){
 			case $c_cliente_domains[$i]:
 			case "www.".$c_cliente_domains[$i]:

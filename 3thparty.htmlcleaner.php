@@ -76,7 +76,7 @@ class htmlcleanertag {
 
 	function parseAttributes($str)
 	{
-		$i=0;
+		$i = 0;
 		$return = array();
 		$_state = -1;
                 $_value = '';
@@ -168,7 +168,7 @@ class htmlcleaner
 
 	function dessicate($str)
 	{
-		$i=0;
+		$i = 0;
 		$parts = array();
 		$_state = -1;
 		$str_len = strlen($str);

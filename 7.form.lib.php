@@ -89,11 +89,11 @@ function interadmin_returnCampo($campo){
 				$form.=ob_get_contents();
 				ob_end_clean();
 			}else{
-				$sql="SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+				$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
 				" WHERE parent_id_tipo=".$campo_nome.
 				" ORDER BY ordem,nome";
 				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-				while($row=$rs->FetchNextObj()){
+				while ($row = $rs->FetchNextObj()) {
 					$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
 				}
 				$rs->Close();
@@ -219,7 +219,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	global $db_type;
 	global $select_campos_sql_temp;
 	global $lang;
-	$sql="SELECT tabela,campos,language FROM ".$db_prefix."_tipos".
+	$sql = "SELECT tabela,campos,language FROM ".$db_prefix."_tipos".
 	" WHERE id_tipo=".$parent_id_tipo_2;
 	
 	if($db_type) 
@@ -252,10 +252,10 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	}
 	// Loop
 	if($select_tabela){
-		$sql="SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix."_".$select_tabela.
+		$sql = "SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix."_".$select_tabela.
 		" ORDER BY varchar_key";
 	}else{
-		$sql="SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix.(($select_lang)?$lang->prefix:"").
+		$sql = "SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix.(($select_lang)?$lang->prefix:"").
 		" WHERE id_tipo=".$parent_id_tipo_2.
 		$sql_where.
 		" AND (deleted='' OR deleted IS NULL)".
@@ -266,7 +266,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	else 
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	$S='';
-	for($i=0;$i<$nivel*5;$i++){
+	for($i = 0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
 		else $S.='> ';
 	}
@@ -278,7 +278,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	while($row=($db_type)?$rs->FetchNextObj():mysql_fetch_object($rs)){
 		if(is_array($current_id))$selected=in_array($row->id,$current_id);
 		else $selected=($row->id==$current_id);
-		if($row->select_key&&!in_array("select_key",$select_campos_2_array)){
+		if ($row->select_key&&!in_array("select_key",$select_campos_2_array)){
 			if($campos[select_key][xtra])$row->varchar_key=interadmin_tipos_nome($row->select_key);
 			else $row->varchar_key=jp7_fields_values($row->select_key);
 		}
@@ -311,18 +311,18 @@ function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$pre
 	global $id_tipo;
 	global $db;
 	global $db_prefix;
-	$sql="SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+	$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
 	" WHERE parent_id_tipo=".$parent_id_tipo_2.
 	$sql_where.
 	" ORDER BY ordem,nome";
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	$S='';
-	for($i=0;$i<$nivel*5;$i++){
+	for($i = 0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
 		else $S.='> ';
 	}
-	$i=0;
-	while($row=$rs->FetchNextObj()){
+	$i = 0;
+	while ($row = $rs->FetchNextObj()) {
 		if(is_array($current_id_tipo))$selected=in_array($row->id_tipo,$current_id_tipo);
 		else $selected=($row->id_tipo==$current_id_tipo);
 		if(interadmin_tipos_nome($parent_id_tipo_2)=="Classes"||$classes)$classes=true;
@@ -417,7 +417,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 	}
 	foreach($post_vars as $key=>$value){
 		if(in_array($key,$vars_headers)){
-			if(!$debug/*&&!@ini_get("safe_mode")*/)$headers.=strtoupper(substr($key,3)).": ".$value."\r\n";
+			if(!$debug/*&&!@ini_get("safe_mode")*/ && $value)$headers.=strtoupper(substr($key,3)).": ".$value."\r\n";
 		}elseif(strpos($key,"DF_spacer")===0){
 			$message.="<br>\r\n";
 		}elseif(strpos($key,"_select_multi")!==false){
@@ -539,7 +539,7 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 				if(!$key_out)$key_out=$key;
 				if(strpos($key,"password_")===0){
 					$new_value="";
-					for($i=0;$i<strlen($value);$i++){
+					for($i = 0;$i<strlen($value);$i++){
 						$new_value.="*";
 					}
 					$value=$new_value;
@@ -551,23 +551,23 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 				}elseif(strpos($key,"select_multi")===0){
 					// Selects Multi
 					if($key_out&&is_int(intval($key_out))){
-						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
+						$sql = "SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
 						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-						if($row=$rs->FetchNextObj())$key_out=$row->nome."_select_multi";
+						if ($row=$rs->FetchNextObj())$key_out=$row->nome."_select_multi";
 						$rs->Close();
 					}
 					if($value/*&&is_int(intval($value))*/){
 						if($campo[xtra]){
-							$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo IN (".$value.")";
+							$sql = "SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo IN (".$value.")";
 							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-							while($row=$rs->FetchNextObj()){
+							while ($row = $rs->FetchNextObj()) {
 								$value_arr[]=$row->nome;
 							}
 							$rs->Close();
 						}else{
-							$sql="SELECT varchar_key FROM ".$db_prefix." WHERE id IN (".$value.")";
+							$sql = "SELECT varchar_key FROM ".$db_prefix." WHERE id IN (".$value.")";
 							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-							while($row=$rs->FetchNextObj()){
+							while ($row = $rs->FetchNextObj()) {
 								$value_arr[]=$row->varchar_key;
 							}
 							$rs->Close();
@@ -577,28 +577,28 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 				}elseif(strpos($key,"select_")===0){
 					// Selects
 					if($key_out&&is_int(intval($key_out))){
-						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
+						$sql = "SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($key_out);
 						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-						if($row=$rs->FetchNextObj())$key_out=$row->nome;
+						if ($row=$rs->FetchNextObj())$key_out=$row->nome;
 						$rs->Close();
 					}
 					if($value&&is_int(intval($value))){
 						if($campo[xtra]){
-							$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($value);
+							$sql = "SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".intval($value);
 							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-							if($row=$rs->FetchNextObj())$value=$row->nome;
+							if ($row=$rs->FetchNextObj())$value=$row->nome;
 							$rs->Close();
 						}else{
-							$sql="SELECT varchar_key FROM ".$db_prefix." WHERE id=".intval($value);
+							$sql = "SELECT varchar_key FROM ".$db_prefix." WHERE id=".intval($value);
 							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-							if($row=$rs->FetchNextObj())$value=$row->varchar_key;
+							if ($row=$rs->FetchNextObj())$value=$row->varchar_key;
 							$rs->Close();
 						}
 					}
 				}elseif(strpos($key,"parent_id")===0){
 					// Parent ID
 					if($value){
-						$sql="SELECT id_tipo,varchar_key FROM ".$db_prefix." WHERE id=".$value;
+						$sql = "SELECT id_tipo,varchar_key FROM ".$db_prefix." WHERE id=".$value;
 						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 						$row=$rs->FetchNextObj();
 						$key_out=$row->id_tipo;
@@ -606,7 +606,7 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 						$rs->Close();
 					}
 					if($key_out){
-						$sql="SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".$key_out;
+						$sql = "SELECT nome FROM ".$db_prefix."_tipos WHERE id_tipo=".$key_out;
 						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 						$row=$rs->FetchNextObj();
 						$key_out=$row->nome;

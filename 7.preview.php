@@ -8,7 +8,7 @@
 	?>
 	<script>
 	function interadmin_preview(){
-		if(confirm("Deseja sair do modo PREVIEW e ir para o modo PUBLICADO?")) location='http://<?=$HTTP_HOST?>/<?=$c_path?>visualizar.php?redirect='+location.toString()
+		if(confirm("Deseja sair do modo PREVIEW e ir para o modo PUBLICADO?")) location='http://<?= $HTTP_HOST ?>/<?= $c_path ?>visualizar.php?redirect='+location.toString()
 	}
 	</script>
 	<div class="preview_type" style="left:0px;border-width:0px 1px 1px 0px;background:#FFCC00;filter:alpha(opacity=50);z-index:1000"><?= $S ?></div>

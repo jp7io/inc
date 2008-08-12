@@ -126,7 +126,7 @@ function toSeo($S) {
  */
 function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*'){
 	$sql_where = $regexp;
-	for ($i=0; $i < strlen($str); $i++){
+	for ($i = 0; $i < strlen($str); $i++){
 		$char = $str[$i];
 		$char = str_replace('a', '[aáàãâäª]', $char);
 		$char =	str_replace('e', '[eéèêë&]', $char);
@@ -401,7 +401,7 @@ function jp7_register_globals(){
 function jp7_password($length=6){
 	$chars="abcdefghijkmnopqrstuvwxyz023456789";
 	$S="";
-	for($i=0;$i<$length;$i++){
+	for($i = 0;$i<$length;$i++){
 		$S.=substr($chars,rand(1,strlen($chars)),1);
 	}
 	return $S;
@@ -466,7 +466,7 @@ function jp7_date_format($date,$format="d/m/Y"){
 		}
 		$date=jp7_date_split($date);
 		$S="";
-		for($i=0;$i<strlen($format);$i++){
+		for($i = 0;$i<strlen($format);$i++){
 			$x=substr($format,$i,1); 
 			$S.=($date[$x])?$date[$x]:$x;
 		}
@@ -572,9 +572,9 @@ function jp7_tel_split($tel){
  */
 function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 	global $db, $jp7_app;
-	$sql="SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
+	$sql = "SELECT * FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	while($row=$rs->FetchNextObj()){
+	while ($row = $rs->FetchNextObj()) {
 		$meta_cols=$db->MetaColumns($table, FALSE);
 		foreach ($meta_cols as $meta){
 			$name=$meta->name;
@@ -613,7 +613,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
 	$table_columns_num=count($table_columns);
 	if($table_id_value){
 		// Update
-		$sql="UPDATE ".$table." SET ";
+		$sql = "UPDATE ".$table." SET ";
 		$j=0;
 		foreach($table_columns as $table_field_name){
 			if (is_array($var_prefix)) {
@@ -664,7 +664,7 @@ function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$v
 			}
 			$i++;
 		}
-		$sql="INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;
+		$sql = "INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		// Last ID
 		eval("global \$".$var_prefix.$table_id_name.";");
@@ -733,9 +733,9 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 		eval("global \$".$field_db.";");
 	}
 	// Update Concatenado (_)
-	$sql="SELECT ".implode(",",$fields_arr_db)." FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
+	$sql = "SELECT ".implode(",",$fields_arr_db)." FROM ".$table." WHERE ".$table_id_name."=".$table_id_value;
 	$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
-	if($row =(array)$rs->FetchNextObj()){
+	if ($row =(array)$rs->FetchNextObj()){
 		foreach($fields_arr as $field){
 			if(strpos($field,"_")===0){
 				$field=substr($field,1);
@@ -745,8 +745,8 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	}
 	$rs->Close();
 	// Update
-	$sql="UPDATE ".$table." SET ";
-	for($i=0;$i<count($fields_arr_db);$i++){
+	$sql = "UPDATE ".$table." SET ";
+	for($i = 0;$i<count($fields_arr_db);$i++){
 		eval("\$field_value=\$".$fields_arr_db[$i].";");
 		$sql.=$fields_arr_db[$i]."='".$field_value."'";
 		if($i!=count($fields_arr_db)-1)$sql.=",";
@@ -766,7 +766,7 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 function interadmin_tipos_campos($campos){
 	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default","nome_id");
 	$campos=split("{;}",$campos);
-	for($i=0;$i<count($campos);$i++){
+	for($i = 0;$i<count($campos);$i++){
 		$parameters=split("{,}",$campos[$i]);
 		if($parameters[0]){
 			$A[$parameters[0]][ordem]=($i+1);
@@ -918,7 +918,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
 		global $db;
 		global $db_prefix;
 		global $lang;
-		$sql="SELECT nome,nome".$lang->prefix." AS nome_lang FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
+		$sql = "SELECT nome,nome".$lang->prefix." AS nome_lang FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		$row=$rs->FetchNextObj();
 		$nome=($row->nome_lang&&!$nolang)?$row->nome_lang:$row->nome;
@@ -959,7 +959,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 		"<option value=\"\">".$l_selecione."</option>\n".
 		"<option value=\"\">--------------------</option>\n";
 	}
-	$sql="SELECT id,".$field." AS field FROM ".$table.
+	$sql = "SELECT id,".$field." AS field FROM ".$table.
 	" WHERE id_tipo=".$id_tipo.
 	" AND char_key<>''".
 	(($s_interadmin_preview)?"":" AND publish<>''").
@@ -968,7 +968,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$sql_where.
 	" ORDER BY ".$order;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	while($row=$rs->FetchNextObj()){
+	while ($row = $rs->FetchNextObj()) {
 		if($seo){
 			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
 			else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
@@ -1096,11 +1096,11 @@ function jp7_id_value($varchar_key,$id_tipo=0){
 	global $db_prefix;
 	global $lang;
 	$table=$db_prefix.$lang->prefix;
-	$sql="SELECT id FROM ".$table." WHERE".
+	$sql = "SELECT id FROM ".$table." WHERE".
 	" varchar_key='".$varchar_key."'".
 	(($id_tipo)?" AND id_tipo=".$id_tipo:"");
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	if($row=$rs->FetchNextObj()){
+	if ($row=$rs->FetchNextObj()){
 		$I=$row->id;
 	}
 	$rs->Close();
@@ -1218,9 +1218,9 @@ class interadmin_tipos{
 	function interadmin_tipos_tipos($id_tipo){
 		global $db, $db_prefix, $lang, $c_lang_default;
 		settype($id_tipo,'integer');
-		$sql="SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!=$c_lang_default)?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
-		$rs=interadmin_query($sql);
-		while($row=$rs->FetchNextObj()){
+		$sql = "SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!=$c_lang_default)?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
+		$rs = interadmin_query($sql);
+		while ($row = $rs->FetchNextObj()) {
 			$this->id_tipo[]=$id_tipo;
 			$this->model_id_tipo[]=$row->model_id_tipo;
 			$this->nome[]=($row->nome_lang)?$row->nome_lang:$row->nome;
@@ -1252,9 +1252,9 @@ class interadmin_tipos{
 		global $db, $db_prefix, $lang, $id_nome, $implicit_parents_names;
 		// Id
 		if($id&&is_numeric($id)){
-			$sql="SELECT id_tipo,parent_id,varchar_key FROM ".$db_prefix.$lang->prefix." WHERE id=".$id;
+			$sql = "SELECT id_tipo,parent_id,varchar_key FROM ".$db_prefix.$lang->prefix." WHERE id=".$id;
 			$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-			while($row=$rs->FetchNextObj()){
+			while ($row = $rs->FetchNextObj()) {
 				$id_tipo=$row->id_tipo;
 				$parent_id=$row->parent_id;
 				$id_nome=$row->varchar_key;
@@ -1263,9 +1263,9 @@ class interadmin_tipos{
 		}
 		// Parent Id
 		if($parent_id&&is_numeric($parent_id)){
-			$sql="SELECT id_tipo,parent_id FROM ".$db_prefix.$lang->prefix." WHERE id=".$parent_id;
+			$sql = "SELECT id_tipo,parent_id FROM ".$db_prefix.$lang->prefix." WHERE id=".$parent_id;
 			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
-			while($row=$rs->FetchNextObj()){
+			while ($row = $rs->FetchNextObj()) {
 				$id_tipo=$row->id_tipo;
 				$grand_parent_id=$row->parent_id;
 			}
@@ -1273,9 +1273,9 @@ class interadmin_tipos{
 		}
 		// Grand Parent Id
 		if($grand_parent_id&&is_numeric($grand_parent_id)){
-			$sql="SELECT id_tipo FROM ".$db_prefix.$lang->prefix." WHERE id=".$grand_parent_id;
+			$sql = "SELECT id_tipo FROM ".$db_prefix.$lang->prefix." WHERE id=".$grand_parent_id;
 			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(),$sql));
-			while($row=$rs->FetchNextObj()){
+			while ($row = $rs->FetchNextObj()) {
 				$id_tipo=$row->id_tipo;
 			}
 			$rs->Close();
@@ -1331,17 +1331,17 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
 	global $db_prefix;
 	global $lang;
 	if($id){
-		$sql="SELECT id_tipo FROM ".$db_prefix.$lang->prefix;
+		$sql = "SELECT id_tipo FROM ".$db_prefix.$lang->prefix;
 		" WHERE id=".$id;
 	}else{
-		$sql="SELECT id_tipo FROM ".$db_prefix."_tipos".
+		$sql = "SELECT id_tipo FROM ".$db_prefix."_tipos".
 		" WHERE parent_id_tipo=".$parent_id_tipo.
 		(($model_id_tipo)?" AND model_id_tipo=".$model_id_tipo:"").
 		" ORDER BY ordem,nome";
 	}
 	$sql.=" LIMIT 1";
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-	if($row=$rs->FetchNextObj()){
+	if ($row=$rs->FetchNextObj()){
 		return $row->id_tipo;
 	}
 	$rs->Close();
@@ -1373,7 +1373,7 @@ class interadmin_cabecalho{
 		global $db_prefix;
 		global $tipos;
 		if($id_tipo=interadmin_id_tipo(0,$tipos->id_tipo[$i],$model_id_tipo)){
-			$sql="SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM ".$db_prefix.$lang->prefix.
+			$sql = "SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM ".$db_prefix.$lang->prefix.
 			" WHERE id_tipo=".$id_tipo.
 			" AND char_key<>''".
 			" AND publish<>''".
@@ -1382,7 +1382,7 @@ class interadmin_cabecalho{
 			$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 			if($rand)$rand=rand(1,$rs->RecordCount());
 			$j=1;
-			while($row=$rs->FetchNextObj()){
+			while ($row = $rs->FetchNextObj()) {
 				if($j==$rand||!$rand){
 					$this->varchar_key=$row->varchar_key;
 					$this->varchar_1=$row->varchar_1;
@@ -1636,7 +1636,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	// TEXT
 	if(strpos($message,"<br>")!==false){
 		$text_hr="";
-		for($i=0;$i<80;$i++){
+		for($i = 0;$i<80;$i++){
 			$text_hr.="-";
 		}
 		$message_text=str_replace("\r","",$message);
@@ -1669,15 +1669,20 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 				$template=str_replace("http://","http://".$_SERVER["PHP_AUTH_USER"].":".$_SERVER["PHP_AUTH_PW"]."@", $template);
 			}
 			
-			//echo "template: ".$template;
-			if(function_exists("file_get_contents")){
-				$template=file_get_contents($template);
-			}else{
-			ob_start();
-			readfile($template);
-			$template=ob_get_contents();
-			ob_end_clean();
+			if (strpos($template,"http://") === 0){
+				if(function_exists("file_get_contents")){
+					$template=file_get_contents($template);
+				}else{
+					ob_start();
+					readfile($template);
+					$template=ob_get_contents();
+					ob_end_clean();
+				}
+			} else {
+				$template = file_get_contents('http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $template);
 			}
+			
+			//echo "template: ".$template;
 			$message_html=str_replace("%MESSAGE%",$message_html,$template);
 		}
 		$message_html=str_replace("=","=3D",$message_html);
@@ -1727,6 +1732,10 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	}
 	// Send
 	if($GLOBALS['c_server_type']!="Principal")$to="debug@jp7.com.br";
+	/*echo 'to: ' . $to . '
+	subject: ' . $subject .	'
+	message: ' . $message . '
+	headers: ' . $headers; */
 	$mail=mail($to,$subject,$message,$headers,$parameters);
 	if(!$mail)$mail=mail($to,$subject,$message,$headers); // Safe Mode
 	if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
