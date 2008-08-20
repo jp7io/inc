@@ -49,7 +49,13 @@ $is = new Browser($_SERVER['HTTP_USER_AGENT']);
  * @return NULL Nothing is returned
  */
 function __autoload($className){
-	if (strpos($className, 'PMA_') !== 0) require_once(jp7_path_find('../classes/' . $className . '.class.php'));
+	global $debugger;
+	$file = jp7_path_find('../classes/' . $className . '.class.php');
+	if (file_exists($file)) {
+		require_once($file);
+	} else {
+		$debugger->addLog('autoload cannot find the Class (' . $className . ')', 'error');
+	}
 }
 
 /**
@@ -993,8 +999,8 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
  * @see jp7_fields_values()
  * @version (2006/08/24)
  */
-function interadmin_fields_values($param_0,$param_1="",$param_2=""){
-	return jp7_fields_values($param_0,$param_1,$param_2);
+function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
+	return jp7_fields_values($param_0,$param_1,$param_2,$param_3);
 }
 
 /**

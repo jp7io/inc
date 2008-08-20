@@ -9,6 +9,9 @@
 <meta name="robots" content="all" />
 <meta name="author" content="JP7 - http://jp7.com.br<? if($c_parceiro) { ?> | <?= $c_parceiro ?><? } ?>" />
 <meta name="generator" content="JP7 InterAdmin" />
+<? if ($config->google_site_verify) { ?>
+	<meta name="verify-v1" content="<?= $config->google_site_verify ?>" />
+<? } ?>
 <title><?=($s_interadmin_preview)?"PREVIEW | ":""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao&&$secao!="home"){ ?> | <?= $secaoTitle ?><? if ($subsecao&&$subsecao!="home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
 <? if ($seo_baseurl) { ?>
 	<base href="<?= $seo_baseurl ?>" />
@@ -65,4 +68,4 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
 <script type="text/javascript" src="../../js/functions.js"></script>
 <script type="text/javascript" src="../../js/init.js"></script>
-<? $debugger->safePoint = TRUE; ?>
+<? $debugger->safePoint = TRUE; // Flag indicating that from this point the debugger can output data ?>
