@@ -21,7 +21,7 @@ if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 /*
  * @global bool $c_jp7
  */
-$c_jp7 = ($_SERVER['REMOTE_ADDR'] == '201.6.156.39' || $_SERVER['SERVER_ADDR'] == '192.168.0.2');
+$c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '201.6.156.39' || $_SERVER['SERVER_ADDR'] == '192.168.0.2');
 
 /**
  * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
