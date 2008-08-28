@@ -1738,10 +1738,6 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 	}
 	// Send
 	if($GLOBALS['c_server_type']!="Principal")$to="debug@jp7.com.br";
-	/*echo 'to: ' . $to . '
-	subject: ' . $subject .	'
-	message: ' . $message . '
-	headers: ' . $headers; */
 	$mail=mail($to,$subject,$message,$headers,$parameters);
 	if(!$mail)$mail=mail($to,$subject,$message,$headers); // Safe Mode
 	if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
