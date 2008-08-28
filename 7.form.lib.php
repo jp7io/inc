@@ -23,6 +23,7 @@ function interadmin_returnCampo($campo){
 	global $registros;
 	global $select_campos_sql_temp;
 	global $tit_start;
+	global $l_selecione;
 	if(is_array($campo)){
 		$campo_array=$campo;
 		$campo_nome=$campo["nome"];
@@ -80,7 +81,7 @@ function interadmin_returnCampo($campo){
 		else $campo_nome_2=($campo_nome=="all"&&$xtra)?"Tipos":interadmin_tipos_nome($campo_nome);
 		$form="".
 		"<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
-		"<option value=\"\">Selecione</option>".
+		"<option value=\"\">" . $l_selecione . "</option>".
 		"<option value=\"\">--------------------</option>";
 		if($xtra){
 			if($campo_nome=="all"){
@@ -100,7 +101,7 @@ function interadmin_returnCampo($campo){
 			}
 		}else{
 			$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
-			"<option value=\"\">Selecione".(($select_campos_2_nomes)?$select_campos_2_nomes:"")."</option>".
+			"<option value=\"\">" . $l_selecione . (($select_campos_2_nomes)?$select_campos_2_nomes:"")."</option>".
 			"<option value=\"\">--------------------</option>".
 			interadmin_combo($valor,(is_numeric($campo_nome))?$campo_nome:0,0,"","","combo",$campo."[".$j."]",$temp_campo_nome,$obrigatorio);
 		}
