@@ -59,7 +59,7 @@ if (!$wap) {
 	$secaoTitle = $tipos->nome[0];
 	$subsecao = toId($tipos->nome[1]);
 	$subsecaoTitle = $tipos->nome[1];
-	if ($c_site != 'ci' && $c_site != 'ciagt') $tipoObj = new InterAdminTipo($id_tipo);
+	if (!$seo) $tipoObj = new InterAdminTipo($id_tipo);
 }
 
 // Login Check
