@@ -1832,54 +1832,57 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
  * @param int $q Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
  * @param int $s Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
  * @return NULL
- * @todo Line 1986 and Line 1990 - "$dst_h=$w;" need to be checked. Line 1996 - "if(filesize($src)/1000>$s)" a 10MB from filesize would become 10KB, which goes against what the comments are saying ("$s=10000000;// 10 MB").
- * @version (2006/08/17)
+ * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src,$src,$dst,$w,$h,$q=90,$s=10000000){
-	$c_gd=function_exists("imagecreatefromjpeg");
+function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
+	$c_gd = function_exists('imagecreatefromjpeg');
 	// Check Size and Orientation (Horizontal x Vertical)
-	if($c_gd){
+	if ($c_gd) {
 		// GD Get Size
-		$src_w=imagesx($im_src);
-		$src_h=imagesy($im_src);
-	}else{
+		$src_w = imagesx($im_src);
+		$src_h = imagesy($im_src);
+	} else {
 		// Magick Get Size
-		$command="/usr/bin/identify -verbose ".$src;
-		exec($command,$a,$b);
-		$src_geometry=split("x",substr($a[2],strpos($a[2],":")+2));
-		$src_w=$src_geometry[0];
-		$src_h=$src_geometry[1];
+		$command = '/usr/bin/identify -verbose ' . $src;
+		exec($command, $a, $b);
+		$src_geometry = split('x', substr($a[2], strpos($a[2], ':') + 2));
+		$src_w = $src_geometry[0];
+		$src_h = $src_geometry[1];
 	}
-	if(!$q)$q=90;
-	if(!$s)$s=10000000;// 10 MB
-	if($src_w==$w&&$src_h==$h){
-		$dst_w=$w;
-		$dst_h=$h;
-	}elseif($w==$h){
-		$dst_w=$w;
-		$dst_h=$h;
-		if($src_w>$src_h)$src_w=$src_h;
-		else $src_h=$src_w;
-	}else{
-		if($src_w>$src_h){
-			$dst_w=$w;
-			$dst_h=intval(round(($dst_w*$src_h)/$src_w));
-		}else{
-			$dst_h=$w;
-			$dst_w=intval(round(($dst_h*$src_w)/$src_h));
+	// Source and destination with the same dimensions or the same proportions (just resize if needed)
+	if (($src_w == $w && $src_h == $h) || ($src_w / $src_h == $w / $h)) {
+		$dst_w = $w;
+		$dst_h = $h;
+	// Destination is square (with same width and height - crop if needed)
+	} elseif ($w == $h) {
+		$dst_w = $w;
+		$dst_h = $h;
+		if ($src_w > $src_h) $src_w = $src_h;
+		else $src_h = $src_w;
+	// The image is resized until it gets the maximum width or height (without crop)
+	} else {
+		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
+		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
+		if ($pre_dst_h <= $h){
+			$dst_w = $w;
+			$dst_h = $pre_dst_h;
+		} else {
+			$dst_h = $h;
+			$dst_w = $pre_dst_w;
 		}
 	}
+	// Checks if destination image is bigger than source image
 	if($dst_w>=$src_w&&$dst_h>=$src_h){
 		// No-Resize and Check Weight
-		if(filesize($src)/1000>$s){
-			$im_dst=$im_src;
-			if($c_gd){
+		if (filesize($src) > $s) {
+			$im_dst = $im_src;
+			if ($c_gd) {
 				// GD Convert Quality
-				imagejpeg($im_dst,$dst,$q);
-			}else{
+				imagejpeg($im_dst, $dst, $q);
+			} else {
 				// Magick Convert Quality
-				$command="/usr/bin/convert ".$src." -quality ".$q." +profile '*' ".$dst;
-				exec($command,$a,$b);
+				$command = "/usr/bin/convert ".$src." -quality ".$q." +profile '*' ".$dst;
+				exec($command, $a, $b);
 			}
 		}else{
 			if(jp7_extension($src)=="gif")$dst=str_replace(".jpg",".gif",$dst);
