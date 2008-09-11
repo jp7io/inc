@@ -8,22 +8,13 @@ function interadmin_returnCampo($campo){
 	global $xtra_disabledfields_arr_final;
 	global $is;
 	global $id;
-	global $db;
-	global $db_prefix;
-	global $s_interadmin_user_sa;
-	global $s_interadmin_user_tipo;
-	global $s_interadmin_screenwidth;
-	global $s_interadmin_mode;
-	global $c_cliente_url;
-	global $c_cliente_url_path;
-	global $iframes_i;
-	global $lang;
-	global $quantidade;
-	global $j;
-	global $registros;
+	global $db, $db_prefix;
+	global $s_interadmin_user_sa, $s_interadmin_user_tipo, $s_interadmin_screenwidth, $s_interadmin_mode;
+	global $c_cliente_url, $c_cliente_url_path;
+	global $iframes_i, $quantidade, $j, $registros;
 	global $select_campos_sql_temp;
 	global $tit_start;
-	global $l_selecione;
+	global $lang, $l_selecione, $c_lang_varchar;
 	if(is_array($campo)){
 		$campo_array=$campo;
 		$campo_nome=$campo["nome"];
@@ -83,7 +74,18 @@ function interadmin_returnCampo($campo){
 		"<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
 		"<option value=\"\">" . $l_selecione . "</option>".
 		"<option value=\"\">--------------------</option>";
-		if($xtra){
+		if ($xtra == 'radio') {
+				$nomevarchar = 'varchar_' . $c_lang_varchar;
+				$sql = "SELECT id," . $nomevarchar  . " FROM ".$db_prefix.
+				" WHERE id_tipo=".$campo_nome.
+				" ORDER BY int_key, char_key,varchar_key";
+				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
+				$form = '';
+				while ($row = $rs->FetchNextObj()) {
+					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "[".$j."]_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")."> <label for=\"" . $campo . "[".$j."]_".$row->id."\">".toHTML($row->$nomevarchar)."</label>";
+				}
+				$rs->Close();
+		} elseif ($xtra) {
 			if($campo_nome=="all"){
 				ob_start();
 				interadmin_tipos_combo($valor,0);
