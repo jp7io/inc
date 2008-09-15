@@ -68,6 +68,7 @@ function interadmin_returnCampo($campo){
 			if($campo_array[label])$campo_nome=$campo_array[label];
 		}
 	}elseif(strpos($campo,"select_")===0){
+		$campo_nome = (string) $campo_nome;
 		if($campo_array[label])$campo_nome_2=$campo_array[label];
 		else $campo_nome_2=($campo_nome=="all"&&$xtra)?"Tipos":interadmin_tipos_nome($campo_nome);
 		$form="".
@@ -101,7 +102,7 @@ function interadmin_returnCampo($campo){
 				}
 				$rs->Close();
 			}
-		}else{
+		}else{		
 			$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
 			"<option value=\"\">" . $l_selecione . (($select_campos_2_nomes)?$select_campos_2_nomes:"")."</option>".
 			"<option value=\"\">--------------------</option>".
