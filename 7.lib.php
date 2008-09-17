@@ -1017,10 +1017,13 @@ function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
  * @return mixed Returns an object containing the values. If there is only one value it returns the value itself, except if $OOP is <tt>TRUE</tt>.
  * @author JP
  * @todo ($GLOBALS["jp7_app"]=='intermail') will not be TRUE, since the previous condition ($GLOBALS['db_type']) is TRUE on the Intermail.
- * @version (2008/05/19)
+ * @version (2008/09/17)
  */
 function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = FALSE){
 	global $db;
+	// Force objects as strings (eg.: select_key, etc.)
+	if (is_object($param_0)) $param_0 = strval($param_0);
+	if (is_object($param_1)) $param_1 = strval($param_1);
 	if (is_numeric($param_0)) {
 		// ($id,$field)
 		global $db_prefix, $lang;
