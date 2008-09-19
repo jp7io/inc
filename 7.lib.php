@@ -554,9 +554,7 @@ function jp7_date_diff($start,$end){
  */
 function jp7_tel_split($tel){
 	$tel=str_replace("(","",$tel);
-	$tel=str_replace(") ",",",$tel);
 	$tel=str_replace(")",",",$tel);
-	$tel=str_replace(" ",",",$tel);
 	$tel=str_replace(" - Ramal: ",",",$tel);
 	$tel=split(",",$tel);
 	return array(
