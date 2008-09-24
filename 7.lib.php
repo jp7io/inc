@@ -49,8 +49,11 @@ $is = new Browser($_SERVER['HTTP_USER_AGENT']);
  * @return NULL Nothing is returned
  */
 function __autoload($className){
-	global $debugger;
+	global $debugger, $jp7_app;
 	$file = jp7_path_find('../classes/' . $className . '.class.php');
+	if ($jp7_app && !file_exists($file)) {
+		$file = jp7_path_find('../' . $jp7_app . '/classes/' . $className . '.class.php');
+	}
 	if (file_exists($file)) {
 		require_once($file);
 	} else {
