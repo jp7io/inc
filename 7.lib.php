@@ -1343,7 +1343,7 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
 	global $db_prefix;
 	global $lang;
 	if($id){
-		$sql = "SELECT id_tipo FROM ".$db_prefix.$lang->prefix;
+		$sql = "SELECT id_tipo FROM ".$db_prefix.$lang->prefix.
 		" WHERE id=".$id;
 	}else{
 		$sql = "SELECT id_tipo FROM ".$db_prefix."_tipos".
