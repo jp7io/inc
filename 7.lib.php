@@ -50,7 +50,12 @@ $is = new Browser($_SERVER['HTTP_USER_AGENT']);
  */
 function __autoload($className){
 	global $debugger, $jp7_app;
-	$file = jp7_path_find('../classes/' . $className . '.class.php');
+	
+	$classNameArr = explode('_', $className);
+	if ($classNameArr[0] == 'Zend') $filename = implode('/', $classNameArr) . '.php';
+	else $filename = $className . '.class.php';
+		
+	$file = jp7_path_find('../classes/' . $filename);
 	if ($jp7_app && !file_exists($file)) {
 		$file = jp7_path_find('../' . $jp7_app . '/classes/' . $className . '.class.php');
 	}
