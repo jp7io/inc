@@ -409,7 +409,7 @@ function jp7_register_globals(){
  *
  * @param string $length Length of the created password, the default value is 6.
  * @return string Created password.
- * @version (2006/09/21)
+ * @version (2008/09/25)
  * @author JP
  */
 function jp7_password($length=6){
@@ -431,7 +431,7 @@ function jp7_password($length=6){
  * @author JP
  */
 function jp7_print_r($S,$return=FALSE){
-	$S="<pre>".print_r($S,1)."</pre>";
+	$S="<pre style=\"text-align:left\">".print_r($S,1)."</pre>";
 	if($return)return $S;
 	else echo $S;
 }
