@@ -36,6 +36,7 @@ jp7_register_globals();
  * @global Debug $debugger
  */
 $debugger = new Debug();
+set_error_handler(array($debugger, 'errorHandler'));
 
 /**
  * @global Browser $is
@@ -2009,13 +2010,14 @@ function jp7_file_size($file){
  *
  * @param string $msgErro Error message, the default is <tt>NULL</tt>.
  * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
- * @param bool $sendMail If <tt>TRUE</tt> sends an email.
+ * @param array $traceArr Debugging data, like the return of debug_backtrace().
  * @global Debug
  * @return string HTML formatted backtrace.
  */
-function jp7_debug($msgErro = NULL, $sql = NULL, $sendMail = TRUE) {
+function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	global $debugger;
-	$backtrace = $debugger->getBacktrace($msgErro, $sql, debug_backtrace());
+	if (!$traceArr) $traceArr = debug_backtrace();
+	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	$nome_app = ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site';
 	//Envia email e exibe tela de manutenção
 	if($GLOBALS['c_server_type'] == 'Principal') {
