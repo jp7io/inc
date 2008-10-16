@@ -36,7 +36,7 @@ jp7_register_globals();
  * @global Debug $debugger
  */
 $debugger = new Debug();
-set_error_handler(array($debugger, 'errorHandler'));
+//set_error_handler(array($debugger, 'errorHandler'));
 
 /**
  * @global Browser $is
