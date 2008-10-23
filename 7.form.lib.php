@@ -142,13 +142,7 @@ function interadmin_returnCampo($campo){
 			echo "".
 			"<tr>".
 				$_th.
-				"<td><input type=\"text\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=255".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:80px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]')\"></td>".
-				"<td rowspan=2".(($valor)?" align=\"center\" onclick=\"openPopup('".$c_cliente_url.$c_cliente_url_path.$url."','arquivo_preview',400,400,'left=36,top=36,resizable=1')\" class=\"image_preview\" style=\"cursor:pointer\">".interadmin_arquivos_preview($c_cliente_url.$c_cliente_url_path.$url):">")."</td>".
-				"<td rowspan=2>".$S_ajuda."</td>".
-			"</tr>\n".
-			"<tr>".
-				"<th".(($obrigatorio||$readonly)?" class=\"".(($readonly)?"disabled":"")."\"":"").">Créditos/Leg.:</th>".
-				"<td><input type=\"text\" name=\"".$campo."_text[]\" value=\"".$GLOBALS[$campo."_text"]."\" maxlength=255".$readonly." class=\"inputs_width_file\"></td>".
+				"<td colspan=\"3\"><input type=\"file\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=255".$readonly." class=\"inputs_width\"></td>".
 			"</tr>\n";
 		}elseif(strpos($campo,"date_")===0){
 			$S="".
