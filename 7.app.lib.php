@@ -33,6 +33,8 @@ function jp7_app_checkPermission(){
 		case "jp7":
 		case "jp7.com.br":
 		case "www.jp7.com.br":
+		case "interadmin.jp7.com.br":
+		case "intermail.jp7.com.br":
 		case "jpsete.com.br":
 		case "www.jpsete.com.br":
 		case "jp7.dnsalias.com":
@@ -169,7 +171,7 @@ function jp7_phpmyadmin_aplicacao_path($path="../../_admin/phpmyadmin/",$path2="
 	if(is_dir($path)||$i>3){
 		global $SCRIPT_NAME;
 		global $jp7_app;
-		return $path2.((strpos($SCRIPT_NAME,($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite")?"interadmin":$jp7_app)===false)?"../":(($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite")?"interadmin":$jp7_app)."/");
+		return $path2.((strpos($SCRIPT_NAME,($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite"||$jp7_app=="intermail_new")?"interadmin":$jp7_app)===false)?"../":(($jp7_app=="intertime"||$jp7_app=="interaccount"||$jp7_app=="intersite"||$jp7_app=="intermail_new")?"interadmin":$jp7_app)."/");
 	}
 	else return jp7_phpmyadmin_aplicacao_path("../".$path,"../".$path2);
 }
