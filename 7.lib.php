@@ -6,7 +6,7 @@
  * @author JP7 (last update by Carlos)
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.10 (2008/06/16)
- * @package JP7_Core
+ * @package JP7
  */
 
 /**
@@ -428,12 +428,15 @@ function jp7_password($length=6){
  * @param mixed $var Array or object that will have its elements printed.
  * @param bool $return If <tt>TRUE</tt> the formatted string is returned, otherwise its printed, default value is <tt>FALSE</tt>.
  * @param bool $hideProtectedVars If <tt>TRUE</tt> the print_r will not show protected properties of an object. This feature is not recursive.
+ * @param string @varPrefix If <tt>TRUE</tt> it will only print the keys starting by this prefix. Is is useful when printing large arrays, like $GLOBALS.
  * @return string|NULL Formatted string or <tt>NULL</tt>. 
  * @version (2008/02/06)
  * @author JP
  */
-function jp7_print_r($var, $return = FALSE, $hideProtectedVars = FALSE) {
-	if ($hideProtectedVars && is_object($var)) {
+function jp7_print_r($var, $return = FALSE, $hideProtectedVars = FALSE, $varPrefix = '') {
+	if ($varPrefix && is_array($var)) {
+		foreach($var as $key=>$value) if (strpos($key, $varPrefix) === 0) $S .= "\r\n[" . $key . '] => ' . str_replace("\n", "\n\t", print_r($value, true));
+	} elseif ($hideProtectedVars && is_object($var)) {
 		$array = (array) $var;
 		foreach ($array as $key => $value) if (strpos($key, chr(0) . chr(42) . chr(0)) === 0) {
 			$array[substr($key,2) . ':protected'] = '*PROTECTED*'; 
