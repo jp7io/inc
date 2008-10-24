@@ -18,7 +18,7 @@ if (!$_SERVER['SERVER_ADDR']) $_SERVER['SERVER_ADDR'] = $_SERVER['LOCAL_ADDR'];
  */
 if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 
-/*
+/**
  * @global bool $c_jp7
  */
 $c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '201.6.156.39' || $_SERVER['SERVER_ADDR'] == '192.168.0.2');
@@ -32,7 +32,7 @@ else error_reporting(0);
 if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
 jp7_register_globals();
 
-/*
+/**
  * @global Debug $debugger
  */
 $debugger = new Debug();
@@ -613,14 +613,14 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
  * @param string $table Name of the table where it will insert or update data.
  * @param string $table_id_name Name of the key field.
  * @param mixed $table_id_value Value expected for the key field, the default value is 0. If a value is given the row is updated, otherwise it is inserted. 
- * @param string $var_prefix Prefix used to get values from global variables, the default value is "". e.g. For the field name "varchar_1" and the global variable "pre_varchar_1", the prefix should be "pre_".
+ * @param mixed $var_prefix Prefix used to get values from global variables, the default value is "". e.g. For the field name "varchar_1" and the global variable "pre_varchar_1", the prefix should be "pre_". If it is passed as an array, the values from this array will be used instead of globals.
  * @param bool $var_check If <tt>FALSE</tt> prepares the data for empty and null values before updating, the default value is <tt>TRUE</tt>.
  * @global ADOConnection
  * @return int When updating: $table_id_value on success or 0 on error. When inserting: the inserted record´s ID.
  * @author JP, Cristiano
  * @version (2007/12/17)
  */
-function jp7_db_insert($table,$table_id_name,$table_id_value=0,$var_prefix="",$var_check=TRUE,$force_magic_quotes_gpc=FALSE){
+function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = "", $var_check = TRUE, $force_magic_quotes_gpc = FALSE) {
 	global $db;
 	
 	$table_columns=$db->MetaColumnNames($table);
