@@ -425,15 +425,28 @@ function jp7_password($length=6){
 /**
  * Formats and prints the elements of an array or object, using the print_r() function and adding the "pre" tag around it.
  *
- * @param mixed $S Array or object that will have its elements printed.
+ * @param mixed $var Array or object that will have its elements printed.
  * @param bool $return If <tt>TRUE</tt> the formatted string is returned, otherwise its printed, default value is <tt>FALSE</tt>.
+ * @param bool $hideProtectedVars If <tt>TRUE</tt> the print_r will not show protected properties of an object, not recursive.
  * @return string|NULL Formatted string or <tt>NULL</tt>. 
  * @version (2008/02/06)
  * @author JP
  */
-function jp7_print_r($S,$return=FALSE){
-	$S="<pre style=\"text-align:left\">".print_r($S,1)."</pre>";
-	if($return)return $S;
+function jp7_print_r($var, $return = FALSE, $hideProtectedVars = FALSE) {
+	if ($hideProtectedVars && is_object($var)) {
+		$array = (array) $var;
+		foreach ($array as $key => $value) if (strpos($key, chr(0) . chr(42) . chr(0)) === 0) {
+			$array[substr($key,2) . ':protected'] = '*PROTECTED*'; 
+			unset($array[$key]); // Retira os valores protected
+		}
+		$S = preg_replace('/Array/', get_class($var) . ' Object', print_r($array, TRUE), 1);
+	} else {
+		$S = print_r($var, TRUE);
+	}
+	
+	$S = "<pre style=\"text-align:left\">" . $S . "</pre>";
+		
+	if ($return) return $S;
 	else echo $S;
 }
 
