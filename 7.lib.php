@@ -427,7 +427,7 @@ function jp7_password($length=6){
  *
  * @param mixed $var Array or object that will have its elements printed.
  * @param bool $return If <tt>TRUE</tt> the formatted string is returned, otherwise its printed, default value is <tt>FALSE</tt>.
- * @param bool $hideProtectedVars If <tt>TRUE</tt> the print_r will not show protected properties of an object, not recursive.
+ * @param bool $hideProtectedVars If <tt>TRUE</tt> the print_r will not show protected properties of an object. This feature is not recursive.
  * @return string|NULL Formatted string or <tt>NULL</tt>. 
  * @version (2008/02/06)
  * @author JP
