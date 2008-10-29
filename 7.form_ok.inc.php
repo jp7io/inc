@@ -49,19 +49,22 @@ for($i = 0;$i<$quantidade;$i++){
 					$tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
 					$keywords = basename($_FILES[$table_field_name]['name'][$i],'.' . $tipo['extension']);
 					$tipo = strtolower($tipo['extension']);
-					$lang_temp = $lang;
-					$lang = $lang->lang;
-					$id_arquivo_banco = jp7_db_insert($db_prefix . '_arquivos_banco', 'id_arquivo_banco', $id_arquivo_banco);
-					$lang = $lang_temp;
-					$id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
-					$path = '../../upload/' . (($id_tipo) ? toId(interadmin_tipos_nome($id_tipo, TRUE)) . '/' : '');
-					$tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
-					$tipo = strtolower($tipo['extension']);
-					if (!is_dir($path)) mkdir($path, 0777);
-					else @chmod($path, 0777);
-					$dst = $path . $id_arquivo_banco . '.' . $tipo;
-					copy($_FILES[$table_field_name]['tmp_name'][$i], $dst) or die("Erro na cópia do arquivo!");
-					$GLOBALS['interadmin_' . $table_field_name] = $dst;
+					$invalid_extensions = array('php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js');
+					if (!in_array($tipo, $invalid_extensions)) {
+						$lang_temp = $lang;
+						$lang = $lang->lang;
+						$id_arquivo_banco = jp7_db_insert($db_prefix . '_arquivos_banco', 'id_arquivo_banco', $id_arquivo_banco);
+						$lang = $lang_temp;
+						$id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+						$path = '../../upload/' . (($id_tipo) ? toId(interadmin_tipos_nome($id_tipo, TRUE)) . '/' : '');
+						$tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
+						$tipo = strtolower($tipo['extension']);
+						if (!is_dir($path)) mkdir($path, 0777);
+						else @chmod($path, 0777);
+						$dst = $path . $id_arquivo_banco . '.' . $tipo;
+						copy($_FILES[$table_field_name]['tmp_name'][$i], $dst) or die("Erro na cópia do arquivo!");
+						$GLOBALS['interadmin_' . $table_field_name] = $dst;
+					}
 				}
 			}elseif(!array_search($table_field_name,$table_fields_notallowed)&&strpos($table_field_name,"date_")===false&&strpos($table_field_name,"time_")===false){
 				/* Old Way
