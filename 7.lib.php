@@ -2108,4 +2108,46 @@ function XORDecrypt($InputString, $KeyPhrase){
     $InputString = XOREncryption($InputString, $KeyPhrase);
     return $InputString;
 }
+
+// moveFiles (2003/03/21)
+function moveFiles($from_path,$to_path){
+	if(!file_exists($to_path))mkdir($to_path,0777);
+	$this_path=getcwd();
+	if(is_dir($from_path)){
+		chdir($from_path);
+		$handle=opendir("."); 
+		while(($file=readdir($handle))!==false){ 
+			if(($file!=".")&&($file!="..")){ 
+				if(is_dir($file)){ 
+					@copyDir($from_path."/".$file,$to_path."/".$file);
+					chdir($from_path);
+				}
+				if(is_file($file)){
+					copy($from_path."/".$file,$to_path."/".$file);
+					unlink($from_path."/".$file);
+				}
+			}
+		}
+		closedir($handle);
+	}
+	chdir($this_path);
+}
+
+/**
+ * Splits the string into an array. The difference from explode() is that jp7_explode() unsets empty values.
+ * 
+ * @param string $separator
+ * @param string $string
+ * @param bool $useTrim If set the function will trim() each part of the string. Defaults to <tt>TRUE</tt>.
+ * @return array Array of parts withuot any empty value.
+ */
+function jp7_explode($separator, $string, $useTrim = TRUE) {
+	$array = explode($separator, $string);
+	foreach($array as $key => $value) {
+		if ($useTrim) $value = trim($value);
+		if (!$value) unset($array[$key]);
+		else $array[$key] = $value;
+	}
+	return $array;
+}
 ?>
