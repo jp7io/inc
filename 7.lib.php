@@ -3,10 +3,11 @@
  * JP7's PHP Functions 
  * 
  * Contains the main custom functions and classes
- * @author JP7 (last update by Carlos)
+ * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.10 (2008/06/16)
- * @package JP7
+ * @category JP7
+ * @package 7lib
  */
 
 /**
@@ -434,15 +435,33 @@ function jp7_password($length=6){
  * @author JP
  */
 function jp7_print_r($var, $return = FALSE, $hideProtectedVars = FALSE, $varPrefix = '') {
-	if ($varPrefix && is_array($var)) {
-		foreach($var as $key=>$value) if (strpos($key, $varPrefix) === 0) $S .= "\r\n[" . $key . '] => ' . str_replace("\n", "\n\t", print_r($value, true));
-	} elseif ($hideProtectedVars && is_object($var)) {
-		$array = (array) $var;
-		foreach ($array as $key => $value) if (strpos($key, chr(0) . chr(42) . chr(0)) === 0) {
-			$array[substr($key,2) . ':protected'] = '*PROTECTED*'; 
-			unset($array[$key]); // Retira os valores protected
+	
+	if ($hideProtectedVars) {
+		if (is_object($var)) {
+			$array[0] = (array) $var;
+		} elseif (is_array($var) && is_object(reset($var))) {
+			foreach ($var as $key => $value) {
+				$array[$key] = (array) $value;
+			} 
 		}
-		$S = preg_replace('/Array/', get_class($var) . ' Object', print_r($array, TRUE), 1);
+	} elseif ($varPrefix && is_array($var)) {
+		$array = $var;
+	}
+		
+	if ($array) {
+		foreach ($array as $key => $value) {
+			if ($varPrefix && strpos($key, $varPrefix) !== 0)  continue;
+			if ($hideProtectedVars) {
+				foreach ($value as $valueKey => $valueValue) {
+					if (strpos($valueKey, chr(0) . chr(42) . chr(0)) === 0) {
+						$array[$key][substr($valueKey, 2) . ':protected'] = '*PROTECTED*'; 
+						unset($array[$key][$valueKey]); // Retira os valores protected
+					}
+				}
+			}
+		}
+		if (is_object($var) && $hideProtectedVars) $array = $array[0];
+		$S = print_r($array, TRUE);
 	} else {
 		$S = print_r($var, TRUE);
 	}
