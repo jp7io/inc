@@ -1102,7 +1102,7 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 		" WHERE ".$table_id_name."='".$table_id_value."'";
 		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
 			$sql .= "" .
-			(($GLOBALS['c_publish']) ? " AND publish <> ''" : "") .
+			(($GLOBALS['c_publish']&&!$GLOBALS['s_interadmin_preview']) ? " AND publish <> ''" : "") .
 			" AND (deleted = '' OR deleted IS NULL)" .
 			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
 		}
