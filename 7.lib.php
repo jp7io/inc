@@ -414,11 +414,11 @@ function jp7_register_globals(){
  * @version (2008/09/25)
  * @author JP
  */
-function jp7_password($length=6){
-	$chars="abcdefghijkmnopqrstuvwxyz023456789";
-	$S="";
-	for($i = 0;$i<$length;$i++){
-		$S.=substr($chars,rand(0,strlen($chars)),1);
+function jp7_password($length = 6) {
+	$chars = 'abcdefghijkmnopqrstuvwxyz023456789';
+	$S = '';
+	for($i = 0; $i < $length; $i++) {
+		$S .= substr($chars, rand(0, strlen($chars) - 1), 1);
 	}
 	return $S;
 }
