@@ -54,8 +54,7 @@ function __autoload($className){
 	global $debugger, $jp7_app;
 	
 	$classNameArr = explode('_', $className);
-	if ($classNameArr[0] == 'Zend') $filename = implode('/', $classNameArr) . '.php';
-	else $filename = $className . '.class.php';
+	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
 		
 	$file = jp7_path_find('../classes/' . $filename);
 	if ($jp7_app && !file_exists($file)) {
@@ -1135,26 +1134,27 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 /**
  * Gets the ID of a record on the database from its "varchar_key" and "id_tipo" values.
  *
- * @param string $varchar_key Value of the field "varchar_key".
+ * @param string $field_value Value of the field.
  * @param int $id_tipo Value of the field "id_tipo" (Optional).
+ * @param string $field_name Name of the field (Optional).
  * @global ADOConnection
  * @global string
  * @global string
  * @return int Value of the field "id", which is the ID of the record.
  * @author JP
- * @version (2006/09/12)
+ * @version (2008/11/12)
  */
-function jp7_id_value($varchar_key,$id_tipo=0){
+function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key') {
 	global $db;
 	global $db_prefix;
 	global $lang;
-	$table=$db_prefix.$lang->prefix;
-	$sql = "SELECT id FROM ".$table." WHERE".
-	" varchar_key='".$varchar_key."'".
-	(($id_tipo)?" AND id_tipo=".$id_tipo:"");
-	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	if ($row=$rs->FetchNextObj()){
-		$I=$row->id;
+	$table = $db_prefix . $lang->prefix;
+	$sql = "SELECT id FROM " . $table . " WHERE" .
+	" " . $field_name . "='" . $field_value . "'" .
+	(($id_tipo) ? " AND id_tipo=" . $id_tipo : "");
+	$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+	if ($row = $rs->FetchNextObj()) {
+		$I = $row->id;
 	}
 	$rs->Close();
 	return $I;
