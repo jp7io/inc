@@ -1,5 +1,5 @@
 <?
-if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br")!==false||$c_server_type=="Default"||$c_server_type=="Principal")&&$c_server_type!="JPSete"){
+if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br")!==false||$c_server_type=="Default"||$c_server_type=="Principal")&&$c_server_type!="JPSete"&&strpos($HTTP_HOST,"intermail.jp7.com.br")===false){
 	// JP7 (Locaweb)
 	$c_server_type="Principal";
 	$db_host="mysql01.jp7.com.br";
@@ -8,10 +8,10 @@ if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br"
 	$db_pass="hov572hov71";
 	if(!isset($c_path))$c_path=$c_site."/";
 	if(!$jp7_app)$publish=true;
-}elseif(strpos($HTTP_HOST,"jpsete.com.br")!==false||$c_server_type=="JPSete"){
+}elseif(strpos($HTTP_HOST,"jpsete.com.br")!==false||strpos($HTTP_HOST,"intermail.jp7.com.br")!==false||$c_server_type=="JPSete"){
 	// JP7 (JPSete)
 	$c_server_type="Principal";
-	$db_host="jpsete.com.br";
+	if(!$db_host)$db_host="jpsete.com.br";
 	if(!$db_name)$db_name="jpseteco_interadmin";
 	$db_user="root";
 	$db_pass="vox06";
