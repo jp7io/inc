@@ -103,7 +103,7 @@ function interadmin_returnCampo($campo){
 				$rs->Close();
 			}
 		}else{		
-			$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
+			$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\" xtype=\"autocomplete\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
 			"<option value=\"\">" . $l_selecione . (($select_campos_2_nomes)?$select_campos_2_nomes:"")."</option>".
 			"<option value=\"\">--------------------</option>".
 			interadmin_combo($valor,(is_numeric($campo_nome))?$campo_nome:0,0,"","","combo",$campo."[".$j."]",$temp_campo_nome,$obrigatorio);
@@ -126,6 +126,9 @@ function interadmin_returnCampo($campo){
 					break;
 				case "num": // Número
 					$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
+					break;
+				case "cpf": // CPF
+					$onkeypress=" xtype=\"cpf\"";
 					break;
 			}
 		}
