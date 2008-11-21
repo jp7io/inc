@@ -251,6 +251,8 @@ function toHTML($S,$HTML=FALSE,$busca_replace=FALSE){
  * @version (2004/05/31)
  */
 function toScript($S){
+	$S=str_replace("\r",'\r',$S);
+	$S=str_replace("\n",'\n',$S);
 	$S=str_replace("\"","&quot;",$S);
 	$S=str_replace("'","\'",$S);
 	return $S;
