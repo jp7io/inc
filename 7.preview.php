@@ -1,7 +1,7 @@
-<? if ($s_interadmin_preview || $c_server_type=="QA") { // Precisa ser Global ?>
+<? if ($s_session['preview'] || $c_server_type=="QA") { // Precisa ser Global ?>
 	<?
 	if ($c_server_type=="QA") $S = "QA";
-	if ($s_interadmin_preview) {
+	if ($s_session['preview']) {
 		if ($c_server_type=="QA") $S .= " - " . strtoupper("Preview");
 		else $S = strtoupper("Preview");
 	}

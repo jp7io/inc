@@ -29,9 +29,10 @@ if($c_template)include $c_doc_root . '_templates/' . $c_template . '/config.php'
 
 // Session (Precisa para o Preview e pode ser usado para outros fins)
 if (!session_id()) {
-	session_name((($jp7_app) ? $jp7_app : 'interadmin') . '_' . $c_site);
 	session_start();
 }
+$s_session = &$_SESSION[$c_site]['interadmin'];
+$s_user = &$s_session['user'];
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === FALSE && !$only_info) {

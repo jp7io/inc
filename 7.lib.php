@@ -105,18 +105,6 @@ function toId($S,$tofile = FALSE, $separador=''){
  * @version (2008/06/12) update by Carlos Rodrigues
  */
 function toSeo($S) {
-	/*$S = str_replace(' - ', '-',$S);
-	$S = str_replace('/', '-',$S);
-	$S=preg_replace("([áàãâäÁÀÃÂÄª])","a",$S);
-	$S=preg_replace("([éèêëÉÈÊË&])","e",$S);
-	$S=preg_replace("([íìîïÍÌÎÏ])","i",$S);
-	$S=preg_replace("([óòõôöÓÒÕÔÖº])","o",$S);
-	$S=preg_replace("([úùûüÚÙÛÜ])","u",$S);
-	$S=preg_replace("([çÇ])","c",$S);
-	$S=preg_replace("([ñÑ])","n",$S);
-	$S = preg_replace("([^(\d\w- )])",'',$S);
-	$S = toId($S, FALSE, '-');
-	return $S;*/
 	$S = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $S);
 	$S = preg_replace("([éèêëÉÈÊË&])", 'e', $S);
 	$S = preg_replace("([íìîïÍÌÎÏ])", 'i', $S);
@@ -380,10 +368,10 @@ function checkReferer($S, $protocol="http"){
  * @global string
  */
 function jp7_string_left($S, $length){
-	global $s_interadmin_lang, $c_lang;
+	global $s_session, $c_lang;
 	if ($c_lang){
 		foreach($c_lang as $item){
-			if ($item[0] == $s_interadmin_lang && $item[2]) $length = $length * 8; // Check if language uses entities for characters (eg.: japanese)
+			if ($item[0] == $s_session['lang'] && $item[2]) $length = $length * 8; // Check if language uses entities for characters (eg.: japanese)
 		}
 	}
 	return (strlen($S) > $length) ? substr($S, 0, $length) . "..." : $S;
@@ -728,7 +716,7 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
  * class jp7_db_pages
  *
  * @version (2007/02/22)
- * @package JP7_Core
+ * @package 7lib
  * @subpackage jp7_db_pages
  * @deprecated Kept as an alias to Pagination class.
  */
@@ -888,8 +876,7 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
 function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NULL, $offset = NULL){	
 	global $c_publish;
 	global $c_path_upload;
-	global $s_interadmin_user;
-	global $s_interadmin_preview;
+	global $s_session;
 	global $db;
 	global $db_prefix;
 	global $lang;
@@ -917,7 +904,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 			$alias = $out[2][$key];
 			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
 			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".$DbNow."' AND ".$alias.".char_key<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
+			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".$DbNow."' AND ".$alias.".char_key<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
 			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
 		}
 	} else {
@@ -926,7 +913,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 		foreach($out[0] as $key=>$value){
 			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ",$sql_where);
 			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_interadmin_preview)?" AND publish<>''":"")." AND ",$sql_where);
+			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND publish<>''":"")." AND ",$sql_where);
 		}
 		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
 	}
@@ -999,7 +986,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @version (2007/01/27)
  */
 function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=FALSE) {
-	global $db, $s_interadmin_preview, $l_selecione;
+	global $db, $s_session, $l_selecione;
 	//global $id;
 	if($type=="list"){
 		$S="".
@@ -1013,7 +1000,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$sql = "SELECT id,".$field." AS field FROM ".$table.
 	" WHERE id_tipo=".$id_tipo.
 	" AND char_key<>''".
-	(($s_interadmin_preview)?"":" AND publish<>''").
+	(($s_session['preview'])?"":" AND publish<>''").
 	" AND (deleted='' OR deleted IS NULL)".
 	" AND date_publish<='".date("Y/m/d H:i:s")."'".
 	$sql_where.
@@ -1066,6 +1053,7 @@ function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
  */
 function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = FALSE){
 	global $db;
+	global $s_session;
 	// Force objects as strings (eg.: select_key, etc.)
 	if (is_object($param_0)) $param_0 = strval($param_0);
 	if (is_object($param_1)) $param_1 = strval($param_1);
@@ -1103,7 +1091,7 @@ function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = F
 		" WHERE ".$table_id_name."='".$table_id_value."'";
 		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
 			$sql .= "" .
-			(($GLOBALS['c_publish']&&!$GLOBALS['s_interadmin_preview']) ? " AND publish <> ''" : "") .
+			(($GLOBALS['c_publish']&&!$s_session['preview']) ? " AND publish <> ''" : "") .
 			" AND (deleted = '' OR deleted IS NULL)" .
 			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
 		}
@@ -1167,7 +1155,7 @@ function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key') {
  *
  * @author JP
  * @version (2007/08/08)
- * @package JP7_Core
+ * @package 7lib
  * @subpackage jp7_lang
  */
 class jp7_lang{
@@ -1255,7 +1243,7 @@ class jp7_lang{
  *
  * @author Thiago
  * @version (2007/07/10)
- * @package JP7_Core
+ * @package 7lib
  * @subpackage interadmin_tipos
  * @deprecated It will be incorporated and suplanted by InterAdminTipos
  */
@@ -1406,7 +1394,7 @@ function interadmin_id_tipo($id="",$parent_id_tipo=0,$model_id_tipo=0){
  * class interadmin_cabecalho
  *
  * @version (2006/11/29)
- * @package JP7_Core
+ * @package 7lib
  * @subpackage interadmin_cabecalho
  */
 class interadmin_cabecalho{
@@ -1983,7 +1971,7 @@ function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
 function jp7_index($lang=""){
 	session_start();
 	//global $HTTP_ACCEPT;
-	global $is, $path, $publish, $s_interadmin_preview, $c_lang_default;
+	global $is, $path, $publish, $s_session, $c_lang_default;
 	$path=dirname($_SERVER["SCRIPT_NAME"]);
 	$path=jp7_path("http://".$_SERVER['HTTP_HOST'].$path);
 	// Publish Check
@@ -1994,10 +1982,10 @@ function jp7_index($lang=""){
 	//if(strpos($_SERVER['HTTP_ACCEPT'],"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
 	//elseif($is->v<4&&!$is->robot)header("Location: /_default/oldbrowser.htm");
 	//else{
-		$path=$path.(($lang&&$lang!=$c_lang_default)?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_interadmin_preview)?"?s_interadmin_preview=".$s_interadmin_preview:"");
+		$path=$path.(($lang&&$lang!=$c_lang_default)?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_session['preview'])?"?s_interadmin_preview=".$s_session['preview']:"");
 		@ini_set("allow_url_fopen","1");
-		//if(!@include $path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
-		if(!@readfile($path.(($s_interadmin_preview)?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
+		//if(!@include $path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
+		if(!@readfile($path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
 	//}
 }
 
@@ -2053,17 +2041,15 @@ function jp7_file_size($file){
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	global $debugger;
+	global $s_interadmin_cliente, $jp7_app;
+	global $c_site, $c_server_type;
 	if (!$traceArr) $traceArr = debug_backtrace();
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
-	$nome_app = ($GLOBALS['jp7_app']) ? $GLOBALS['jp7_app'] : 'Site';
+	$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 	//Envia email e exibe tela de manutenção
-	if($GLOBALS['c_server_type'] == 'Principal') {
-		if (trim($GLOBALS['c_site']))
-			$cliente = $GLOBALS['c_site'];
-		elseif (trim($_SESSION['s_interadmin_cliente']))
-			$cliente = $_SESSION['s_interadmin_cliente'];
-		elseif (trim($_COOKIE['cookie_interadmin_cliente']))
-			$cliente = $_COOKIE['cookie_interadmin_cliente'];
+	if($c_server_type == 'Principal') {
+		if (trim($c_site)) $cliente = $c_site;
+		elseif (trim($s_interadmin_cliente)) $cliente = $s_interadmin_cliente;
 		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
 		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
 		$to = 'debug+' . $cliente . '@jp7.com.br';
@@ -2073,7 +2059,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 		//$template="form_htm.php";
 		$html = TRUE;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if($GLOBALS['c_server_type'] == 'Principal' && (!$GLOBALS['c_jp7'] || $jp7_cache)) {
+		if($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /_default/em_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>

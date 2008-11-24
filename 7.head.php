@@ -12,7 +12,7 @@
 <? if ($config->google_site_verify) { ?>
 	<meta name="verify-v1" content="<?= $config->google_site_verify ?>" />
 <? } ?>
-<title><?=($s_interadmin_preview)?"PREVIEW | ":""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao&&$secao!="home"){ ?> | <?= $secaoTitle ?><? if ($subsecao&&$subsecao!="home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
+<title><?=($s_session['preview'])?"PREVIEW | ":""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao&&$secao!="home"){ ?> | <?= $secaoTitle ?><? if ($subsecao&&$subsecao!="home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
 <? if ($seo_baseurl) { ?>
 	<base href="<?= $seo_baseurl ?>" />
 <? } else { ?>
@@ -43,11 +43,11 @@ var path='<?= $c_path ?>'
 var lang='<?= $lang->lang ?>'
 var lang_path='<?= $lang->path_2 ?>'
 
-var s_interadmin_preview='<?= $s_interadmin_preview ?>'
+var s_interadmin_preview='<?= $s_session['preview'] ?>'
 
 var fullpath='http://'+location.host+'/'+path+lang_path
 
-<? if($s_interadmin_preview&&!$isPopup) { ?>
+<? if($s_session['preview']&&!$isPopup) { ?>
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
 <? } ?>
 </script>

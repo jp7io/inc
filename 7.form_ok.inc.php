@@ -11,7 +11,7 @@ $interadmin_date_modify=date("Y-m-d H:i:s");
 $interadmin_date_publish=date("Y-m-d H:i:s");
 
 // Log
-$interadmin_log=date("d/m/Y H:i")." - ".$s_interadmin_user." - ".(($id)?"modify":"insert")." - ".$REMOTE_ADDR.chr(13);
+$interadmin_log=date("d/m/Y H:i")." - ".$s_user['login']." - ".(($id)?"modify":"insert")." - ".$REMOTE_ADDR.chr(13);
 if($id){
 	$sql = "SELECT log FROM ".$db_prefix.$referer_lang_prefix.(($tipo_tabela)?"_".$tipo_tabela:"")." WHERE id=".$id;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
@@ -152,6 +152,6 @@ for($i = 0;$i<$quantidade;$i++){
 
 // InterAdmin Log File
 $file=fopen($c_doc_root . "interadmin.log","w");
-fwrite($file,$s_interadmin_user);
+fwrite($file,$s_user['login']);
 fclose($file);
 //copy("interadmin.log",$c_cliente_physical_path."interadmin.log");

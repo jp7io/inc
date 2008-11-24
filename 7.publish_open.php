@@ -1,6 +1,6 @@
 <?
 // Publish Check
-if ($publish && !$s_interadmin_preview && !$interadmin_gerar_menu) {
+if ($publish && !$s_session['preview'] && !$interadmin_gerar_menu) {
 	//echo $go_url;
 	$publish_file = $_SERVER['REQUEST_URI'];
 	$pos1 = strpos($publish_file, '?');
@@ -39,7 +39,7 @@ if ($publish && !$s_interadmin_preview && !$interadmin_gerar_menu) {
 	}
 }
 
-if ($seo_publish && !$s_interadmin_preview && !$interadmin_gerar_menu) {
+if ($seo_publish && !$s_session['preview'] && !$interadmin_gerar_menu) {
 
 	$go_url = $_SERVER['REQUEST_URI'];
 	
@@ -64,7 +64,7 @@ if ($seo_publish && !$s_interadmin_preview && !$interadmin_gerar_menu) {
 } else {
 
 	// Publish Start
-	if ($publish && !$s_interadmin_preview) {
+	if ($publish && !$s_session['preview']) {
 		$publish_open = true;
 		header('pragma: no-cache');
 		ob_start();

@@ -9,9 +9,9 @@
 function jp7_app_checkPermission(){
 	global $jp7_app;
 	global $c_cliente_domains;
-	eval("global \$s_".$jp7_app."_cliente;");
-	eval("\$cliente=\"\$s_".$jp7_app."_cliente\";");
-	$ok=false;
+	global $s_interadmin_cliente;
+	$cliente = ($s_interadmin_cliente) ?  $s_interadmin_cliente : $GLOBALS['s_' . $jp7_app . '_cliente'];
+	$ok = FALSE;
 	for($i = 0;$i<count($c_cliente_domains);$i++){
 		switch($_SERVER['HTTP_HOST']){
 			case $c_cliente_domains[$i]:
@@ -22,7 +22,7 @@ function jp7_app_checkPermission(){
 			case "intermail.".$c_cliente_domains[$i]:
 			case "ri.".$c_cliente_domains[$i]:
 			case "ir.".$c_cliente_domains[$i]:
-				$ok=true;
+				$ok = TRUE;
 				break;
 		}
 	}
@@ -38,7 +38,7 @@ function jp7_app_checkPermission(){
 		case "jpsete.com.br":
 		case "www.jpsete.com.br":
 		case "jp7.dnsalias.com":
-			$ok=true;
+			$ok = TRUE;
 			break;
 	}
 	if(!$ok){
@@ -137,9 +137,9 @@ function jp7_app_log($log,$S){
 		$app_user=$s_intermail_user;
 	}else{
 		global $s_interadmin_cliente;
-		global $s_interadmin_user;
+		global $s_user;
 		$app_cliente=$s_interadmin_cliente;
-		$app_user=$s_interadmin_user;
+		$app_user=$s_user['login'];
 	}
 	$file_path="../../../".$jp7_app."/~".$app_cliente."/_log/";
 	@chmod($file_path,0777);

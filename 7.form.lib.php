@@ -9,7 +9,7 @@ function interadmin_returnCampo($campo){
 	global $is;
 	global $id;
 	global $db, $db_prefix;
-	global $s_interadmin_user_sa, $s_interadmin_user_tipo, $s_interadmin_screenwidth, $s_interadmin_mode;
+	global $s_user, $s_session;
 	global $c_cliente_url, $c_cliente_url_path;
 	global $iframes_i, $quantidade, $j, $registros;
 	global $select_campos_sql_temp;
@@ -32,7 +32,7 @@ function interadmin_returnCampo($campo){
 	$_th="<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 	if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\">";
 	if($readonly=="hidden")$readonly_hidden=true;
-	if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_interadmin_user_tipo&&!$s_interadmin_user_sa))$readonly=" disabled";
+	if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
 	
 	if(strpos($campo,"tit_")===0){
 		if($tit_start){
@@ -185,14 +185,14 @@ function interadmin_returnCampo($campo){
 		}else{
 			if(!$readonly_hidden){
 				echo "".
-				"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+				"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 					"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 					"<td colspan=2>".$form."</td>".
 					"<td>".$S_ajuda."</td>".
 				"</tr>\n";
 				if(strpos($campo,"password_")===0){
 					echo "".
-					"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 						"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>".
 						"<td colspan=2><input type=\"password\" xtype=\"password\" name=\"".$campo."[]\" label=\"Confirmação de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>".
 						"<td>".$S_ajuda."</td>".
@@ -208,7 +208,7 @@ function interadmin_returnCampo($campo){
 			echo "</tbody>";
 			$tit_start=false;
 		}
-		echo "<tr><td height=".(($quantidade>1||$s_interadmin_screenwidth<=800)?5:10)." colspan=4></td></tr>\n";
+		echo "<tr><td height=".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)." colspan=4></td></tr>\n";
 	}
 }
 
