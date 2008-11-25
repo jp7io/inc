@@ -48,23 +48,35 @@ $is = new Browser($_SERVER['HTTP_USER_AGENT']);
  * Includes a class in case it hasn't been defined yet.
  *
  * @param string $className Name of the class
- * @return NULL Nothing is returned
+ * @return void
  */
 function __autoload($className){
-	global $debugger, $jp7_app;
+	global $debugger, $jp7_app, $s_interadmin_cliente;
 	
 	$classNameArr = explode('_', $className);
 	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
-		
-	$file = jp7_path_find('../classes/' . $filename);
-	if ($jp7_app && !file_exists($file)) {
-		$file = jp7_path_find('../' . $jp7_app . '/classes/' . $className . '.class.php');
+	
+	// InterAdmin
+	if ($jp7_app) {
+		$fileArr = array(
+			'../' . $jp7_app . '/classes/' . $filename,
+			'../' . $s_interadmin_cliente . '/classes/' . $filename
+		);
 	}
-	if (file_exists($file)) {
-		require_once($file);
-	} else {
-		$debugger->addLog('autoload cannot find the Class (' . $className . ')', 'error');
+	
+	$fileArr[] = '../classes/' . $filename;
+	
+	$i = 0;
+	while (!file_exists($file)) {
+		if ($fileArr[$i]) { 
+			$file = jp7_path_find($fileArr[$i]);
+		} else {
+			if ($debugger) $debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
+			return;
+		}
+		$i++;
 	}
+	require_once($file);
 }
 
 /**
