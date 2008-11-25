@@ -11,7 +11,7 @@ $interadmin_date_modify=date("Y-m-d H:i:s");
 $interadmin_date_publish=date("Y-m-d H:i:s");
 
 // Log
-$interadmin_log=date("d/m/Y H:i")." - ".$s_user['login']." - ".(($id)?"modify":"insert")." - ".$REMOTE_ADDR.chr(13);
+$interadmin_log=date("d/m/Y H:i")." - ".(($user_log) ? $user_log : $s_user['login'])." - ".(($id)?"modify":"insert")." - ".$REMOTE_ADDR.chr(13);
 if($id){
 	$sql = "SELECT log FROM ".$db_prefix.$referer_lang_prefix.(($tipo_tabela)?"_".$tipo_tabela:"")." WHERE id=".$id;
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
@@ -82,25 +82,29 @@ for($i = 0;$i<$quantidade;$i++){
 			}elseif(strpos($table_field_name,"time_")!==false){
 				if($GLOBALS[$table_field_name."_i"][$i])$GLOBALS["interadmin_".$table_field_name]=$GLOBALS[$table_field_name."_H"][$i].":".$GLOBALS[$table_field_name."_i"][$i].":00";
 			}elseif(strpos($table_field_name,"date_")!==false&&$table_field_name!="date_insert"&&$table_field_name!="date_modify"&&$table_field_name!="date_publish"){
-				if($GLOBALS[$table_field_name."_Y"][$i]) {
-					$data=$GLOBALS[$table_field_name."_Y"][$i]."-".$GLOBALS[$table_field_name."_m"][$i]."-".$GLOBALS[$table_field_name."_d"][$i];
-				}
-				$hora=" ".(($GLOBALS[$table_field_name."_H"][$i])?$GLOBALS[$table_field_name."_H"][$i]:"00").":".(($GLOBALS[$table_field_name."_i"][$i])?$GLOBALS[$table_field_name."_i"][$i]:"00").":00";
-				//se a data for inválida, apaga os dados para nao dar erros de sqls
-				//tenta usar a data completa
-				if(strtotime($data.$hora)){
-					$dataCorreta=$data.$hora;
-				//se nao der, tenta usar ela sem hora
-				}elseif(strtotime($data)){
-					$dataCorreta=$data." 00:00:00";
-				//se nao der nao salvar nada, pois é inválida
-				}else{
-					$dataCorreta="";
-				}
 				
-				$GLOBALS["interadmin_".$table_field_name]=$dataCorreta;
+				if ($GLOBALS[$table_field_name."_Y"][$i]) {
+					$data = $GLOBALS[$table_field_name."_Y"][$i]."-".$GLOBALS[$table_field_name."_m"][$i]."-".$GLOBALS[$table_field_name."_d"][$i];
+					$hora = " ".(($GLOBALS[$table_field_name."_H"][$i])?$GLOBALS[$table_field_name."_H"][$i]:"00").":".(($GLOBALS[$table_field_name."_i"][$i])?$GLOBALS[$table_field_name."_i"][$i]:"00").":00";
+				
+					//se a data for inválida, apaga os dados para nao dar erros de sqls
+					//tenta usar a data completa			
+					if (strtotime($data . $hora)) {
+						$dataCorreta = $data . $hora;
+					//se nao der, tenta usar ela sem hora
+					} elseif (strtotime($data)) {
+						$dataCorreta = $data." 00:00:00";
+					//se nao der nao salvar nada, pois é inválida
+					} else {
+						$dataCorreta = "";
+					}
+					
+					$GLOBALS["interadmin_".$table_field_name]=$dataCorreta;
+				}
 			}
+			
 		}
+		
 		// Password
 		if($interadmin_password_key&&$interadmin_password_key_xtra)$interadmin_password_key=md5(strtolower($interadmin_password_key));
 		// Text/HTML
