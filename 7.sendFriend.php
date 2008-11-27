@@ -27,7 +27,6 @@ $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 $headers .= 'To: ' . $_POST['to'] . "\r\n";
 $headers .= 'From: ' . $_POST['name'] . ' <' . $_POST['mail'] . '>' . "\r\n";
 
-// @FIXME Alterar o e-mail para o do formulário
 if (mail($_POST['to'], 'Indicação do site', $template, $headers)) {
 	if ($_POST['success'] == 'global' or $_POST['success'] == false) {
 		$template = jp7_path_find('../../_default/site/_templates/sendFriend/success.htm');
