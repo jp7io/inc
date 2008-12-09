@@ -914,9 +914,9 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 		// Com Alias
 		foreach($out[1] as $key=>$value){
 			$alias = $out[2][$key];
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
+			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE (".$alias.".mostrar<>'' OR ".$alias.".mostrar IS NULL) AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
 			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE ".$alias.".date_publish<='".$DbNow."' AND ".$alias.".char_key<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
+			else $sql_where=str_replace("WHERE ","WHERE (".$alias.".date_publish<='".$DbNow."' OR ".$alias.".date_publish IS NULL) AND (".$alias.".char_key<>'' OR ".$alias.".char_key IS NULL)  AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND ".$alias.".publish<>''":"")." AND ",$sql_where);
 			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
 		}
 	} else {
