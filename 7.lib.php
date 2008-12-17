@@ -56,20 +56,13 @@ function __autoload($className){
 	$classNameArr = explode('_', $className);
 	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
 	
-	// InterAdmin
-	if ($jp7_app) {
-		$fileArr = array(
-			'../' . $jp7_app . '/classes/' . $filename,
-			'../' . $s_interadmin_cliente . '/classes/' . $filename
-		);
-	}
-	
-	$fileArr[] = '../classes/' . $filename;
+	$paths = explode(PATH_SEPARATOR, get_include_path()); 
+	$paths[] = '../classes';
 	
 	$i = 0;
 	while (!file_exists($file)) {
-		if ($fileArr[$i]) { 
-			$file = jp7_path_find($fileArr[$i]);
+		if ($paths[$i]) { 
+			$file = jp7_path_find($paths[$i] . '/' . $filename);
 		} else {
 			if ($debugger) $debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
 			return;
@@ -715,7 +708,7 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
 			}
 			$i++;
 		}
-		$sql = "INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;
+		$sql = "INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;//echo $sql ."<br /><hr /><br />";
 		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		// Last ID
 		eval("global \$".$var_prefix.$table_id_name.";");
