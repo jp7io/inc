@@ -269,6 +269,18 @@ function toParam($S){
 }
 
 /**
+ * Formats a string to be used inside a XML.
+ *
+ * @param string $S String to be formatted.
+ * @return string Formatted string.
+ * @version (2008/12/05)
+ * @author JP7
+ */
+function toXml($S) {
+	return str_replace(array('&', '"', "'", '<', '>', '’' ), array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'), $S);
+}
+
+/**
  * Converts Hex string into binary string.
  *
  * @param string $S String to be converted.
