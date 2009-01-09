@@ -49,7 +49,10 @@ if (!$db_type) $db_type = 'mysql';
 include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 $ADODB_LANG = 'pt-br';
-$dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}"; 
+$dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}";
+/**
+ * @global ADOConnection $db
+ */
 $db = ADONewConnection($dsn);
 //$db->debug = true;
 

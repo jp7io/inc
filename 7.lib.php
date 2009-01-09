@@ -180,9 +180,10 @@ function wap_toHTML($S){
 }
 
 /**
- * Quotes a string to be sent to the database. e.g. 'mysql' becomes ''mysql''.
+ * Quotes a string to be sent to the database. e.g. mysql becomes 'mysql'.
  *
  * @param string $S The input string.
+ * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
  * @global ADOConnection
  * @return string Quoted string.
  * @version (2003/08/25)
@@ -190,7 +191,7 @@ function wap_toHTML($S){
 function toBase($S,$force_magic_quotes_gpc=FALSE){
 	global $db;
 	if($S){
-		$S=$db->qstr($S,get_magic_quotes_gpc()&&!$force_magic_quotes_gpc); //trata as aspas. Ex.: mysql fica \' sqlserver ''
+		$S=$db->qstr($S,get_magic_quotes_gpc()&&!$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
 		$S=trim($S);
 	}else{
 		$S="''";
