@@ -2169,7 +2169,7 @@ function moveFiles($from_path,$to_path){
 function jp7_explode($separator, $string, $useTrim = TRUE) {
 	$array = explode($separator, $string);
 	foreach($array as $key => $value) {
-		//if ($useTrim) $value = trim($value);
+		if ($useTrim) $value = trim($value);
 		if (!$value) unset($array[$key]);
 		else $array[$key] = $value;
 	}
