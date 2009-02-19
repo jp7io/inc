@@ -30,7 +30,7 @@ $c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '20
 if (!setlocale(LC_CTYPE, 'pt_BR')) setlocale(LC_CTYPE, 'pt_BR.ISO8859-1');
 if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
-if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen','1');
+if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen', '1');
 jp7_register_globals();
 
 /**
@@ -49,9 +49,10 @@ $is = new Browser($_SERVER['HTTP_USER_AGENT']);
  *
  * @param string $className Name of the class
  * @return void
+ * @global Debug
  */
 function __autoload($className){
-	global $debugger, $jp7_app, $s_interadmin_cliente;
+	global $debugger;
 	
 	$classNameArr = explode('_', $className);
 	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
@@ -61,7 +62,7 @@ function __autoload($className){
 	
 	$i = 0;
 	while (!file_exists($file)) {
-		if ($paths[$i]) { 
+		if (isset($paths[$i])) { 
 			$file = jp7_path_find($paths[$i] . '/' . $filename);
 		} else {
 			if ($debugger) $debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
@@ -1654,11 +1655,11 @@ function jp7_path_find($file) {
 	}
 	if (!$ok) {
 		if (strpos($file,'/head.php') !== FALSE) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
-		if ($GLOBALS['c_template'] && strpos($file,'../../inc/') !== FALSE) return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
+		if ($GLOBALS['c_template'] && strpos($file, '../../inc/') !== FALSE) return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}
-	return ($debugger) ? $debugger->showFilename($path . $file) : $path . $file;
+	return ($debugger && file_exists($path . $file)) ? $debugger->showFilename($path . $file) : $path . $file;
 }
 
 /**
