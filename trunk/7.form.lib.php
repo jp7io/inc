@@ -124,6 +124,9 @@ function interadmin_returnCampo($campo){
 				case "email": // E-Mail
 					$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.')\"";
 					break;
+				case "id_email": // ID E-Mail
+					$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.')\"";
+					break;
 				case "num": // Número
 					$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
 					break;
