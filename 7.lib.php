@@ -45,6 +45,11 @@ $debugger = new Debug();
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 /**
+ * Carrega o Krumo
+ */
+require_once jp7_path_find('/_default/krumo/class.krumo.php');
+
+/**
  * Includes a class in case it hasn't been defined yet.
  *
  * @param string $className Name of the class
