@@ -45,9 +45,9 @@ $debugger = new Debug();
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 /**
- * Carrega o Krumo
+ * Define o diretório com os arquivos do Krumo
  */
-require_once jp7_path_find('/_default/krumo/class.krumo.php');
+define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 
 /**
  * Includes a class in case it hasn't been defined yet.
@@ -68,7 +68,7 @@ function __autoload($className){
 	$i = 0;
 	while (!file_exists($file)) {
 		if (isset($paths[$i])) { 
-			$file = jp7_path_find($paths[$i] . '/' . $filename);
+			$file = jp7_path_find($paths[$i] . '/' . $filename, true);
 		} else {
 			if ($debugger) $debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
 			return;
@@ -1639,13 +1639,14 @@ function jp7_include($file){
  * Attempts to find a file on the directories above the current directory and, if it fails, it points to the root.
  *
  * @param string $file Filename.
+ * @param bool $autoload Is called by __autoload.
  * @global Debug
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
- * @version (2008/08/11)
+ * @version (2009/02/25)
  */
-function jp7_path_find($file) {
+function jp7_path_find($file, $autoload = false) {
 	global $debugger;
 	static $path_levels;
 	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
@@ -1653,18 +1654,18 @@ function jp7_path_find($file) {
 		($i) ? $path .= '../' : $path = '';
 		if ($ok = @file_exists($path . $file)) break;
 	}
-	if (!$ok) {
+	if (!$ok && !$autoload) {
 		// Necessário para localização de includes em templates
 		$path = jp7_path($GLOBALS['c_doc_root'], TRUE) . dirname($_SERVER['REQUEST_URI']) . '/';
 		$ok = @file_exists($path . $file);
 	}
-	if (!$ok) {
+	if (!$ok && !$autoload) {
 		if (strpos($file,'/head.php') !== FALSE) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
 		if ($GLOBALS['c_template'] && strpos($file, '../../inc/') !== FALSE) return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}
-	return ($debugger && file_exists($path . $file)) ? $debugger->showFilename($path . $file) : $path . $file;
+	return ($debugger && !$autoload) ? $debugger->showFilename($path . $file) : $path . $file;
 }
 
 /**
@@ -2181,4 +2182,18 @@ function jp7_explode($separator, $string, $useTrim = TRUE) {
 	}
 	return $array;
 }
+
+/**
+ * Alias of {@link Krumo::dump()}
+ *
+ * @param mixed $data,...
+ * @see Krumo::dump()
+ */
+function krumo() {
+    $_ = func_get_args();
+    return call_user_func_array(
+        array('krumo', 'dump'), $_
+    );
+}
+
 ?>
