@@ -59,6 +59,8 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 function __autoload($className){
 	global $debugger;
 	
+	if (!$className) return;
+	
 	$classNameArr = explode('_', $className);
 	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
 	
