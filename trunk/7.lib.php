@@ -2175,7 +2175,7 @@ function moveFiles($from_path,$to_path){
  * @param bool $useTrim If set the function will trim() each part of the string. Defaults to <tt>TRUE</tt>.
  * @return array Array of parts withuot any empty value.
  */
-function jp7_explode($separator, $string, $useTrim = TRUE) {
+function jp7_explode($separator, $string, $useTrim = true) {
 	$array = explode($separator, $string);
 	foreach($array as $key => $value) {
 		if ($useTrim) $value = trim($value);
@@ -2183,6 +2183,24 @@ function jp7_explode($separator, $string, $useTrim = TRUE) {
 		else $array[$key] = $value;
 	}
 	return $array;
+}
+
+/**
+ * Joins the array into a string. The difference from implode() is that jp7_implode() discards empty values.
+ * 
+ * @param string $separator
+ * @param string $string
+ * @param bool $useTrim If set the function will trim() each part of the string. Defaults to <tt>TRUE</tt>.
+ * @return array Array of parts withuot any empty value.
+ */
+function jp7_implode($separator, $array, $useTrim = true) {
+	foreach($array as $key => $value) {
+		if ($useTrim) $value = trim($value);
+		if (!$value) unset($array[$key]);
+		else $array[$key] = $value;
+	}
+	$string = implode($separator, $array);
+	return $string;
 }
 
 /**
