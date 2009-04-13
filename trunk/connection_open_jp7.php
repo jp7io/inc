@@ -40,7 +40,6 @@ if((strpos($HTTP_HOST,"jp7.com.br")!==false||strpos($HTTP_HOST,"convidar.com.br"
 		//echo "</pre>";
 		//$c_path="_outros/".$c_path;		
 	}
-	if (!$jp7_app) $c_cache = FALSE;
 	$googlemaps_key="ABQIAAAAsTwKY5N-m6Cx1Kj1a16NkxT3_qgDTySkwweE9jZ4ymNJXfPNXBRlNbYW-v3TBcZ8ELaBai9ocj8iAA";
 }
 $c_path_default="/_default/";
