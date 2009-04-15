@@ -2194,6 +2194,7 @@ function jp7_explode($separator, $string, $useTrim = true) {
  * @return array Array of parts withuot any empty value.
  */
 function jp7_implode($separator, $array, $useTrim = true) {
+	if (!$array) return $array;
 	foreach($array as $key => $value) {
 		if ($useTrim) $value = trim($value);
 		if (!$value) unset($array[$key]);
