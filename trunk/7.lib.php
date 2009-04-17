@@ -1597,12 +1597,12 @@ function jp7_path($S, $reverse = FALSE){
  * @global bool
  * @global string
  * @return string Root directory.
- * @version (2005/09/22)
+ * @version (2009/03/20)
  */
 function jp7_doc_root(){
  	global $PATH_INFO, $c_jp7, $c_path;
-	$S = $_SERVER['DOCUMENT_ROOT'];
-	if(!$S) $S = @ini_get('doc_root');
+	$S = @ini_get('doc_root');
+	if(!$S) $S = $_SERVER['DOCUMENT_ROOT'];
 	if(!$S){
 		$S = dirname($_SERVER['PATH_TRANSLATED']);
 		if($c_jp7){
@@ -2217,4 +2217,16 @@ function krumo() {
     );
 }
 
+function interadmin_bootstrap() {
+	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
+	$url = $_SERVER['REQUEST_URI'];
+	$urlArr = explode('/', $url);
+	$cliente = $urlArr[1];
+	$url = str_replace('/' . $cliente . '/interadmin/', '', $_SERVER['REQUEST_URI']);
+	$urlArr = explode('?', $url);
+	if ($urlArr[0]) {
+		$url = $urlArr[0];
+	}
+	return $url;
+}
 ?>
