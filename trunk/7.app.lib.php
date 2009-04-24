@@ -161,13 +161,19 @@ function jp7_msg($S,$type){
 }
 
 // jp7_phpmyadmin_path (2004/06/23)
-function jp7_phpmyadmin_path($path="../../_admin/phpmyadmin/",$i=0){
+/**
+ * @deprecated Não é mais utilizado o phpmyadmin para backup
+ */
+function jp7_phpmyadmin_path($path="../_admin/phpmyadmin/",$i=0){
 	if(is_dir($path)||$i>3)return $path;
 	else return jp7_phpmyadmin_path("../".$path,$i++);
 }
 
 // jp7_phpmyadmin_aplicacao_path (2007/07/19)
-function jp7_phpmyadmin_aplicacao_path($path="../../_admin/phpmyadmin/",$path2="../"){
+/**
+ * @deprecated Não é mais utilizado o phpmyadmin para backup
+ */
+function jp7_phpmyadmin_aplicacao_path($path="../_admin/phpmyadmin/",$path2="../../"){
 	if(is_dir($path)||$i>3){
 		global $SCRIPT_NAME;
 		global $jp7_app;
