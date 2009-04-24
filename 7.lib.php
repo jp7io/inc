@@ -2218,14 +2218,24 @@ function krumo() {
 }
 
 function interadmin_bootstrap() {
+	global $config;
 	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
 	$url = $_SERVER['REQUEST_URI'];
 	$urlArr = explode('/', $url);
-	$cliente = $urlArr[1];
+	$cliente = $_GET['cliente'] = $urlArr[1];
 	$url = str_replace('/' . $cliente . '/interadmin/', '', $_SERVER['REQUEST_URI']);
 	$urlArr = explode('?', $url);
 	if ($urlArr[0]) {
 		$url = $urlArr[0];
+	}
+	if (!$url) {
+		if ($config->interadmin_remote && $config->server->type != 'Desenvolvimento') {
+			$interadminHost = $config->interadmin_remote[0];
+		} else {
+			$interadminHost = $_SERVER['HTTP_HOST'];
+		}
+		header('Location: http://' . $interadminHost . '/interadmin/' . $cliente);
+		exit;
 	}
 	return $url;
 }
