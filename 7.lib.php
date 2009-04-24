@@ -62,7 +62,7 @@ function __autoload($className){
 	if (!$className) return;
 	
 	$classNameArr = explode('_', $className);
-	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
+	$filename = implode('/', $classNameArr) . ((($classNameArr[0] == 'Zend') || ($classNameArr[0] == 'Jp7')) ? '' : '.class') . '.php';
 	
 	$paths = explode(PATH_SEPARATOR, get_include_path()); 
 	$paths[] = '../classes';

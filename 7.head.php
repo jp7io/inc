@@ -1,3 +1,10 @@
+<?php
+if ($this instanceof Zend_View) {
+	$array = (array) $this;
+	extract($array);
+	include_once 'connection_open_jp7.php';
+}
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -16,7 +23,7 @@
 <? if ($seo_baseurl) { ?>
 	<base href="<?= $seo_baseurl ?>" />
 <? } else { ?>
-	<base href="http://<?= $HTTP_HOST ?><?=($REQUEST_URI&&!$baseurl)?$REQUEST_URI:$SCRIPT_NAME?>" />
+	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'] ?>" />
 <? } ?>
 <link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css" />
 <link rel="stylesheet" type="text/css" href="../../css/<?= $c_site ?>.css" />
