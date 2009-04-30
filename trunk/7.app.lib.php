@@ -157,7 +157,7 @@ function jp7_app_log($log,$S){
 
 // jp7_msg (2003/XX/XX)
 function jp7_msg($S,$type){
-	include jp7_path_find("../../inc/msg.php");
+	include jp7_path_find('inc/msg.php');
 }
 
 // jp7_phpmyadmin_path (2004/06/23)
