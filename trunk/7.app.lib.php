@@ -130,6 +130,7 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 function jp7_app_log($log,$S){
 	global $REMOTE_ADDR;
 	global $jp7_app;
+	global $c_interadminConfigPath;
 	if($jp7_app=="intermail"){
 		global $s_intermail_cliente;
 		global $s_intermail_user;
@@ -141,7 +142,7 @@ function jp7_app_log($log,$S){
 		$app_cliente=$s_interadmin_cliente;
 		$app_user=$s_user['login'];
 	}
-	$file_path="../../../".$jp7_app."/~".$app_cliente."/_log/";
+	$file_path = $c_interadminConfigPath . '_log/';
 	@chmod($file_path,0777);
 	if(date(d,filemtime($file_path.$log.".log"))==date(d)){
 		ob_start();
