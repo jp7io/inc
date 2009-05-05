@@ -3,6 +3,8 @@ if ($this instanceof Zend_View) {
 	$array = (array) $this;
 	extract($array);
 	include_once 'connection_open_jp7.php';
+} else {
+	$baseUrl = '../..';
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -26,7 +28,7 @@ if ($this instanceof Zend_View) {
 	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'] ?>" />
 <? } ?>
 <link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css" />
-<link rel="stylesheet" type="text/css" href="../../css/<?= $c_site ?>.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css" />
 <? if($c_template) { ?>
 	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css" />
 	<link rel="stylesheet" type="text/css" href="/_templates/<?= $c_template ?>/css/style.css" />
@@ -69,10 +71,10 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 		<script type="text/javascript" src="<?= $c_menu ?>"></script>
 	<? }else{ ?>
 		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js"></script>
-		<script type="text/javascript" src="../../js/interdyn_menu_str.php?lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
+		<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/interdyn_menu_str.php?lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
 	<? } ?>
 <? } ?>
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
-<script type="text/javascript" src="../../js/functions.js"></script>
-<script type="text/javascript" src="../../js/init.js"></script>
+<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js"></script>
+<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js"></script>
 <? $debugger->safePoint = TRUE; // Flag indicating that from this point the debugger can output data ?>
