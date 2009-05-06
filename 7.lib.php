@@ -2088,10 +2088,10 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
 		if($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
-			header('Location: /_default/em_manutencao.htm');
+			header('Location: /_default/index_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>
             <script language="javascript" type="text/javascript">
-			document.location.href="/_default/em_manutencao.htm";
+			document.location.href="/_default/index_manutencao.htm";
 			</script>
             <?
 			exit();
