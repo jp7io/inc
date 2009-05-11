@@ -2205,6 +2205,22 @@ function jp7_implode($separator, $array, $useTrim = true) {
 }
 
 /**
+ * Same as file_exists, the difference is that it takes include_path in consideration.
+ *
+ * @param string $filename Relative path to the file or directory.
+ * @return bool Returns TRUE if the file or directory specified by filename exists on any of the directories listed on include_path; FALSE otherwise.
+ */
+function jp7_file_exists($filename) {
+	$include_paths = explode(PATH_SEPARATOR, get_include_path());
+	foreach ($include_paths as $include_path) {
+		if (file_exists($include_path . '/' . $filename)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Alias of {@link Krumo::dump()}
  *
  * @param mixed $data,...
