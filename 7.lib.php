@@ -68,7 +68,7 @@ function __autoload($className){
 	$paths[] = '../classes';
 	
 	$i = 0;
-	while (!file_exists($file)) {
+	while (!@file_exists($file)) {
 		if (isset($paths[$i])) { 
 			$file = jp7_path_find($paths[$i] . '/' . $filename, true);
 		} else {
