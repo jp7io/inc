@@ -1823,11 +1823,13 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
  * @param string $padding Padding for the text, using CSS-like format, the default value is "0 0 0 0".
  * @param array|bool $shadow Array containing "color" (RGB string separated by comma),  "x" and "y" (the coordinates of the shadow), the default value is <tt>FALSE</tt>.
  * @param string $antialiasing If it receives the char "-" (minus) the antialiasing is turned off, the default value is "".
+ * @param bol $truecolor If <tt>TRUE</tt> Os PNGs serão tratados com alpha. The default value is <tt>FALSE</tt>.
  * @return NULL
  * @version (2006/04/07)
  */
-function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,$padding="0 0 0 0",$shadow=FALSE,$antialiasing=""){
+function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fontfile,$text,$padding="0 0 0 0",$shadow=FALSE,$antialiasing="",$truecolor=false){
 	$im=imagecreatefrompng($filename_src);
+	if ($truecolor) imagesavealpha($im, true);
 	$col_arr=explode(",",$col);
 	$col_arr=imagecolorallocate($im,$col_arr[0],$col_arr[1],$col_arr[2]);
 	if($x!=="center"&&$shadow){
@@ -1836,13 +1838,14 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 		else $shadow_color=imagecolorallocate($im,$shadow_color[0],$shadow_color[1],$shadow_color[2]);
 		imagettftext($im,$size,$angle,$x+$shadow[x],$y+$shadow[y],$shadow_color,$fontfile,$text);
 	}
-	imagettftext($im,$size,$angle,($x==="center"||$x==="right"||$x==="trim")?0:$x,($y==="center")?0:$y,$antialiasing.$col_arr,$fontfile,$text);
+	$padding=explode(" ",$padding);
+	imagettftext($im,$size,$angle,($x==="center"||$x==="right"||$x==="trim")?$padding[3]:$x,($y==="center")?0:$y,$antialiasing.$col_arr,$fontfile,$text);
 	imagepng($im,$filename_dst);
 	imagedestroy($im);
 	// Center
 	if($x==="center"||$y==="center"){
 		$im=imagecreatefrompng($filename_dst);
-		$padding=explode(" ",$padding);
+		if ($truecolor) imagesavealpha($im, true);
 		$center=imagettfbbox($size,$angle,$fontfile,$text);
 		if($x==="center"){
 			$x=$center[4]+1;
@@ -1857,7 +1860,7 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 	// Right
 	}elseif($x==="right"){
 		$im=imagecreatefrompng($filename_dst);
-		$padding=explode(" ",$padding);
+		if ($truecolor) imagesavealpha($im, true);
 		$right=imagettfbbox($size,$angle,$fontfile,$text);
 		if($x==="right"){
 			$x=$right[4];
@@ -1868,18 +1871,27 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 	// Trim
 	}elseif($x==="trim"){
 		$im=imagecreatefrompng($filename_dst);
-		$padding=explode(" ",$padding);
+		if ($truecolor) imagesavealpha($im, true);
 		$x=imagettfbbox($size,$angle,$fontfile,$text);
 		$x=$x[4]+1;
 		if($x!=="trim"){
-			$im2=imagecreate($x+$padding[1]+$padding[3],imagesy($im));
-			$im_bg=imagecolorsforindex($im,imagecolorat($im,1,1));
-			$im_bg=imagecolorallocate($im2,$im_bg["red"],$im_bg["green"],$im_bg["blue"]);
-			imagefill($im2,0,0,$im_bg);
-			imagecolortransparent($im2,$im_bg);
-			imagecopymerge($im2,$im,$padding[1],0,0,0,$x+$padding[1]+$padding[3],imagesy($im),100);
-			imagepng($im2,$filename_dst);
-			imagedestroy($im2);
+			if ($truecolor) {
+				$im2=imagecreatetruecolor($x+$padding[1]+$padding[3],imagesy($im));
+				imagealphablending($im2, false);
+				imagecopy($im2,$im,0,0,0,0,$x+$padding[1]+$padding[3],imagesy($im));
+				imagesavealpha($im2, true);
+				imagepng($im2,$filename_dst);
+				imagedestroy($im2);
+			} else {
+				$im2=imagecreate($x+$padding[1]+$padding[3],imagesy($im));
+				$im_bg=imagecolorsforindex($im,imagecolorat($im,1,1));
+				$im_bg=imagecolorallocate($im2,$im_bg["red"],$im_bg["green"],$im_bg["blue"]);
+				imagefill($im2,0,0,$im_bg);
+				imagecolortransparent($im2,$im_bg);
+				imagecopymerge($im2,$im,$padding[1],0,0,0,$x+$padding[1]+$padding[3],imagesy($im),100);
+				imagepng($im2,$filename_dst);
+				imagedestroy($im2);
+			}
 		}
 		imagedestroy($im);
 	}
