@@ -144,16 +144,17 @@ function jp7_app_log($log,$S){
 	}
 	$file_path = $c_interadminConfigPath . '_log/';
 	@chmod($file_path,0777);
-	if(date(d,filemtime($file_path.$log.".log"))==date(d)){
+	$log_file = $file_path . $log . '.log';
+	if (file_exists($log_file) && date('d', filemtime($log_file)) == date('d')) {
 		ob_start();
-		readfile($file_path.$log.".log");
+		readfile($log_file);
 		$file_data=ob_get_contents();
 		ob_end_clean();
 	}
-	$file=fopen($file_path.$log.".log","w");
+	$file=fopen($log_file,"w");
 	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$REMOTE_ADDR." - ".$S."\r\n");
 	fclose($file);
-	copy($file_path.$log.".log",$file_path.$log."_".date(d).".log");
+	copy($log_file, $file_path.$log."_".date(d).".log");
 }
 
 // jp7_msg (2003/XX/XX)
