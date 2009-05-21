@@ -25,7 +25,7 @@ if ($this instanceof Zend_View) {
 <? if ($seo_baseurl) { ?>
 	<base href="<?= $seo_baseurl ?>" />
 <? } else { ?>
-	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'] ?>" />
+	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : (($_GET['redirect_root']) ? preg_replace('/^\/' . $c_site . '/', '', $_SERVER['SCRIPT_NAME']) : $_SERVER['SCRIPT_NAME']) ?>" />
 <? } ?>
 <link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css" />
