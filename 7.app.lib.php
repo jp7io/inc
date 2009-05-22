@@ -29,7 +29,6 @@ function jp7_app_checkPermission(){
 	switch($_SERVER['HTTP_HOST']){
 		case "192.168.0.2":
 		case "localhost":
-		case "carlos":
 		case "jp":
 		case "jp7":
 		case "jp7.com.br":
