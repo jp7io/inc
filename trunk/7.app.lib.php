@@ -29,6 +29,7 @@ function jp7_app_checkPermission(){
 	switch($_SERVER['HTTP_HOST']){
 		case "192.168.0.2":
 		case "localhost":
+		case "carlos":
 		case "jp":
 		case "jp7":
 		case "jp7.com.br":
@@ -128,7 +129,6 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 }
 
 function jp7_app_log($log,$S){
-	global $REMOTE_ADDR;
 	global $jp7_app;
 	global $c_interadminConfigPath;
 	if($jp7_app=="intermail"){
@@ -152,7 +152,7 @@ function jp7_app_log($log,$S){
 		ob_end_clean();
 	}
 	$file=fopen($log_file,"w");
-	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$REMOTE_ADDR." - ".$S."\r\n");
+	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$_SERVER['REMOTE_ADDR']." - ".$S."\r\n");
 	fclose($file);
 	copy($log_file, $file_path.$log."_".date(d).".log");
 }
