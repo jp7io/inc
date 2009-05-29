@@ -2250,8 +2250,13 @@ function interadmin_bootstrap() {
 	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
 	$url = $_SERVER['REQUEST_URI'];
 	$urlArr = explode('/', $url);
-	$cliente = $_GET['cliente'] = $urlArr[1];
-	$url = str_replace('/' . $cliente . '/interadmin/', '', $_SERVER['REQUEST_URI']);
+	if ($urlArr[1] == 'interadmin_config') {
+        $cliente = $_GET['cliente'] = $urlArr[2];
+        $url = str_replace('/interadmin_config/' . $cliente . '/', '', $_SERVER['REQUEST_URI']);
+	} else {
+        $cliente = $_GET['cliente'] = $urlArr[1];
+        $url = str_replace('/' . $cliente . '/interadmin/', '', $_SERVER['REQUEST_URI']);
+	}
 	$urlArr = explode('?', $url);
 	if ($urlArr[0]) {
 		$url = $urlArr[0];
