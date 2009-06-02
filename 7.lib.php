@@ -2241,7 +2241,7 @@ function jp7_file_exists($filename) {
 function krumo() {
     $_ = func_get_args();
     return call_user_func_array(
-        array('krumo', 'dump'), $_
+        array('Krumo', 'dump'), $_
     );
 }
 
