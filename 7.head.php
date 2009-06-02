@@ -21,7 +21,7 @@ if ($this instanceof Zend_View) {
 <? if ($config->google_site_verify) { ?>
 	<meta name="verify-v1" content="<?= $config->google_site_verify ?>" />
 <? } ?>
-<title><?=($s_session['preview'])?"PREVIEW | ":""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao&&$secao!="home"){ ?> | <?= $secaoTitle ?><? if ($subsecao&&$subsecao!="home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
+<title><?= ($s_session['preview']) ? "PREVIEW | " : ""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao && $secao != "home"){ ?> | <?= $secaoTitle ?><? if ($subsecao && $subsecao != "home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
 <? if ($seo_baseurl) { ?>
 	<base href="<?= $seo_baseurl ?>" />
 <? } else { ?>
@@ -56,7 +56,7 @@ var s_interadmin_preview='<?= $s_session['preview'] ?>'
 
 var fullpath='http://'+location.host+'/'+path+lang_path
 
-<? if($s_session['preview']&&!$isPopup) { ?>
+<? if ($s_session['preview'] && !$isPopup) { ?>
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
 <? } ?>
 </script>
@@ -66,15 +66,15 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.2.6.pack.js"></script>
-<? if ($c_menu != "none"){ ?>
-	<? if(strpos($c_menu,"../") !== FALSE) { ?>
+<? if ($c_menu != "none") { ?>
+	<? if (strpos($c_menu, "../") !== false) { ?>
 		<script type="text/javascript" src="<?= $c_menu ?>"></script>
 	<? }else{ ?>
-		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js"></script>
+		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{ ?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js"></script>
 		<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/interdyn_menu_str.php?lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
 	<? } ?>
 <? } ?>
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js"></script>
-<? $debugger->safePoint = TRUE; // Flag indicating that from this point the debugger can output data ?>
+<? $debugger->safePoint = true; // Flag indicating that from this point the debugger can output data ?>
