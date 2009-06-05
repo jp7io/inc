@@ -153,7 +153,10 @@ function jp7_app_log($log,$S){
 	$file=fopen($log_file,"w");
 	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$_SERVER['REMOTE_ADDR']." - ".$S."\r\n");
 	fclose($file);
-	copy($log_file, $file_path.$log."_".date(d).".log");
+	$log_file_day = $file_path . $log . '_' . date('d') . '.log';
+	copy($log_file, $log_file_day);
+	@chmod($log_file, 0777);
+	@chmod($log_file_day, 0777);
 }
 
 // jp7_msg (2003/XX/XX)
