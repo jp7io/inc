@@ -1888,7 +1888,7 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 				$im_bg=imagecolorallocate($im2,$im_bg["red"],$im_bg["green"],$im_bg["blue"]);
 				imagefill($im2,0,0,$im_bg);
 				imagecolortransparent($im2,$im_bg);
-				imagecopymerge($im2,$im,$padding[1],0,0,0,$x+$padding[1]+$padding[3],imagesy($im),100);
+				imagecopymerge($im2,$im,0,0,0,0,$x+$padding[1]+$padding[3],imagesy($im),100);
 				imagepng($im2,$filename_dst);
 				imagedestroy($im2);
 			}
