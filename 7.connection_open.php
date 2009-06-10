@@ -43,7 +43,7 @@ $config->lang = $config->langs[$lang->lang];
 if  (!$c_site_title) $c_site_title = $config->lang->title;
 
 @include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
-@include $c_root . 'inc/lang_' . $lang->lang . '.php';
+@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
 
 if (!$db_type) $db_type = 'mysql';
 include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
