@@ -2245,30 +2245,40 @@ function krumo() {
     );
 }
 
+/**
+ * Works as a bootstrap for custom pages inside /APP_config/CLIENT or /CLIENT/APP.
+ * Parses the URI and sets the include_path.
+ * 
+ * @return string Filename to be included.
+ */
 function interadmin_bootstrap() {
 	global $config;
-	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
-	$url = $_SERVER['REQUEST_URI'];
-	$urlArr = explode('/', $url);
-	if ($urlArr[1] == 'interadmin_config') {
+
+	$urlArr = explode('/', $_SERVER['REQUEST_URI']);
+
+	if (preg_match('/_config/', $urlArr[1])) {
+		// APP_config/CLIENTE
+		$jp7_app = str_replace('_config', '', $urlArr[1]);
         $cliente = $_GET['cliente'] = $urlArr[2];
-        $url = str_replace('/interadmin_config/' . $cliente . '/', '', $_SERVER['REQUEST_URI']);
+        $url = str_replace('/' . $jp7_app . '_config/' . $cliente . '/', '', $_SERVER['REQUEST_URI']);
 	} else {
+		// CLIENTE/APP
+		$jp7_app = $urlArr[2];
         $cliente = $_GET['cliente'] = $urlArr[1];
-        $url = str_replace('/' . $cliente . '/interadmin/', '', $_SERVER['REQUEST_URI']);
+        $url = str_replace('/' . $cliente . '/' . $jp7_app . '/', '', $_SERVER['REQUEST_URI']);
 	}
-	$urlArr = explode('?', $url);
-	if ($urlArr[0]) {
-		$url = $urlArr[0];
-	}
+
+	// Retira a query string
+	$url = preg_replace('/([^?]*)(.*)/', '\1', $url);
+
 	if (!$url) {
-		if ($config->interadmin_remote && $config->server->type != 'Desenvolvimento') {
-			$interadminHost = $config->interadmin_remote[0];
-		} else {
-			$interadminHost = $_SERVER['HTTP_HOST'];
-		}
-		header('Location: http://' . $interadminHost . '/interadmin/' . $cliente);
+		header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $jp7_app . '/');
 		exit;
+	}
+	
+	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . $jp7_app);
+	if ($jp7_app != 'interadmin') {
+		set_include_path(get_include_path() . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
 	}
 	return $url;
 }
