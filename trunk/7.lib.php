@@ -2258,12 +2258,12 @@ function interadmin_bootstrap() {
 
 	if (preg_match('/_config/', $urlArr[1])) {
 		// APP_config/CLIENTE
-		$jp7_app = str_replace('_config', '', $urlArr[1]);
+		$jp7_app = $_GET['jp7_app'] = str_replace('_config', '', $urlArr[1]);
         $cliente = $_GET['cliente'] = $urlArr[2];
         $url = str_replace('/' . $jp7_app . '_config/' . $cliente . '/', '', $_SERVER['REQUEST_URI']);
 	} else {
 		// CLIENTE/APP
-		$jp7_app = $urlArr[2];
+		$jp7_app = $_GET['jp7_app'] = $urlArr[2];
         $cliente = $_GET['cliente'] = $urlArr[1];
         $url = str_replace('/' . $cliente . '/' . $jp7_app . '/', '', $_SERVER['REQUEST_URI']);
 	}
