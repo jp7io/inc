@@ -2,9 +2,9 @@
 if((strpos($HTTP_HOST,"jp7.com.br")!==false||$c_server_type=="Default"||$c_server_type=="Principal")&&strpos($HTTP_HOST,"intermail.jp7.com.br")===false){
 	// JP7 (Locaweb)
 	$c_server_type="Principal";
-	$db_host="mysql01.jp7.com.br";
-	if(!$db_name)$db_name="jp71";
-	$db_user="jp71";
+	$db_host="localhost";
+	if(!$db_name)$db_name="interadmin";
+	$db_user="root";
 	$db_pass="hov572hov71";
 	if(!isset($c_path))$c_path=$c_site."/";
 	if(!$jp7_app)$publish=true;
