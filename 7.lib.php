@@ -1009,10 +1009,10 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @global string
  * @return string Generated HTML code for a combobox or a list.
  * @author JP
- * @version (2007/01/27)
+ * @version (2009/06/13)
  */
 function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=FALSE) {
-	global $db, $s_session, $l_selecione;
+	global $db, $s_session, $l_selecione, $c_publish;
 	//global $id;
 	if($type=="list"){
 		$S="".
@@ -1026,7 +1026,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$sql = "SELECT id,".$field." AS field FROM ".$table.
 	" WHERE id_tipo=".$id_tipo.
 	" AND char_key<>''".
-	(($s_session['preview'])?"":" AND publish<>''").
+	(($s_session['preview'] || !$c_publish)?"":" AND publish<>''").
 	" AND (deleted='' OR deleted IS NULL)".
 	" AND date_publish<='".date("Y/m/d H:i:s")."'".
 	$sql_where.
