@@ -5,7 +5,7 @@ if (!$db_host) {
 
 // Paths
 $c_path = jp7_path($c_path);
-$c_root = $c_doc_root . $c_path;
+$c_root = $c_doc_root . $config->name_id . '/';
 if (!$c_path_js) $c_path_js = '/_default/js/';
 if (!$c_path_css) $c_path_css = '/_default/css/';
 if (!$c_path_default) $c_path_default = '/_default/';
