@@ -2272,7 +2272,7 @@ function interadmin_bootstrap() {
 	$url = preg_replace('/([^?]*)(.*)/', '\1', $url);
 
 	if (!$url) {
-		header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $jp7_app . '/');
+		header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $jp7_app . '/' . $cliente);
 		exit;
 	}
 	
