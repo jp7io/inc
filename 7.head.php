@@ -1,11 +1,5 @@
 <?php
-if ($this instanceof Zend_View) {
-	$array = (array) $this;
-	extract($array);
-	include_once 'connection_open_jp7.php';
-} else {
-	$baseUrl = '../..';
-}
+$baseUrl = '../..';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -18,6 +12,7 @@ if ($this instanceof Zend_View) {
 <meta name="robots" content="all" />
 <meta name="author" content="JP7 - http://jp7.com.br<? if($c_parceiro) { ?> | <?= $c_parceiro ?><? } ?>" />
 <meta name="generator" content="JP7 InterAdmin" />
+<meta name="version" content="<?php echo interadmin_get_version($config->name_id); ?>" />
 <? if ($config->google_site_verify) { ?>
 	<meta name="verify-v1" content="<?= $config->google_site_verify ?>" />
 <? } ?>

@@ -2283,4 +2283,55 @@ function interadmin_bootstrap() {
 	}
 	return $url;
 }
-?>
+
+/**
+ * Checks if an executable program exists. On Windows it works only for .exe files.
+ * Searchs for the executable file inside the directories on the %PATH% variable.
+ * 
+ * @param $executable Name of the file without the extension (.exe), e.g. "svn".
+ * @return bool
+ */
+function jp7_is_executable($executable) {
+	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+		$comando = 'for %G in ("%path:;=" "%") do @IF EXIST %G/' . $executable . '.exe echo 1';
+	} else { 
+		$comando = 'type -P ' . $executable;
+	}
+	return (bool) @shell_exec($comando);
+}
+
+/**
+ * Checks the current version of a package using a call to SVN executable.
+ * The version is cached on a file called: $packageDir/.version
+ * 
+ * @param string $packageDir Name of the package on SVN repository, defaults to 'interadmin'.
+ * @param string $format Format of the output. Defaults to "Versão {release} (Build {build})".
+ * @return string Formatted string.
+ */
+function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {release} (Build {build})')
+{
+	global $c_doc_root;
+	
+	$cacheFile = $c_doc_root . $packageDir . '/.version';
+	if (@is_file($cacheFile) && date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile))) {
+		$version = unserialize(file_get_contents($cacheFile));
+	}
+	
+	if (!$version) {
+		$comando = 'svn info "' . $c_doc_root . $packageDir . '"';
+		$svninfo = explode("\n", shell_exec($comando));
+		
+		$version = new stdClass();
+		$version->release = reset(preg_grep('/^URL:(.*)/', $svninfo));
+		$version->release = preg_replace('~URL:(.*)' . $packageDir . '/~', '', $version->release);
+		if (strpos($version->release, 'tags') === 0) {
+			$version->release = preg_replace('~tags/release-([0-9.]*)(-crypt)?~', '$1', $version->release);			
+		}
+		$version->build = reset(preg_grep('/^Rev(.*)/', $svninfo));
+		$version->build = preg_replace('~Rev(.*): (.*)~', '$2', $version->build);
+		file_put_contents($cacheFile, serialize($version));
+	}
+	$retorno = str_replace('{release}', $version->release, $format);
+	$retorno = str_replace('{build}', $version->build, $retorno);
+	return $retorno;
+}
