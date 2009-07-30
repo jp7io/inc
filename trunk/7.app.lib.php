@@ -127,6 +127,13 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 	}
 }
 
+/**
+ * Adiciona string ao arquivo de log, que é gravado dentro da pasta $c_interadminConfigPath/_log.
+ * 
+ * @param string $log Prefixo do nome do arquivo de log. Por exemplo: sql
+ * @param string $S String a ser adicionada ao arquivo de log.
+ * @return void
+ */
 function jp7_app_log($log,$S){
 	global $jp7_app;
 	global $c_interadminConfigPath;
@@ -153,10 +160,11 @@ function jp7_app_log($log,$S){
 	$file=fopen($log_file,"w");
 	fwrite($file,$file_data.date("d/m/Y H:i")." - ".$app_user." - ".$_SERVER['REMOTE_ADDR']." - ".$S."\r\n");
 	fclose($file);
-	$log_file_day = $file_path . $log . '_' . date('d') . '.log';
-	copy($log_file, $log_file_day);
+	$log_file_day = $log . '_' . date('d') . '.log';
+	copy($log_file, $file_path . $log_file_day);
 	@chmod($log_file, 0777);
-	@chmod($log_file_day, 0777);
+	@chmod($file_path . $log_file_day, 0777);
+	interadmin_update_remote_files(array('_log/' . $log . '.log', '_log/' . $log_file_day));
 }
 
 // jp7_msg (2003/XX/XX)
