@@ -2313,8 +2313,11 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	global $c_doc_root;
 	
 	$cacheFile = $c_doc_root . $packageDir . '/.version';
-	if (@is_file($cacheFile) && date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile))) {
-		$version = unserialize(file_get_contents($cacheFile));
+	if (@is_file($cacheFile)) {
+        // If .version was saved this day or SVN is not available, keep .version cache
+		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
+            $version = unserialize(file_get_contents($cacheFile));
+        }
 	}
 	
 	if (!$version) {
