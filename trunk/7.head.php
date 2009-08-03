@@ -60,7 +60,7 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_form.js"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.2.6.pack.js"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.3.2.min.js"></script>
 <? if ($c_menu != "none") { ?>
 	<? if (strpos($c_menu, "../") !== false) { ?>
 		<script type="text/javascript" src="<?= $c_menu ?>"></script>
