@@ -13,6 +13,9 @@ $baseUrl = '../..';
 <meta name="author" content="JP7 - http://jp7.com.br<? if($c_parceiro) { ?> | <?= $c_parceiro ?><? } ?>" />
 <meta name="generator" content="JP7 InterAdmin" />
 <meta name="version" content="<?php echo interadmin_get_version($config->name_id); ?>" />
+<?php if ($config->ie7compatible) { ?>
+	<meta http-equiv="X-UA-Compatible" content="IE=7" />
+<?php } ?>
 <? if ($config->google_site_verify) { ?>
 	<meta name="verify-v1" content="<?= $config->google_site_verify ?>" />
 <? } ?>
