@@ -20,6 +20,7 @@ function jp7_app_checkPermission(){
 			case "www2.".$c_cliente_domains[$i]:
 			case "interadmin.".$c_cliente_domains[$i]:
 			case "intermail.".$c_cliente_domains[$i]:
+			case "qa.intermail.".$c_cliente_domains[$i]:
 			case "ri.".$c_cliente_domains[$i]:
 			case "ir.".$c_cliente_domains[$i]:
 				$ok = TRUE;
