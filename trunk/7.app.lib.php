@@ -63,8 +63,12 @@ function jp7_app_createSelect($name,$label,$div,$start,$finish,$value,$xtra=""){
 
 // jp7_app_createSelect_date() (2007/05/25 by JP)
 function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonly="",$xtra=""){
-	global $l_dia, $l_mes, $l_ano, $l_hora, $l_min;
-	global $lang;
+	global $l_dia, $l_mes, $l_ano, $l_hora, $l_min, $jp7_app;
+	if ($jp7_app) {
+		$lang = new jp7_lang('pt-br', true);
+	} else {
+		global $lang;
+	}
 	$date=jp7_date_split($GLOBALS[$var]);
 	if($i!==false)$i="[".$i."]";
 	if($GLOBALS["interadmin_visualizar"]){
