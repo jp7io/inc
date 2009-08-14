@@ -262,13 +262,9 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		$sql = "SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix.(($select_lang)?$lang->prefix:"").
 		" WHERE id_tipo=".$parent_id_tipo_2.
 		$sql_where.
-		" AND (deleted='' OR deleted IS NULL)".
 		" ORDER BY int_key,varchar_key,select_key";
 	}
-	if($db_type) 
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	else 
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	$rs=interadmin_query($sql);
 	$S='';
 	for($i = 0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
