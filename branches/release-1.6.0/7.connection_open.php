@@ -63,7 +63,18 @@ if (!$wap) {
 	$secaoTitle = $tipos->nome[0];
 	$subsecao = toId($tipos->nome[1]);
 	$subsecaoTitle = $tipos->nome[1];
-	if (!$seo) $tipoObj = new InterAdminTipo($id_tipo);
+	if (!$seo) {
+		$tipoObj = new InterAdminTipo($id_tipo);
+		if ($id) {
+			$interAdminObj = new InterAdmin($id);
+		}
+	}
+}
+
+// Hits
+if ($id) {
+	$sql = "UPDATE " . $db_prefix . $lang->prefix . " SET date_hit = '" . date('c') . "', hits = hits + 1 WHERE id = " . $id;
+	$db->Execute($sql);
 }
 
 // Login Check
