@@ -908,12 +908,12 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	global $db_prefix;
 	global $lang;
 	global $debugger;
-
+	
 	$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
-
+	
 	// Debug - Before SQL injection
 	$debugger->showSql($sql, $sql_debug, 'color:#FFFFFF;background:#444444;');
-
+	
 	// Split
 	$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
 	$sql_slipt = explode("{;}", $sql_slipt);
@@ -927,22 +927,40 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	preg_match_all("(([^ ,]+) AS ([^ ,]+))", $sql_from, $out, PREG_PATTERN_ORDER);
 	if (count($out[1])) {
 		// Com Alias
-		foreach($out[1] as $key=>$value){
+		foreach ($out[1] as $key=>$value) {
 			$alias = $out[2][$key];
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE (".$alias.".mostrar<>'' OR ".$alias.".mostrar IS NULL) AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE (".$alias.".date_publish<='".$DbNow."' OR ".$alias.".date_publish IS NULL) AND (".$alias.".char_key<>'' OR ".$alias.".char_key IS NULL)  AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND (".$alias.".publish<>'' OR  ".$alias.".publish<>'' IS NULL)":"")." AND ",$sql_where);
-			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
+			if (strpos($value, $db_prefix . '_tipos') !== false) {
+				$sql_where = str_replace("WHERE ","WHERE (" . $alias . ".mostrar<>'' OR " . $alias . ".mostrar IS NULL) AND (" . $alias . ".deleted_tipo='' OR " . $alias . ".deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos')!==false || strpos($value, $db_prefix . '_arquivos') !== false) {
+				$sql_where = str_replace("WHERE ","WHERE " . $alias . ".mostrar<>'' AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL) AND ", $sql_where);
+			} else {
+				$sql_where_replace = '' .
+				"WHERE (" . $alias . ".date_publish<='" . $DbNow . "' OR " . $alias . ".date_publish IS NULL)" .
+				" AND (" . $alias . ".date_expire>'" . $DbNow . "' OR " . $alias . ".date_expire IS NULL OR " . $alias . ".date_expire='0000-00-00 00:00:00')" .
+				" AND (" . $alias . ".char_key<>'' OR " . $alias . ".char_key IS NULL)" .
+				" AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL)" .
+				(($c_publish && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish<>'' IS NULL)" : "") . " AND ";
+				$sql_where = str_replace("WHERE ", $sql_where_replace, $sql_where);
+			}
+			if ($c_path_upload) {
+				$sql_select = preg_replace('/([ ,])' . $alias . '.file_([0-9])/', '\1REPLACE(' . $alias . '.file_\2,\'../../upload/\',\'' . $c_path_upload . '\') AS file_\2', $sql_select);
+			}
 		}
 	} else {
 		// Sem Alias
-		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)",$sql_from,$out,PREG_PATTERN_ORDER);
-		foreach($out[0] as $key=>$value){
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND (publish<>'' OR publish IS NULL)":"")." AND ",$sql_where);
+		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)", $sql_from, $out, PREG_PATTERN_ORDER);
+		foreach ($out[0] as $key=>$value) {
+			if (strpos($value, $db_prefix."_tipos")!==false) {
+				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos') !== false || strpos($value, $db_prefix . '_arquivos') !== false) {
+				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
+			} else {
+				$sql_where = str_replace("WHERE ","WHERE date_publish<='" . $DbNow . "' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)" . (($c_publish && !$s_session['preview']) ? " AND (publish<>'' OR publish IS NULL)" : "") . " AND ", $sql_where);
+			}
 		}
-		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+		if ($c_path_upload) {
+			$sql_select = preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+		}
 	}
 	// Join
 	$sql = $sql_select . $sql_from . $sql_where . $sql_final;
