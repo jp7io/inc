@@ -1,5 +1,11 @@
 <?php
 $baseUrl = '../..';
+
+// Hits
+if ($id || $intranet_id) {
+	$sql = "UPDATE " . $db_prefix . $lang->prefix . " SET date_hit = '" . date('c') . "', hits = hits + 1 WHERE id = " . $id;
+	$db->Execute($sql);
+}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

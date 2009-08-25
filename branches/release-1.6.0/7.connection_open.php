@@ -71,12 +71,6 @@ if (!$wap) {
 	}
 }
 
-// Hits
-if ($id) {
-	$sql = "UPDATE " . $db_prefix . $lang->prefix . " SET date_hit = '" . date('c') . "', hits = hits + 1 WHERE id = " . $id;
-	$db->Execute($sql);
-}
-
 // Login Check
 if ($tipos->restrito[1] || $tipos->restrito[$tipos->i-1]) include '../../inc/login_check.php';
 
