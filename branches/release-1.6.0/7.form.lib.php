@@ -83,7 +83,7 @@ function interadmin_returnCampo($campo){
 				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
 				$form = '';
 				while ($row = $rs->FetchNextObj()) {
-					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "_" . $j . "_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")." /> <label for=\"" . $campo . "_" . $j . "_".$row->id."\">".toHTML($row->$nomevarchar)."</label>";
+					$form.="<input ".(($obrigatorio)?" obligatory=\"yes\"":""). " label=\"".$campo_nome_2."\" type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "_" . $j . "_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")." /> <label for=\"" . $campo . "_" . $j . "_".$row->id."\">".toHTML($row->$nomevarchar)."</label>";
 				}
 				$rs->Close();
 		} elseif ($xtra) {
@@ -158,7 +158,7 @@ function interadmin_returnCampo($campo){
 					((strpos($xtra,"calendar_")!==false)?"<input type=\"hidden\" id=\"".$campo."_calendar_value_".$j."\" value=\"".$valor."\" />":"").
 					"<table width=\"100%\">".
 						"<tr>".
-							"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly.(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra)."</td>".
+							"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly.(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra,$obrigatorio)."</td>".
 							"<td width=\"99%\" align=\"right\">".
 								//"<input type=\"button\" value=\"Atualizar".((strpos($xtra,"calendar")===false)?" Data".(($xtra!="S")?" - Hora":""):"")."\"".$readonly." tabindex=\"-1\" onclick=\"refreshDate('".$campo."','".$j."','','".$xtra."')".(($xtra=="calendar_datetime"||$xtra=="calendar_date")?";interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"")."\">".
 								((strpos($xtra,"calendar")!==false)?"<input type=\"button\" id=\"".$campo."_calendar_".$j."\" value=\"Calendário\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\" />":"").
@@ -396,7 +396,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 	);
 	// Check Data
 	if(!$DF_to||!$DF_subject){
-		echo "Faltam parâmetros.";
+		echo 'Faltam parâmetros <b>$DF_to</b> ou <b>$DF_subject</b>. Linha:' . __LINE__ . ' Arquivo: ' . __FILE__;
 		exit;
 	}
 	// Send Mail
