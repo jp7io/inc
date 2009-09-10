@@ -2356,3 +2356,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	$retorno = str_replace('{build}', $version->build, $retorno);
 	return $retorno;
 }
+
+function array_trim($var) {
+	return trim($var);
+}
