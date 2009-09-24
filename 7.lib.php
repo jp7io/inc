@@ -34,9 +34,9 @@ if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen', '1');
 jp7_register_globals();
 
 /**
- * @global Debug $debugger
+ * @global Jp7_Debugger $debugger
  */
-$debugger = new Debug();
+$debugger = new Jp7_Debugger();
 //set_error_handler(array($debugger, 'errorHandler'));
 
 /**
@@ -54,7 +54,7 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
  *
  * @param string $className Name of the class
  * @return void
- * @global Debug
+ * @global Jp7_Debugger
  */
 function __autoload($className){
 	global $debugger;
@@ -1624,7 +1624,7 @@ function jp7_doc_root(){
  * Attempts to include a file from two levels above and, if it fails, tries from the root.
  *
  * @param string $file Filename which will be included. e.g. "inc/example.php".
- * @global Debug
+ * @global Jp7_Debugger
  * @return NULL
  * @version (2008/06/13)
  * @deprecated Instead of using this function use "include jp7_path_find('folder/filename.php');"
@@ -1643,7 +1643,7 @@ function jp7_include($file){
  *
  * @param string $file Filename.
  * @param bool $autoload Is called by __autoload.
- * @global Debug
+ * @global Jp7_Debugger
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
@@ -2076,7 +2076,7 @@ function jp7_file_size($file){
  * @param string $msgErro Error message, the default is <tt>NULL</tt>.
  * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
  * @param array $traceArr Debugging data, like the return of debug_backtrace().
- * @global Debug
+ * @global Jp7_Debugger
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
