@@ -1053,7 +1053,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while ($row = $rs->FetchNextObj()) {
 		if($seo){
-			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
+			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".((toId($row->field)==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
 			else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
 		}else{
 			if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
