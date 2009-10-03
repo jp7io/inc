@@ -90,24 +90,27 @@ function __autoload($className){
  * @return string Formatted string.
  * @version (2006/01/18)
  */
-function toId($S,$tofile = FALSE, $separador=''){
-	if ($separador) $S = str_replace(' ', $separador, $S);
-	$S = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $S);
-	$S = preg_replace("([éèêëÉÈÊË&])", 'e', $S);
-	$S = preg_replace("([íìîïÍÌÎÏ])", 'i', $S);
-	$S = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $S);
-	$S = preg_replace("([úùûüÚÙÛÜ])", 'u', $S);
-	$S = preg_replace("([çÇ])", 'c', $S);
-	$S = preg_replace("([ñÑ])", 'n', $S);
-	if($tofile){
-		$S = preg_replace("([^(\d\w)])", '_', $S);
-	}else{
-		$S = preg_replace("([^(\d\w)])", $separador, $S);
-		$S = strtolower($S);
+function toId($string, $tofile = false, $separador = '') {
+	// Check if there are diacritics before replacing them
+	if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
+		$string = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $string);
+		$string = preg_replace("([éèêëÉÈÊË&])", 'e', $string);
+		$string = preg_replace("([íìîïÍÌÎÏ])", 'i', $string);
+		$string = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $string);
+		$string = preg_replace("([úùûüÚÙÛÜ])", 'u', $string);
+		$string = preg_replace("([çÇ])", 'c', $string);
+		$string = preg_replace("([ñÑ])", 'n', $string);
 	}
-	$S = preg_replace("([\(\)])", '', $S);
-	if ($separador != '-') $S = preg_replace("([/-])", '_', $S);
-	return $S;
+	if ($tofile) {
+		$string = preg_replace("([^(\d\w)])", '_', $string);
+	} else {
+		$string = preg_replace("([^\d\w]+)", $separador, $string);
+		$string = trim(strtolower($string), $separador);
+	}
+	if ($separador != '-') {
+		$string = preg_replace("([/-])", '_', $string);
+	}
+	return $string;
 }
 
 /**
@@ -118,17 +121,8 @@ function toId($S,$tofile = FALSE, $separador=''){
  * @author JP
  * @version (2008/06/12) update by Carlos Rodrigues
  */
-function toSeo($S) {
-	$S = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $S);
-	$S = preg_replace("([éèêëÉÈÊË&])", 'e', $S);
-	$S = preg_replace("([íìîïÍÌÎÏ])", 'i', $S);
-	$S = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $S);
-	$S = preg_replace("([úùûüÚÙÛÜ])", 'u', $S);
-	$S = preg_replace("([çÇ])", 'c', $S);
-	$S = preg_replace("([ñÑ])", 'n', $S);
-	$S = preg_replace("([^\d\w- /])", '', $S);
-	$S = preg_replace("([ -/]+)", '-', trim($S));
-	return strtolower($S);
+function toSeo($string) {
+	return toId($string, false, '-');
 }
 
 /**
