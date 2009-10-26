@@ -1923,8 +1923,9 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
  * @return NULL
  * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
+function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $crop = false) {
 	$c_gd = function_exists('imagecreatefromjpeg');
+	$command_path = '/usr/bin/';
 	// Check Size and Orientation (Horizontal x Vertical)
 	if ($c_gd) {
 		// GD Get Size
@@ -1932,7 +1933,7 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 		$src_h = imagesy($im_src);
 	} else {
 		// Magick Get Size
-		$command = '/usr/bin/identify -verbose ' . $src;
+		$command = $command_path . 'identify -verbose ' . $src;
 		exec($command, $a, $b);
 		$src_geometry = split('x', substr($a[2], strpos($a[2], ':') + 2));
 		$src_w = $src_geometry[0];
@@ -1948,6 +1949,21 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 		$dst_h = $h;
 		if ($src_w > $src_h) $src_w = $src_h;
 		else $src_h = $src_w;
+	// The image is resized until it gets the maximum width or height (with crop)
+	} elseif ($crop) {
+		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
+		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
+		if ($pre_dst_h > $h) {
+			$dst_w = $w;
+			$dst_h = $pre_dst_h;
+			$dif_h = round(($h - $pre_dst_h) / 2);
+		} else {
+			$dst_h = $h;
+			$dst_w = $pre_dst_w;
+			$dif_w = round(($w - $pre_dst_w) / 2);
+		}
+		$new_w = $w;
+		$new_h = $h;
 	// The image is resized until it gets the maximum width or height (without crop)
 	} else {
 		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
@@ -1960,8 +1976,15 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 			$dst_w = $pre_dst_w;
 		}
 	}
+	// 
+	if (!$new_w) {
+		$new_w = $dst_w;
+	}
+	if (!$new_h) {
+		$new_h = $dst_h;
+	}
 	// Checks if destination image is bigger than source image
-	if($dst_w>=$src_w&&$dst_h>=$src_h){
+	if ($dst_w >= $src_w && $dst_h >= $src_h) {
 		// No-Resize and Check Weight
 		if (filesize($src) > $s) {
 			$im_dst = $im_src;
@@ -1970,24 +1993,26 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 				imagejpeg($im_dst, $dst, $q);
 			} else {
 				// Magick Convert Quality
-				$command = "/usr/bin/convert ".$src." -quality ".$q." +profile '*' ".$dst;
+				$command = $command_path . "convert " . $src . " -quality " . $q . " +profile '*' " . $dst;
 				exec($command, $a, $b);
 			}
-		}else{
-			if(jp7_extension($src)=="gif")$dst=str_replace(".jpg",".gif",$dst);
+		} else {
+			if (jp7_extension($src)=="gif") {
+				$dst = str_replace(".jpg", ".gif", $dst);
+			}
 			copy($src,$dst);
 		}
-	}else{
-		if($c_gd){
+	} else {
+		if ($c_gd) {
 			// GD Resize
-			$im_dst=imagecreatetruecolor($dst_w,$dst_h);
-			imagecopyresampled($im_dst,$im_src,0,0,0,0,$dst_w,$dst_h,$src_w,$src_h);
-			imagejpeg($im_dst,$dst,$q);
+			$im_dst = imagecreatetruecolor($new_w, $new_h);
+			imagecopyresampled($im_dst, $im_src, $dif_w, $dif_h, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+			imagejpeg($im_dst, $dst,$q);
 			imagedestroy($im_dst);
-		}else{
+		} else {
 			// Magick Resize
-			$command="/usr/bin/convert ".$src." -resize '".$dst_w."x".$dst_h."!' -quality ".$q." +profile '*' ".$dst;
-			exec($command,$a,$b);
+			$command = $command_path . "convert " . $src . " -resize " . $dst_w . "x" . $dst_h . "! -quality " . $q . " +profile '*' " . $dst;
+			exec($command, $a, $b);
 		}
 	}
 }
