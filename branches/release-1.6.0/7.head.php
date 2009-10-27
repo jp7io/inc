@@ -73,7 +73,7 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <? if ($c_menu != "none") { ?>
 	<? if (strpos($c_menu, "../") !== false) { ?>
 		<script type="text/javascript" src="<?= $c_menu ?>"></script>
-	<? }else{ ?>
+	<? } else { ?>
 		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{ ?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js"></script>
 		<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/interdyn_menu_str.php?lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
 	<? } ?>
@@ -81,4 +81,3 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js"></script>
-<? $debugger->safePoint = true; // Flag indicating that from this point the debugger can output data ?>
