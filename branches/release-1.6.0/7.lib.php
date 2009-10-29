@@ -494,7 +494,7 @@ function jp7_date_split($date){
 	$date=str_replace("/",",",$date);
 	$date=str_replace("-",",",$date);
 	$date=str_replace(":",",",$date);
-	$date=split(",",$date);
+	$date=explode(",",$date);
 	return array(
 		Y=>$date[0],
 		m=>$date[1],
@@ -610,7 +610,7 @@ function jp7_tel_split($tel){
 	$tel=str_replace("(","",$tel);
 	$tel=str_replace(")",",",$tel);
 	$tel=str_replace(" - Ramal: ",",",$tel);
-	$tel=split(",",$tel);
+	$tel=explode(",",$tel);
 	return array(
 		ddd=>trim($tel[0]),
 		numero=>trim($tel[1]),
@@ -784,7 +784,7 @@ function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
  */
 function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	global $db;
-	$fields_arr=split(",",$fields);
+	$fields_arr=explode(",",$fields);
 	// Variáveis
 	foreach($fields_arr as $field){
 		$fields_arr_db[]=(strpos($field,"_")===0)?substr($field,1):$field;
@@ -825,9 +825,9 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
  */
 function interadmin_tipos_campos($campos){
 	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default","nome_id");
-	$campos=split("{;}",$campos);
+	$campos=explode("{;}",$campos);
 	for($i = 0;$i<count($campos);$i++){
-		$parameters=split("{,}",$campos[$i]);
+		$parameters=explode("{,}",$campos[$i]);
 		if($parameters[0]){
 			$A[$parameters[0]][ordem]=($i+1);
 			for($j=0;$j<count($parameters);$j++){
@@ -856,9 +856,9 @@ function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
 	while($tipo_model_id_tipo){
 		jp7_db_select($db_prefix."_tipos","id_tipo",$tipo_model_id_tipo,"tipo_");
 	}
-	$tipo_campos=split("{;}",$tipo_campos);
+	$tipo_campos=explode("{;}",$tipo_campos);
 	foreach($tipo_campos as $campo){
-		$campo=split("{,}",$campo);
+		$campo=explode("{,}",$campo);
 		if($campo[0]==$var_key){
 			return array(
 				nome=>$campo[1],
@@ -1935,7 +1935,7 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		// Magick Get Size
 		$command = $command_path . 'identify -verbose ' . $src;
 		exec($command, $a, $b);
-		$src_geometry = split('x', substr($a[2], strpos($a[2], ':') + 2));
+		$src_geometry = explode('x', substr($a[2], strpos($a[2], ':') + 2));
 		$src_w = $src_geometry[0];
 		$src_h = $src_geometry[1];
 	}
