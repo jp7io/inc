@@ -81,3 +81,4 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js"></script>
 <script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js"></script>
+<? $debugger->setSafePoint(true); // Flag indicating that from this point the debugger can output data ?>
