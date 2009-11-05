@@ -1,5 +1,7 @@
 <?php
 $baseUrl = '../..';
+
+$c_build = interadmin_get_version($config->name_id, '{build}');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -25,11 +27,11 @@ $baseUrl = '../..';
 <? } else { ?>
 	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : preg_replace('~^/' . $c_site . '/~', jp7_path('/' . $c_path), $_SERVER['SCRIPT_NAME']) ?>" />
 <? } ?>
-<link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css" />
-<link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css" />
+<link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css?build=<?php echo $c_build; ?>" />
+<link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css?build=<?php echo $c_build; ?>" />
 <? if($c_template) { ?>
-	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css" />
-	<link rel="stylesheet" type="text/css" href="/_templates/<?= $c_template ?>/css/style.css" />
+	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css?build=<?php echo $c_build; ?>" />
+	<link rel="stylesheet" type="text/css" href="/_templates/<?= $c_template ?>/css/style.css?build=<?php echo $c_build; ?>" />
 <? } ?>
 <script type="text/javascript">
 var d=document
@@ -58,21 +60,21 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
 <? } ?>
 </script>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn_checkflash.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn_form.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js"></script>
-<script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>interdyn.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>interdyn_checkflash.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>interdyn_form.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.3.2.min.js?build=<?php echo $c_build; ?>"></script>
 <? if ($c_menu != "none") { ?>
 	<? if (strpos($c_menu, "../") !== false) { ?>
 		<script type="text/javascript" src="<?= $c_menu ?>"></script>
 	<? }else{ ?>
-		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{ ?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js"></script>
-		<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/interdyn_menu_str.php?lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
+		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{ ?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js?build=<?php echo $c_build; ?>"></script>
+		<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/interdyn_menu_str.php?build=<?php echo $c_build; ?>&lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
 	<? } ?>
 <? } ?>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js"></script>
-<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js"></script>
-<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js"></script>
+<script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/functions.js?build=<?php echo $c_build; ?>"></script>
+<script type="text/javascript" src="<?php echo $baseUrl; ?>/js/init.js?build=<?php echo $c_build; ?>"></script>
 <? $debugger->safePoint = true; // Flag indicating that from this point the debugger can output data ?>
