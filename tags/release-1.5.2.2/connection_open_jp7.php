@@ -1,0 +1,53 @@
+<?
+if((strpos($HTTP_HOST,"jp7.com.br")!==false||$c_server_type=="Default"||$c_server_type=="Principal")&&strpos($HTTP_HOST,"intermail.jp7.com.br")===false){
+	// JP7 (Locaweb)
+	$c_server_type="Principal";
+	$db_host="localhost";
+	if(!$db_name)$db_name="interadmin";
+	$db_user="root";
+	$db_pass="hov572hov71";
+	if(!isset($c_path))$c_path=$c_site."/";
+	if(!$jp7_app)$publish=true;
+}elseif(strpos($HTTP_HOST,"interadmin.jp7.com.br")!==false||strpos($HTTP_HOST,"intermail.jp7.com.br")!==false){
+	// JP7 (Cloud)
+	$c_server_type="Principal";
+	if(!$db_host)$db_host="localhost";
+	if(!$db_name)$db_name="interadmin";
+	$db_user="root";
+	$db_pass="hov572hov71";
+	if(!isset($c_path))$c_path=$c_site."/";
+	if(!$jp7_app)$publish=true;
+}else{
+	// JP7 (Local)
+	$c_server_type="Local";
+	if ($_SERVER['SERVER_ADDR'] != '192.168.0.2') {
+		$db_host = '192.168.0.2';
+	} else {
+		$db_host=($db_type=="mssql")?"jp":"localhost";
+	}
+	if(!$db_name)$db_name=(strpos($REQUEST_URI,"_outros")!==false)?"interadmin_outros":"interadmin";
+	$db_user=($db_type=="mssql")?"sa":"root";
+	$db_pass="123";
+	if(!$c_path)$c_path=$c_site."/";
+	if(!file_exists($c_doc_root.$c_path)){
+		//echo "<pre>".dirname($SCRIPT_NAME);
+		$path_size=explode("/",dirname($SCRIPT_NAME));
+		//print_r($path_size)."\n";
+		$path_arr=array_slice($path_size,1,count($path_size)-3);//-3
+		//print_r($path_arr)."\n";
+		$c_path=implode("/",$path_arr)."/";
+		//echo $c_path."\n";
+		//echo "</pre>";
+		//$c_path="_outros/".$c_path;		
+	}
+	$googlemaps_key="ABQIAAAAsTwKY5N-m6Cx1Kj1a16NkxT3_qgDTySkwweE9jZ4ymNJXfPNXBRlNbYW-v3TBcZ8ELaBai9ocj8iAA";
+}
+$c_path_default="/_default/";
+$c_path_js="/_default/js/";
+$c_path_css="/_default/css/";
+
+$config->server->db->host = $db_host;
+$config->server->db->name = $db_name;
+$config->server->db->user = $db_user;
+$config->server->db->pass = $db_pass;
+?>
