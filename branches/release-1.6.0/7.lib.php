@@ -1923,7 +1923,27 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
  * @return NULL
  * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $crop = false) {
+function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
+	// Param Parser
+	if (is_array($q)) {
+		$options = $q;
+		if ($options['quality']) {
+			$q = $options['quality'];
+		}
+		if ($options['maxsize']) {
+			$s = $options['maxsize'];
+		}
+		if ($options['crop']) {
+			$crop = $options['crop'];
+		}
+		if ($options['imagemagick']) {
+			$imagemagick = $options['imagemagick'];
+		}
+		if ($options['enlarge']) {
+			$enlarge = $options['enlarge'];
+		}
+	}
+	// Check GD
 	$c_gd = function_exists('imagecreatefromjpeg');
 	$command_path = '/usr/bin/';
 	// Check Size and Orientation (Horizontal x Vertical)
@@ -1984,7 +2004,7 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		$new_h = $dst_h;
 	}
 	// Checks if destination image is bigger than source image
-	if ($dst_w >= $src_w && $dst_h >= $src_h) {
+	if ($dst_w >= $src_w && $dst_h >= $src_h && !$enlarge) {
 		// No-Resize and Check Weight
 		if (filesize($src) > $s) {
 			$im_dst = $im_src;
