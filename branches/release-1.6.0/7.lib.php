@@ -925,6 +925,8 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 			$alias = $out[2][$key];
 			if (strpos($value, '_tipos') === (strlen($value) - strlen('_tipos'))) {
 				$sql_where = str_replace("WHERE ","WHERE (" . $alias . ".mostrar<>'' OR " . $alias . ".mostrar IS NULL) AND (" . $alias . ".deleted_tipo='' OR " . $alias . ".deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, '_tags') === (strlen($value) - strlen('_tags'))) {
+				// do nothing
 			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos')!==false || strpos($value, $db_prefix . '_arquivos') !== false) {
 				$sql_where = str_replace("WHERE ","WHERE " . $alias . ".mostrar<>'' AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL) AND ", $sql_where);
 			} else {
@@ -946,6 +948,8 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 		foreach ($out[0] as $key=>$value) {
 			if (strpos($value, $db_prefix."_tipos")!==false) {
 				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, $db_prefix."_tags")!==false) {
+				// do nothing
 			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos') !== false || strpos($value, $db_prefix . '_arquivos') !== false) {
 				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
 			} else {
