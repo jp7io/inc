@@ -27,7 +27,8 @@ $c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '20
 /**
  * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
  */
-if (!setlocale(LC_CTYPE, 'pt_BR')) setlocale(LC_CTYPE, 'pt_BR.ISO8859-1');
+setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
+setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
 if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen', '1');
@@ -2403,3 +2404,12 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 function array_trim($var) {
 	return trim($var);
 }
+
+if (!function_exists('json_encode')) {
+	require_once dirname(__FILE__) . "/3thparty/JSON.php";
+	function json_encode($array) {
+		$json = new Services_JSON();
+		return $json->encode($array);
+	}
+}
+
