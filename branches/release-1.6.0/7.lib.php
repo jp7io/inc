@@ -936,7 +936,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 				" AND (" . $alias . ".date_expire>'" . $DbNow . "' OR " . $alias . ".date_expire IS NULL OR " . $alias . ".date_expire='0000-00-00 00:00:00')" .
 				" AND (" . $alias . ".char_key<>'' OR " . $alias . ".char_key IS NULL)" .
 				" AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL)" .
-				(($c_publish && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish<>'' IS NULL)" : "") . " AND ";
+				(($c_publish && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish IS NULL)" : "") . " AND ";
 				$sql_where = str_replace("WHERE ", $sql_where_replace, $sql_where);
 			}
 			if ($c_path_upload) {
@@ -2145,13 +2145,18 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	global $debugger;
 	global $s_interadmin_cliente, $jp7_app;
 	global $c_site, $c_server_type;
-	if (!$traceArr) $traceArr = debug_backtrace();
+	if (!$traceArr) {
+		$traceArr = debug_backtrace();
+	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 	//Envia email e exibe tela de manutenção
-	if($c_server_type == 'Principal') {
-		if (trim($c_site)) $cliente = $c_site;
-		elseif (trim($s_interadmin_cliente)) $cliente = $s_interadmin_cliente;
+	if ($c_server_type == 'Principal') {
+		if (trim($c_site)) {
+			$cliente = $c_site;
+		} elseif (trim($s_interadmin_cliente)) {
+			$cliente = $s_interadmin_cliente;
+		}
 		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
 		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
 		$to = 'debug+' . $cliente . '@jp7.com.br';
@@ -2161,7 +2166,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 		//$template="form_htm.php";
 		$html = TRUE;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
+		if ($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /_default/index_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>
