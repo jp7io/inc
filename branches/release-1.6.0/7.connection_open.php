@@ -31,7 +31,9 @@ if($c_template)include $c_doc_root . '_templates/' . $c_template . '/config.php'
 if (!session_id()) {
 	session_start();
 }
-$s_session = &$_SESSION[$c_site]['interadmin'];
+if ($_SESSION[$c_site]['interadmin']) {
+		$s_session = &$_SESSION[$c_site]['interadmin'];
+}
 $s_user = &$s_session['user'];
 
 // PHPMyAdmin
@@ -50,6 +52,9 @@ include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 $ADODB_LANG = 'pt-br';
 $dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}";
+if ($config->db->flags) {
+	$dsn .= $config->db->flags;
+}
 /**
  * @global ADOConnection $db
  */
