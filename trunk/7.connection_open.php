@@ -1,4 +1,4 @@
-<?
+<?php
 if (!$db_host) {
 	include $c_doc_root . 'inc/connection_open_jp7.php';
 }
@@ -10,7 +10,7 @@ if (!$c_path_js) $c_path_js = '/_default/js/';
 if (!$c_path_css) $c_path_css = '/_default/css/';
 if (!$c_path_default) $c_path_default = '/_default/';
 if (!$c_lang_default) $c_lang_default = 'pt-br';
-$config->server->url = 'http://' . $HTTP_HOST . '/' . $c_path; // Temp - Delete it when InterSite Class get finished
+$config->server->url = 'http://' . $HTTP_HOST . '/' . $c_path; // FIXME - Delete it when InterSite Class get finished
 $c_url = $config->server->url;
 
 // Check IDs
@@ -50,6 +50,9 @@ include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 $ADODB_LANG = 'pt-br';
 $dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}";
+if ($config->db->flags) {
+	$dsn .= $config->db->flags;
+}
 /**
  * @global ADOConnection $db
  */
