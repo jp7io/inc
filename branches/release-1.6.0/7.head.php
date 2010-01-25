@@ -2,7 +2,7 @@
 $baseUrl = '../..';
 
 // Hits
-if ($id || $intranet_id) {
+if ($id || $intranet_id || ($id = $interadminObj)) {
 	$sql = "UPDATE " . $db_prefix . $lang->prefix . " SET date_hit = '" . date('c') . "', hits = hits + 1 WHERE id = " . $id;
 	$db->Execute($sql);
 }
