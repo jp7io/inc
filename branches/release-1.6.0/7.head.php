@@ -1,11 +1,14 @@
 <?php
 $baseUrl = '../..';
 
+$c_build = interadmin_get_version($config->name_id, '{build}');
 // Hits
-if ($id || $intranet_id || ($id = $interadminObj)) {
+/*
+if ($id || $intranet_id) {
 	$sql = "UPDATE " . $db_prefix . $lang->prefix . " SET date_hit = '" . date('c') . "', hits = hits + 1 WHERE id = " . $id;
 	$db->Execute($sql);
 }
+*/
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -32,7 +35,7 @@ if ($id || $intranet_id || ($id = $interadminObj)) {
 	<base href="http://<?= $_SERVER['HTTP_HOST'] ?><?= ($_SERVER['REQUEST_URI'] && !$baseurl) ? $_SERVER['REQUEST_URI'] : preg_replace('~^/' . $c_site . '/~', jp7_path('/' . $c_path), $_SERVER['SCRIPT_NAME']) ?>" />
 <? } ?>
 <link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css" />
-<link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo $baseUrl; ?>/css/<?= $c_site ?>.css?build=<?php echo $c_build; ?>" />
 <? if($c_template) { ?>
 	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css" />
 	<link rel="stylesheet" type="text/css" href="/_templates/<?= $c_template ?>/css/style.css" />
