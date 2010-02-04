@@ -29,7 +29,7 @@ function interadmin_returnCampo($campo){
 	}
 	$valor=$GLOBALS[$campo];
 	if(!$valor&&!$id)$valor=$valor_default;
-	$_th="<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+	$_th="<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>\r\n";
 	if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
 	if($readonly=="hidden")$readonly_hidden=true;
 	if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
@@ -83,7 +83,7 @@ function interadmin_returnCampo($campo){
 				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
 				$form = '';
 				while ($row = $rs->FetchNextObj()) {
-					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "_" . $j . "_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")." /> <label for=\"" . $campo . "_" . $j . "_".$row->id."\">".toHTML($row->$nomevarchar)."</label>";
+					$form.="<input ".(($obrigatorio)?" obligatory=\"yes\"":""). " label=\"".$campo_nome_2."\" type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "_" . $j . "_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")." /> <label for=\"" . $campo . "_" . $j . "_".$row->id."\">".toHTML($row->$nomevarchar)."</label>";
 				}
 				$rs->Close();
 		} elseif ($xtra) {
@@ -146,60 +146,60 @@ function interadmin_returnCampo($campo){
 		}elseif(strpos($campo,"file_")===0){
 			if(strpos($valor,"../../")===0)$url=substr($valor,6);
 			echo "".
-			"<tr>".
+			"<tr>\r\n".
 				$_th.
-				"<td colspan=\"3\"><input type=\"file\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width\" /></td>".
-			"</tr>\n";
+				"<td colspan=\"3\"><input type=\"file\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width\" /></td>\r\n".
+			"</tr>\r\n";
 		}elseif(strpos($campo,"date_")===0){
 			$S="".
-			"<tr>".
+			"<tr>\r\n".
 				$_th.
-				"<td colspan=\"2\">".
+				"<td colspan=\"2\">\r\n".
 					((strpos($xtra,"calendar_")!==false)?"<input type=\"hidden\" id=\"".$campo."_calendar_value_".$j."\" value=\"".$valor."\" />":"").
-					"<table width=\"100%\">".
-						"<tr>".
-							"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly.(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra)."</td>".
-							"<td width=\"99%\" align=\"right\">".
-								//"<input type=\"button\" value=\"Atualizar".((strpos($xtra,"calendar")===false)?" Data".(($xtra!="S")?" - Hora":""):"")."\"".$readonly." tabindex=\"-1\" onclick=\"refreshDate('".$campo."','".$j."','','".$xtra."')".(($xtra=="calendar_datetime"||$xtra=="calendar_date")?";interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"")."\">".
+					"<table width=\"100%\">\r\n".
+						"<tr>\r\n".
+							"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly.(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra,$obrigatorio)."</td>\r\n".
+							"<td width=\"99%\" align=\"right\">\r\n".
+								//"<input type=\"button\" value=\"Atualizar".((strpos($xtra,"calendar")===false)?" Data".(($xtra!="S")?" - Hora":""):"")."\"".$readonly." tabindex=\"-1\" onclick=\"refreshDate('".$campo."','".$j."','','".$xtra."')".(($xtra=="calendar_datetime"||$xtra=="calendar_date")?";interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"")."\">\r\n".
 								((strpos($xtra,"calendar")!==false)?"<input type=\"button\" id=\"".$campo."_calendar_".$j."\" value=\"Calendário\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\" />":"").
-							"</td>".
-						"</tr>".
-					"</table>".
-				"</td>".
-				"<td>".$S_ajuda."</td>".
-			"</tr>";
+							"</td>\r\n".
+						"</tr>\r\n".
+					"</table>\r\n".
+				"</td>\r\n".
+				"<td>".$S_ajuda."</td>\r\n".
+			"</tr>\r\n";
 			echo $S;
 		}elseif(strpos($campo,"password_")===0&&$valor&&$xtra){
 			echo "".
 			"<tr>".
 				$_th.
-				"<td colspan=\"2\">".
-					"<table width=\"100%\">".
-						"<tr>".
-							"<td width=\"99%\" style=\"display:none\"><input type=\"password\" name=\"".$campo."[".$j."]\" label=\"".$campo_nome."\" disabled style=\"width:100%\"><input type=\"hidden\" name=\"".$campo."_xtra[".$j."]\" value=\"".$xtra."\"></td>".
-							"<td><input type=\"button\" value=\"Alterar...\" onclick=\"interadmin_inserir_password(this,'".$campo."[".$j."]')\"><input type=\"text\" disabled style=\"width:1px;visibility:hidden\"></td>".
-						"</tr>".
-					"</table>".
-				"</td>".
-				"<td>".$S_ajuda."</td>".
-			"</tr>\n";
+				"<td colspan=\"2\">\r\n".
+					"<table width=\"100%\">\r\n".
+						"<tr>\r\n".
+							"<td width=\"99%\" style=\"display:none\"><input type=\"password\" name=\"".$campo."[".$j."]\" label=\"".$campo_nome."\" disabled style=\"width:100%\"><input type=\"hidden\" name=\"".$campo."_xtra[".$j."]\" value=\"".$xtra."\"></td>\r\n".
+							"<td><input type=\"button\" value=\"Alterar...\" onclick=\"interadmin_inserir_password(this,'".$campo."[".$j."]')\"><input type=\"text\" disabled style=\"width:1px;visibility:hidden\"></td>\r\n".
+						"</tr>\r\n".
+					"</table>\r\n".
+				"</td>\r\n".
+				"<td>".$S_ajuda."</td>\r\n".
+			"</tr>\r\n";
 		}elseif(strpos($campo,"special_")===0){
 			echo $campo_nome($campo_array,$valor);
 		}else{
 			if(!$readonly_hidden){
 				echo "".
-				"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-					"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
-					"<td colspan=2>".$form."</td>".
-					"<td>".$S_ajuda."</td>".
-				"</tr>\n";
+				"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">\r\n".
+					"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>\r\n".
+					"<td colspan=2>".$form."</td>\r\n".
+					"<td>".$S_ajuda."</td>\r\n".
+				"</tr>\r\n";
 				if(strpos($campo,"password_")===0){
 					echo "".
-					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-						"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>".
-						"<td colspan=2><input type=\"password\" xtype=\"password\" id=\"".$campo."_confirm[]\" name=\"".$campo."[]\" label=\"Confirmação de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>".
-						"<td>".$S_ajuda."</td>".
-					"</tr>\n";
+					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">\r\n".
+						"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>\r\n".
+						"<td colspan=2><input type=\"password\" xtype=\"password\" id=\"".$campo."_confirm[]\" name=\"".$campo."[]\" label=\"Confirmação de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>\r\n".
+						"<td>".$S_ajuda."</td>\r\n".
+					"</tr>\r\n";
 				}
 			}else{
 				echo $form;
@@ -208,10 +208,10 @@ function interadmin_returnCampo($campo){
 	}
 	if($separador){
 		if($tit_start){
-			echo "</tbody>";
+			echo "</tbody>\r\n";
 			$tit_start=false;
 		}
-		echo "<tr><td height=".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)." colspan=4></td></tr>\n";
+		echo "<tr><td height=".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)." colspan=4></td></tr>\r\n";
 	}
 }
 
@@ -396,7 +396,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 	);
 	// Check Data
 	if(!$DF_to||!$DF_subject){
-		echo "Faltam parâmetros.";
+		echo 'Faltam parâmetros <b>$DF_to</b> ou <b>$DF_subject</b>. Linha:' . __LINE__ . ' Arquivo: ' . __FILE__;
 		exit;
 	}
 	// Send Mail

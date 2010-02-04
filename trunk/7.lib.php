@@ -27,16 +27,17 @@ $c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '20
 /**
  * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
  */
-if (!setlocale(LC_CTYPE, 'pt_BR')) setlocale(LC_CTYPE, 'pt_BR.ISO8859-1');
+setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
+setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
 if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
 else error_reporting(0);
 if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen', '1');
 jp7_register_globals();
 
 /**
- * @global Debug $debugger
+ * @global Jp7_Debugger $debugger
  */
-$debugger = new Debug();
+$debugger = new Jp7_Debugger();
 //set_error_handler(array($debugger, 'errorHandler'));
 
 /**
@@ -54,7 +55,7 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
  *
  * @param string $className Name of the class
  * @return void
- * @global Debug
+ * @global Jp7_Debugger
  */
 function __autoload($className){
 	global $debugger;
@@ -90,24 +91,27 @@ function __autoload($className){
  * @return string Formatted string.
  * @version (2006/01/18)
  */
-function toId($S,$tofile = FALSE, $separador=''){
-	if ($separador) $S = str_replace(' ', $separador, $S);
-	$S = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $S);
-	$S = preg_replace("([éèêëÉÈÊË&])", 'e', $S);
-	$S = preg_replace("([íìîïÍÌÎÏ])", 'i', $S);
-	$S = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $S);
-	$S = preg_replace("([úùûüÚÙÛÜ])", 'u', $S);
-	$S = preg_replace("([çÇ])", 'c', $S);
-	$S = preg_replace("([ñÑ])", 'n', $S);
-	if($tofile){
-		$S = preg_replace("([^(\d\w)])", '_', $S);
-	}else{
-		$S = preg_replace("([^(\d\w)])", $separador, $S);
-		$S = strtolower($S);
+function toId($string, $tofile = false, $separador = '') {
+	// Check if there are diacritics before replacing them
+	if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
+		$string = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $string);
+		$string = preg_replace("([éèêëÉÈÊË&])", 'e', $string);
+		$string = preg_replace("([íìîïÍÌÎÏ])", 'i', $string);
+		$string = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $string);
+		$string = preg_replace("([úùûüÚÙÛÜ])", 'u', $string);
+		$string = preg_replace("([çÇ])", 'c', $string);
+		$string = preg_replace("([ñÑ])", 'n', $string);
 	}
-	$S = preg_replace("([\(\)])", '', $S);
-	if ($separador != '-') $S = preg_replace("([/-])", '_', $S);
-	return $S;
+	if ($tofile) {
+		$string = preg_replace("([^(\d\w)])", '_', $string);
+	} else {
+		$string = preg_replace("([^\d\w]+)", $separador, $string);
+		$string = trim(strtolower($string), $separador);
+	}
+	if ($separador != '-') {
+		$string = preg_replace("([/-])", '_', $string);
+	}
+	return $string;
 }
 
 /**
@@ -118,17 +122,8 @@ function toId($S,$tofile = FALSE, $separador=''){
  * @author JP
  * @version (2008/06/12) update by Carlos Rodrigues
  */
-function toSeo($S) {
-	$S = preg_replace("([áàãâäÁÀÃÂÄª])", 'a', $S);
-	$S = preg_replace("([éèêëÉÈÊË&])", 'e', $S);
-	$S = preg_replace("([íìîïÍÌÎÏ])", 'i', $S);
-	$S = preg_replace("([óòõôöÓÒÕÔÖº])", 'o', $S);
-	$S = preg_replace("([úùûüÚÙÛÜ])", 'u', $S);
-	$S = preg_replace("([çÇ])", 'c', $S);
-	$S = preg_replace("([ñÑ])", 'n', $S);
-	$S = preg_replace("([^\d\w- /])", '', $S);
-	$S = preg_replace("([ -/]+)", '-', trim($S));
-	return strtolower($S);
+function toSeo($string) {
+	return toId($string, false, '-');
 }
 
 /**
@@ -500,7 +495,7 @@ function jp7_date_split($date){
 	$date=str_replace("/",",",$date);
 	$date=str_replace("-",",",$date);
 	$date=str_replace(":",",",$date);
-	$date=split(",",$date);
+	$date=explode(",",$date);
 	return array(
 		Y=>$date[0],
 		m=>$date[1],
@@ -616,7 +611,7 @@ function jp7_tel_split($tel){
 	$tel=str_replace("(","",$tel);
 	$tel=str_replace(")",",",$tel);
 	$tel=str_replace(" - Ramal: ",",",$tel);
-	$tel=split(",",$tel);
+	$tel=explode(",",$tel);
 	return array(
 		ddd=>trim($tel[0]),
 		numero=>trim($tel[1]),
@@ -790,7 +785,7 @@ function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
  */
 function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
 	global $db;
-	$fields_arr=split(",",$fields);
+	$fields_arr=explode(",",$fields);
 	// Variáveis
 	foreach($fields_arr as $field){
 		$fields_arr_db[]=(strpos($field,"_")===0)?substr($field,1):$field;
@@ -831,9 +826,9 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
  */
 function interadmin_tipos_campos($campos){
 	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default","nome_id");
-	$campos=split("{;}",$campos);
+	$campos=explode("{;}",$campos);
 	for($i = 0;$i<count($campos);$i++){
-		$parameters=split("{,}",$campos[$i]);
+		$parameters=explode("{,}",$campos[$i]);
 		if($parameters[0]){
 			$A[$parameters[0]][ordem]=($i+1);
 			for($j=0;$j<count($parameters);$j++){
@@ -862,9 +857,9 @@ function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
 	while($tipo_model_id_tipo){
 		jp7_db_select($db_prefix."_tipos","id_tipo",$tipo_model_id_tipo,"tipo_");
 	}
-	$tipo_campos=split("{;}",$tipo_campos);
+	$tipo_campos=explode("{;}",$tipo_campos);
 	foreach($tipo_campos as $campo){
-		$campo=split("{,}",$campo);
+		$campo=explode("{,}",$campo);
 		if($campo[0]==$var_key){
 			return array(
 				nome=>$campo[1],
@@ -908,12 +903,12 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	global $db_prefix;
 	global $lang;
 	global $debugger;
-
+	
 	$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
-
+	
 	// Debug - Before SQL injection
 	$debugger->showSql($sql, $sql_debug, 'color:#FFFFFF;background:#444444;');
-
+	
 	// Split
 	$sql_slipt = preg_replace(array('/([	 ])(FROM )/','/([	 ])(WHERE )/','/([ 	])(ORDER BY )/'), '{;}\1\2', $sql, 1);
 	$sql_slipt = explode("{;}", $sql_slipt);
@@ -927,22 +922,44 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 	preg_match_all("(([^ ,]+) AS ([^ ,]+))", $sql_from, $out, PREG_PATTERN_ORDER);
 	if (count($out[1])) {
 		// Com Alias
-		foreach($out[1] as $key=>$value){
+		foreach ($out[1] as $key=>$value) {
 			$alias = $out[2][$key];
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE (".$alias.".mostrar<>'' OR ".$alias.".mostrar IS NULL) AND (".$alias.".deleted_tipo='' OR ".$alias.".deleted_tipo IS NULL) AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE ".$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE (".$alias.".date_publish<='".$DbNow."' OR ".$alias.".date_publish IS NULL) AND (".$alias.".char_key<>'' OR ".$alias.".char_key IS NULL)  AND (".$alias.".deleted='' OR ".$alias.".deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND (".$alias.".publish<>'' OR  ".$alias.".publish<>'' IS NULL)":"")." AND ",$sql_where);
-			if($c_path_upload)$sql_select=preg_replace('/([ ,])'.$alias.'.file_([0-9])/','\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2',$sql_select);
+			if (strpos($value, '_tipos') === (strlen($value) - strlen('_tipos'))) {
+				$sql_where = str_replace("WHERE ","WHERE (" . $alias . ".mostrar<>'' OR " . $alias . ".mostrar IS NULL) AND (" . $alias . ".deleted_tipo='' OR " . $alias . ".deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, '_tags') === (strlen($value) - strlen('_tags'))) {
+				// do nothing
+			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos')!==false || strpos($value, $db_prefix . '_arquivos') !== false) {
+				$sql_where = str_replace("WHERE ","WHERE " . $alias . ".mostrar<>'' AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL) AND ", $sql_where);
+			} else {
+				$sql_where_replace = '' .
+				"WHERE (" . $alias . ".date_publish<='" . $DbNow . "' OR " . $alias . ".date_publish IS NULL)" .
+				" AND (" . $alias . ".date_expire>'" . $DbNow . "' OR " . $alias . ".date_expire IS NULL OR " . $alias . ".date_expire='0000-00-00 00:00:00')" .
+				" AND (" . $alias . ".char_key<>'' OR " . $alias . ".char_key IS NULL)" .
+				" AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL)" .
+				(($c_publish && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish IS NULL)" : "") . " AND ";
+				$sql_where = str_replace("WHERE ", $sql_where_replace, $sql_where);
+			}
+			if ($c_path_upload) {
+				$sql_select = preg_replace('/([ ,])' . $alias . '.file_([0-9])/', '\1REPLACE(' . $alias . '.file_\2,\'../../upload/\',\'' . $c_path_upload . '\') AS file_\2', $sql_select);
+			}
 		}
 	} else {
 		// Sem Alias
-		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)",$sql_from,$out,PREG_PATTERN_ORDER);
-		foreach($out[0] as $key=>$value){
-			if(strpos($value,$db_prefix."_tipos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ",$sql_where);
-			elseif(strpos($value,$db_prefix.$lang->prefix."_arquivos")!==false||strpos($value,$db_prefix."_arquivos")!==false)$sql_where=str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ",$sql_where);
-			else $sql_where=str_replace("WHERE ","WHERE date_publish<='".$DbNow."' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)".(($c_publish&&!$s_session['preview'])?" AND (publish<>'' OR publish IS NULL)":"")." AND ",$sql_where);
+		preg_match_all("([ ,]+[".$db_prefix."][^ ,]+)", $sql_from, $out, PREG_PATTERN_ORDER);
+		foreach ($out[0] as $key=>$value) {
+			if (strpos($value, $db_prefix."_tipos")!==false) {
+				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
+			} elseif (strpos($value, $db_prefix."_tags")!==false) {
+				// do nothing
+			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos') !== false || strpos($value, $db_prefix . '_arquivos') !== false) {
+				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
+			} else {
+				$sql_where = str_replace("WHERE ","WHERE date_publish<='" . $DbNow . "' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)" . (($c_publish && !$s_session['preview']) ? " AND (publish<>'' OR publish IS NULL)" : "") . " AND ", $sql_where);
+			}
 		}
-		if($c_path_upload)$sql_select=preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+		if ($c_path_upload) {
+			$sql_select = preg_replace('/([ ,])file_([0-9])/','\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+		}
 	}
 	// Join
 	$sql = $sql_select . $sql_from . $sql_where . $sql_final;
@@ -1035,7 +1052,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	while ($row = $rs->FetchNextObj()) {
 		if($seo){
-			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
+			if($type=="combo")$S.="<option value=\"".toSeo($row->field)."\"".((toId($row->field)==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
 			else $S.="<li".(($row->id==$id)?" class=\"on\"":"")."><a href=\"?id=".$row->id."\">".toHTML($row->field)."</a></li>\n";
 		}else{
 			if($type=="combo")$S.="<option value=\"".$row->id."\"".(($row->id==$id)?" selected=\"selected\" class=\"on\"":"").">".toHTML($row->field)."</option>\n";
@@ -1624,7 +1641,7 @@ function jp7_doc_root(){
  * Attempts to include a file from two levels above and, if it fails, tries from the root.
  *
  * @param string $file Filename which will be included. e.g. "inc/example.php".
- * @global Debug
+ * @global Jp7_Debugger
  * @return NULL
  * @version (2008/06/13)
  * @deprecated Instead of using this function use "include jp7_path_find('folder/filename.php');"
@@ -1643,7 +1660,7 @@ function jp7_include($file){
  *
  * @param string $file Filename.
  * @param bool $autoload Is called by __autoload.
- * @global Debug
+ * @global Jp7_Debugger
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
  * @author JP, Carlos
@@ -1911,8 +1928,29 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
  * @return NULL
  * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
+function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
+	// Param Parser
+	if (is_array($q)) {
+		$options = $q;
+		if ($options['quality']) {
+			$q = $options['quality'];
+		}
+		if ($options['maxsize']) {
+			$s = $options['maxsize'];
+		}
+		if ($options['crop']) {
+			$crop = $options['crop'];
+		}
+		if ($options['imagemagick']) {
+			$imagemagick = $options['imagemagick'];
+		}
+		if ($options['enlarge']) {
+			$enlarge = $options['enlarge'];
+		}
+	}
+	// Check GD
 	$c_gd = function_exists('imagecreatefromjpeg');
+	$command_path = '/usr/bin/';
 	// Check Size and Orientation (Horizontal x Vertical)
 	if ($c_gd) {
 		// GD Get Size
@@ -1920,9 +1958,9 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 		$src_h = imagesy($im_src);
 	} else {
 		// Magick Get Size
-		$command = '/usr/bin/identify -verbose ' . $src;
+		$command = $command_path . 'identify -verbose ' . $src;
 		exec($command, $a, $b);
-		$src_geometry = split('x', substr($a[2], strpos($a[2], ':') + 2));
+		$src_geometry = explode('x', substr($a[2], strpos($a[2], ':') + 2));
 		$src_w = $src_geometry[0];
 		$src_h = $src_geometry[1];
 	}
@@ -1936,6 +1974,21 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 		$dst_h = $h;
 		if ($src_w > $src_h) $src_w = $src_h;
 		else $src_h = $src_w;
+	// The image is resized until it gets the maximum width or height (with crop)
+	} elseif ($crop) {
+		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
+		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
+		if ($pre_dst_h > $h) {
+			$dst_w = $w;
+			$dst_h = $pre_dst_h;
+			$dif_h = round(($h - $pre_dst_h) / 2);
+		} else {
+			$dst_h = $h;
+			$dst_w = $pre_dst_w;
+			$dif_w = round(($w - $pre_dst_w) / 2);
+		}
+		$new_w = $w;
+		$new_h = $h;
 	// The image is resized until it gets the maximum width or height (without crop)
 	} else {
 		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
@@ -1948,8 +2001,15 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 			$dst_w = $pre_dst_w;
 		}
 	}
+	// 
+	if (!$new_w) {
+		$new_w = $dst_w;
+	}
+	if (!$new_h) {
+		$new_h = $dst_h;
+	}
 	// Checks if destination image is bigger than source image
-	if($dst_w>=$src_w&&$dst_h>=$src_h){
+	if ($dst_w >= $src_w && $dst_h >= $src_h && !$enlarge) {
 		// No-Resize and Check Weight
 		if (filesize($src) > $s) {
 			$im_dst = $im_src;
@@ -1958,24 +2018,26 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000) {
 				imagejpeg($im_dst, $dst, $q);
 			} else {
 				// Magick Convert Quality
-				$command = "/usr/bin/convert ".$src." -quality ".$q." +profile '*' ".$dst;
+				$command = $command_path . "convert " . $src . " -quality " . $q . " +profile '*' " . $dst;
 				exec($command, $a, $b);
 			}
-		}else{
-			if(jp7_extension($src)=="gif")$dst=str_replace(".jpg",".gif",$dst);
+		} else {
+			if (jp7_extension($src)=="gif") {
+				$dst = str_replace(".jpg", ".gif", $dst);
+			}
 			copy($src,$dst);
 		}
-	}else{
-		if($c_gd){
+	} else {
+		if ($c_gd) {
 			// GD Resize
-			$im_dst=imagecreatetruecolor($dst_w,$dst_h);
-			imagecopyresampled($im_dst,$im_src,0,0,0,0,$dst_w,$dst_h,$src_w,$src_h);
-			imagejpeg($im_dst,$dst,$q);
+			$im_dst = imagecreatetruecolor($new_w, $new_h);
+			imagecopyresampled($im_dst, $im_src, $dif_w, $dif_h, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+			imagejpeg($im_dst, $dst,$q);
 			imagedestroy($im_dst);
-		}else{
+		} else {
 			// Magick Resize
-			$command="/usr/bin/convert ".$src." -resize '".$dst_w."x".$dst_h."!' -quality ".$q." +profile '*' ".$dst;
-			exec($command,$a,$b);
+			$command = $command_path . "convert " . $src . " -resize " . $dst_w . "x" . $dst_h . "! -quality " . $q . " +profile '*' " . $dst;
+			exec($command, $a, $b);
 		}
 	}
 }
@@ -2076,20 +2138,25 @@ function jp7_file_size($file){
  * @param string $msgErro Error message, the default is <tt>NULL</tt>.
  * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
  * @param array $traceArr Debugging data, like the return of debug_backtrace().
- * @global Debug
+ * @global Jp7_Debugger
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	global $debugger;
 	global $s_interadmin_cliente, $jp7_app;
 	global $c_site, $c_server_type;
-	if (!$traceArr) $traceArr = debug_backtrace();
+	if (!$traceArr) {
+		$traceArr = debug_backtrace();
+	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 	//Envia email e exibe tela de manutenção
-	if($c_server_type == 'Principal') {
-		if (trim($c_site)) $cliente = $c_site;
-		elseif (trim($s_interadmin_cliente)) $cliente = $s_interadmin_cliente;
+	if ($c_server_type == 'Principal') {
+		if (trim($c_site)) {
+			$cliente = $c_site;
+		} elseif (trim($s_interadmin_cliente)) {
+			$cliente = $s_interadmin_cliente;
+		}
 		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
 		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
 		$to = 'debug+' . $cliente . '@jp7.com.br';
@@ -2099,7 +2166,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 		//$template="form_htm.php";
 		$html = TRUE;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
+		if ($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /_default/index_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>
@@ -2337,3 +2404,16 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	$retorno = str_replace('{build}', $version->build, $retorno);
 	return $retorno;
 }
+
+function array_trim($var) {
+	return trim($var);
+}
+
+if (!function_exists('json_encode')) {
+	require_once dirname(__FILE__) . "/3thparty/JSON.php";
+	function json_encode($array) {
+		$json = new Services_JSON();
+		return $json->encode($array);
+	}
+}
+
