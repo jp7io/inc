@@ -516,10 +516,15 @@ function jp7_date_split($date){
  * @param string $format Format using: "Y", "m", "M", "d", "H", "i", "s" or "y". The default value is "d/m/Y", when english language is active the "d/m" is automatically replaced by "m/d". 
  * @global string
  * @return string|NULL Returns formatted date or <tt>NULL</tt> if no date is given.
- * @version (2006/08/24)
+ * @version (2010/02/08)
  */
 function jp7_date_format($date,$format="d/m/Y"){
-	global $lang;
+	global $jp7_app;
+	if ($jp7_app) {
+		$lang = new jp7_lang('pt-br', true);
+	} else {
+		global $lang;
+	}
 	if($date){
 		if($lang->lang=="en"){
 			$format=str_replace("d/m","m/d",$format);
