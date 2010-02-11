@@ -2422,3 +2422,37 @@ if (!function_exists('json_encode')) {
 	}
 }
 
+/**
+ * Encodes an array as XML. Similar to json_encode().
+ * 
+ * @param array $data
+ * @param array $options 
+ * @return string XML string.
+ */
+function jp7_xml_encode($data, $options = array()) {
+	$default = array(
+		'send_headers' => true, 
+		'encoding' => 'UTF-8',
+		'xml_tag' => true
+	);
+	
+	$options += $default;
+	if ($options['send_headers']) {
+		header('Content-Type: text/xml; charset=' . $options['encoding']);
+	}
+	$xml = '';
+	if ($options['xml_tag']) {
+		$xml .= '<?xml version="1.0" encoding="' . $options['encoding'] . '"?>';
+	}	
+	foreach ($data as $key => $value) {
+		$xml .= '<' . $key . '>';
+		if (is_array($value)) {
+			$xml .= jp7_xml_encode($value, array('xml_tag' => false, 'send_headers' => false));
+		} else {
+			$xml .= $value;
+		}
+		$xml .= '</' .$key . '>';
+	}
+	return $xml;
+}
+
