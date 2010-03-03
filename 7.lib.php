@@ -674,67 +674,68 @@ function jp7_db_select($table,$table_id_name,$table_id_value,$var_prefix=""){
 function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = "", $var_check = TRUE, $force_magic_quotes_gpc = FALSE) {
 	global $db;
 	
-	$table_columns=$db->MetaColumnNames($table);
+	$table_columns = $db->MetaColumnNames($table);
 	array_shift($table_columns); // ID is the first value
-	$table_columns_num=count($table_columns);
-	if($table_id_value){
+	$table_columns_num = count($table_columns);
+	if ($table_id_value) {
 		// Update
 		$sql = "UPDATE ".$table." SET ";
-		$j=0;
-		foreach($table_columns as $table_field_name){
+		$j = 0;
+		foreach ($table_columns as $table_field_name) {
 			if (is_array($var_prefix)) {
 				$var_isset = array_key_exists($table_field_name, $var_prefix);
 				$table_field_value = $var_prefix[$table_field_name];
 			} else {
-				eval("global \$".$var_prefix.$table_field_name.";");
-				eval("\$var_isset=isset(\$".$var_prefix.$table_field_name.");");
-				eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
+				$var_isset = isset($GLOBALS[$var_prefix . $table_field_name]);
+				$table_field_value = $GLOBALS[$var_prefix . $table_field_name];
 			}
-			if(!$var_check||$var_isset){
+			if (!$var_check || $var_isset) {
 				//se for definido valor ou campo for inteiro
-				if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
-					$sql.=((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value,$force_magic_quotes_gpc);
+				if (($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0) {
+					$sql .= ((!$j)?" ":",")."".$table_field_name."=".toBase($table_field_value,$force_magic_quotes_gpc);
 				//se não for definido valor e for mysql salva branco
-				}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
-					$sql.=((!$j)?" ":",")."".$table_field_name."=''";
+				} elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")) {
+					$sql .= ((!$j)?" ":",")."".$table_field_name."=''";
 				//se não for definido valor e for != de mysql
-				}else{
-					$sql.=((!$j)?" ":",")."".$table_field_name."=NULL";
+				} else {
+					$sql .= ((!$j)?" ":",")."".$table_field_name."=NULL";
 				}
 				$j++;
 			}
 		}
-		$sql.=" WHERE ".$table_id_name."=".$table_id_value;
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		return ($rs)?$table_id_value:0;
-	}else{		
+		$sql .= " WHERE " . $table_id_name . "=" . $table_id_value;
+		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		return ($rs) ? $table_id_value : 0;
+	} else {
 		// Insert
-		$i=1;
-		foreach($table_columns as $table_field_name){
+		$i = 1;
+		foreach ($table_columns as $table_field_name) {
 			if (is_array($var_prefix)) {
 				$table_field_value = $var_prefix[$table_field_name];
 			} else {
-				eval("global \$".$var_prefix.$table_field_name.";");
-				eval("\$table_field_value=\$".$var_prefix.$table_field_name.";");
+				$table_field_value = $GLOBALS[$var_prefix . $table_field_name];
 			}
-			$sql_campos.=" ".$table_field_name." ".(($i==$table_columns_num)?") ":",\n");
+			$sql_campos .= " " . $table_field_name . " " . (($i == $table_columns_num) ? ") " : ",\n");
 			//se for definido valor
-			if(($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
-				$valores.=toBase($table_field_value,$force_magic_quotes_gpc).(($i==$table_columns_num)?")":",\n");
+			if (($table_field_value!=="" && !is_null($table_field_value))||strpos($table_field_name,"int_")===0){
+				$valores .= toBase($table_field_value,$force_magic_quotes_gpc).(($i==$table_columns_num)?")":",\n");
 			//se não for definido valor e for mysql salva branco
-			}elseif(($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
-				$valores.="''".(($i==$table_columns_num)?")":",\n");
+			} elseif (($table_field_value==="" || is_null($table_field_value)) && ($GLOBALS['db_type']==""||$GLOBALS['db_type']=="mysql")){
+				$valores .= "''".(($i==$table_columns_num)?")":",\n");
 			//se não for definido valor e for != de mysql
-			}else{
-				$valores.="NULL".(($i==$table_columns_num)?")":",\n");
+			} else {
+				$valores .= "NULL".(($i==$table_columns_num)?")":",\n");
 			}
 			$i++;
 		}
 		$sql = "INSERT INTO ".$table." (".$sql_campos."VALUES (".$valores;//echo $sql ."<br /><hr /><br />";
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		
 		// Last ID
-		eval("global \$".$var_prefix.$table_id_name.";");
-		eval("\$".$var_prefix.$table_id_name."=".$db->Insert_ID().";");
+		if (!is_array($var_prefix)) {
+			$GLOBALS[$var_prefix . $table_id_name] = $db->Insert_ID();
+		}
+		
 		return $db->Insert_ID();
 	}
 }
