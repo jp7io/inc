@@ -2339,12 +2339,18 @@ function interadmin_bootstrap() {
 		// CLIENTE/APP
 		$jp7_app = $_GET['jp7_app'] = $urlArr[2];
         $cliente = $_GET['cliente'] = $urlArr[1];
+		
+		if (!$cliente) {
+			interadmin_bootstrap_open_url($jp7_app);
+			// linha acima dá exit
+		}
+		
         $url = str_replace('/' . $cliente . '/' . $jp7_app . '/', '', $_SERVER['REQUEST_URI']);
 	}
 
 	// Retira a query string
 	$url = preg_replace('/([^?]*)(.*)/', '\1', $url);
-
+	
 	if (!$url) {
 		header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $jp7_app . '/' . $cliente);
 		exit;
