@@ -1947,6 +1947,12 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		if ($options['crop']) {
 			$crop = $options['crop'];
 		}
+		if ($options['bgcolor']) {
+			$bgcolor = $options['bgcolor'];
+			if (is_string($bgcolor)) {
+				$bgcolor = explode(',', $bgcolor);
+			}
+		}
 		if ($options['imagemagick']) {
 			$imagemagick = $options['imagemagick'];
 		}
@@ -2044,7 +2050,11 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 			// GD Resize
 			$im_dst = imagecreatetruecolor($new_w, $new_h);
 			if ($crop === 'border') {
-				$bg = imagecolorat($im_src, 1, 1);
+				if ($bgcolor) {
+					$bg = imagecolorallocate($im_src, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
+				} else {
+					$bg = imagecolorat($im_src, 1, 1);
+				}
 				imagefill($im_dst, 0, 0, $bg);
 			}
 			imagecopyresampled($im_dst, $im_src, $dif_w, $dif_h, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
