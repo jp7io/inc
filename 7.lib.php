@@ -1981,7 +1981,7 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		if ($src_w > $src_h) $src_w = $src_h;
 		else $src_h = $src_w;
 	// The image is resized until it gets the maximum width or height (with crop)
-	} elseif ($crop) {
+	} elseif ($crop && $crop !== 'border') {
 		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
 		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
 		if ($pre_dst_h > $h) {
@@ -2005,6 +2005,12 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		} else {
 			$dst_h = $h;
 			$dst_w = $pre_dst_w;
+		}
+		if ($crop === 'border') {
+			$new_w = $w;
+			$new_h = $h;
+			$dif_w = ($new_w - $dst_w) / 2;
+			$dif_h = ($new_h - $dst_h) / 2;
 		}
 	}
 	// 
@@ -2037,6 +2043,10 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		if ($c_gd) {
 			// GD Resize
 			$im_dst = imagecreatetruecolor($new_w, $new_h);
+			if ($crop === 'border') {
+				$bg = imagecolorat($im_src, 1, 1);
+				imagefill($im_dst, 0, 0, $bg);
+			}
 			imagecopyresampled($im_dst, $im_src, $dif_w, $dif_h, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
 			imagejpeg($im_dst, $dst,$q);
 			imagedestroy($im_dst);
@@ -2133,8 +2143,8 @@ function getFileName($filename){
  * @return string Size of the file in KB or MB.
  */
 function jp7_file_size($file){
-	$file = ceil(@filesize($file) / 1000);
-	$file = ($file < 1000) ? ceil($file) . 'KB' : round($file / 1000, 1) . 'MB';
+	$file = ceil(@filesize($file) / 1024);
+	$file = ($file < 1024) ? ceil($file) . 'KB' : round($file / 1024, 1) . 'MB';
 	return $file;
 }
 
@@ -2388,6 +2398,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 {
 	global $c_doc_root;
 	$cacheFile = $c_doc_root . $packageDir . '/.version';
+	/*
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
 		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
@@ -2409,6 +2420,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 		$version->build = preg_replace('~Rev(.*): (.*)~', '$2', $version->build);
 		file_put_contents($cacheFile, serialize($version));
 	}
+	*/
 	$retorno = str_replace('{release}', $version->release, $format);
 	$retorno = str_replace('{build}', $version->build, $retorno);
 	return $retorno;
