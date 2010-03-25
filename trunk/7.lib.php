@@ -2410,7 +2410,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 {
 	global $c_doc_root;
 	$cacheFile = $c_doc_root . $packageDir . '/.version';
-	/*
+	
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
 		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
@@ -2432,7 +2432,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 		$version->build = preg_replace('~Rev(.*): (.*)~', '$2', $version->build);
 		file_put_contents($cacheFile, serialize($version));
 	}
-	*/
+	
 	$retorno = str_replace('{release}', $version->release, $format);
 	$retorno = str_replace('{build}', $version->build, $retorno);
 	return $retorno;
