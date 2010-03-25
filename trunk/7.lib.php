@@ -2190,9 +2190,9 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
 		$parameters = '';
 		//$template="form_htm.php";
-		$html = TRUE;
+		$html = true;
 		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
-		if ($c_server_type == 'Principal' && (!$jp7_app || $jp7_cache)) {
+		if (!$jp7_app || $jp7_cache) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /_default/index_manutencao.htm');
 			//Caso nao funcione o header, tenta por javascript	?>
@@ -2202,6 +2202,8 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
             <?
 			exit();
 		}
+	} else {
+		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']);
 	}
 	return $backtrace;	
 }
