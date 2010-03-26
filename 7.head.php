@@ -33,8 +33,8 @@ $c_build = interadmin_get_version($config->name_id, '{build}');
 <?php if ($config->ie7compatible) { ?>
 	<meta http-equiv="X-UA-Compatible" content="IE=7" />
 <?php } ?>
-<?php if ($config->google-site-verification) { ?>
-	<meta name="google-site-verification" content="<?php echo $config->google-site-verification; ?>" />
+<?php if ($config->google_site_verification) { ?>
+	<meta name="google-site-verification" content="<?php echo $config->google_site_verification; ?>" />
 <?php } ?>
 <title><?= ($s_session['preview']) ? "PREVIEW | " : ""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao && $secao != "home"){ ?> | <?= $secaoTitle ?><? if ($subsecao && $subsecao != "home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
 <base href="<?php echo $baseHref; ?>" />
