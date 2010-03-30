@@ -10,7 +10,6 @@ function interadmin_returnCampo($campo){
 	global $id;
 	global $db, $db_prefix;
 	global $s_user, $s_session;
-	global $c_cliente_url, $c_cliente_url_path;
 	global $iframes_i, $quantidade, $j, $registros;
 	global $select_campos_sql_temp;
 	global $tit_start;
@@ -220,22 +219,18 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	global $id_tipo;
 	global $db;
 	global $db_prefix;
-	global $db_type;
 	global $select_campos_sql_temp;
 	global $lang;
 	$sql = "SELECT tabela,campos,language FROM ".$db_prefix."_tipos".
 	" WHERE id_tipo=".$parent_id_tipo_2;
 	
-	if($db_type) 
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	else 
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	while($row=($db_type)?$rs->FetchNextObj():mysql_fetch_object($rs)){
+	$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	while($row=$rs->FetchNextObj()){
 		$campos=interadmin_tipos_campos($row->campos);
 		$select_lang=$row->language;
 		$select_tabela=$row->tabela;
 	}
-	($db_type)?$rs->Close():$rs->Close();
+	$rs->Close();
 	// Combo Fields
 	if($campos){
 		foreach($campos as $select_campo){
@@ -270,12 +265,12 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		if($i<$nivel*5-1)$S.='-';
 		else $S.='> ';
 	}
-	$numRows=($db_type)?$rs->RecordCount():mysql_num_rows($rs);
+	$numRows = $rs->RecordCount();
 	if($style=="checkbox")$R.="<input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".strtoupper($GLOBALS['l_todos'])."</label><br>\n";
 	elseif($style=="combo"){
 		$R.="<option value=\"\" style=\"color:#ccc\">".$select_campos_2_nomes."</option>";
 	}
-	while($row=($db_type)?$rs->FetchNextObj():mysql_fetch_object($rs)){
+	while($row=$rs->FetchNextObj()){
 		if(is_array($current_id))$selected=in_array($row->id,$current_id);
 		else $selected=($row->id==$current_id);
 		if ($row->select_key&&!in_array("select_key",$select_campos_2_array)){
@@ -302,7 +297,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		else $R.="<option value=\"".$row->id."\"".(($selected)?" SELECTED style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"").">"./*substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</option>\n";
 		//if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
 	}
-	($db_type)?$rs->Close():$rs->Close();
+	$rs->Close();
 	return $R;
 }
 
