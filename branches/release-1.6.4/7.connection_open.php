@@ -1,4 +1,11 @@
 <?php
+if (!$config) {
+	die(jp7_debug('Configuration object not found: $config'));
+}
+if (!$config->db || !$config->db->type) {
+	die(jp7_debug('Database not set in the $config object'));
+}
+
 // Paths
 $c_root = $c_doc_root . $config->name_id . '/';
 
@@ -44,11 +51,11 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	// Language
 	$lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
 	$config->lang = $config->langs[$lang->lang];
-		
+			
 	@include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 	@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
 	
-	include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
+	require_once jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
 	$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
