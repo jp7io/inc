@@ -36,40 +36,40 @@ $c_build = interadmin_get_version($config->name_id, '{build}');
 <?php if ($config->google_site_verification) { ?>
 	<meta name="google-site-verification" content="<?php echo $config->google_site_verification; ?>" />
 <?php } ?>
-<title><?= ($s_session['preview']) ? "PREVIEW | " : ""?><? if($p_title){ ?><?= $p_title ?><? }else{ ?><?= $c_site_title ?><? if($secao && $secao != "home"){ ?> | <?= $secaoTitle ?><? if ($subsecao && $subsecao != "home") { ?> | <?= $subsecaoTitle ?><? } ?><? } ?><? } ?></title>
+<title><?php echo ($s_session['preview']) ? 'PREVIEW | ' : ''; ?><?php if ($p_title) { ?><?php echo $p_title; ?><?php } else { ?><?php echo $c_site_title; ?><?php if ($secao && $secao != 'home') { ?> | <?php echo $secaoTitle; ?><?php if ($subsecao && $subsecao != 'home') { ?> | <?php echo $subsecaoTitle; ?><?php } ?><?php } ?><?php } ?></title>
 <base href="<?php echo $baseHref; ?>" />
-<link rel="stylesheet" type="text/css" href="<?= $c_path_css ?>7_w3c.css?build=<?php echo $c_build; ?>" />
-<link rel="stylesheet" type="text/css" href="../../css/<?= $c_site ?>.css?build=<?php echo $c_build; ?>" />
-<? if($c_template) { ?>
+<link rel="stylesheet" type="text/css" href="<?php echo $c_path_css; ?>7_w3c.css?build=<?php echo $c_build; ?>" />
+<link rel="stylesheet" type="text/css" href="../../css/<?php echo $c_site; ?>.css?build=<?php echo $c_build; ?>" />
+<?php if($c_template) { ?>
 	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css?build=<?php echo $c_build; ?>" />
-	<link rel="stylesheet" type="text/css" href="/_templates/<?= $c_template ?>/css/style.css?build=<?php echo $c_build; ?>" />
-<? } ?>
+	<link rel="stylesheet" type="text/css" href="/_templates/<?php echo $c_template; ?>/css/style.css?build=<?php echo $c_build; ?>" />
+<?php } ?>
 <script type="text/javascript">
-var d=document
-var site='<?= $c_site ?>'
-var secao='<?= $secao ?>'
-var subsecao='<?= $subsecao ?>'
-var isPopup='<?= $isPopup ?>'
-var noMenu='<?= $noMenu ?>'
-var noSubMenu='<?= $noSubMenu ?>'
-var isFrameset='<?= $isFrameset ?>'
-var isFrame='<?= $isFrame ?>'
+var d = document;
+var site = '<?php echo $c_site; ?>';
+var secao = '<?php echo $secao; ?>';
+var subsecao = '<?php echo $subsecao; ?>';
+var isPopup = '<?php echo $isPopup; ?>';
+var noMenu = '<?php echo $noMenu; ?>';
+var noSubMenu = '<?php echo $noSubMenu; ?>';
+var isFrameset = '<?php echo $isFrameset; ?>';
+var isFrame = '<?php echo $isFrame; ?>';
 
-var DMquerystring=null
-var tipo_id='<?= $id ?>'
-var tipos=new Array(<? for($i = 0;$i<$tipos->i;$i++) { ?>'<?= $tipos->id_tipo[$i] ?>'<? if($i+1<$tipos->i) { ?>,<? } ?><? } ?>)
+var DMquerystring = null;
+var tipo_id = '<?php echo $id; ?>';
+var tipos = new Array(<?php for($i = 0; $i < $tipos->i; $i++) { ?>'<?php echo $tipos->id_tipo[$i]; ?>'<?php if ($i + 1 < $tipos->i) { ?>,<?php } ?><?php } ?>);
 
-var path='<?= $c_path ?>'
-var lang='<?= $lang->lang ?>'
-var lang_path='<?= $lang->path_2 ?>'
+var path = '<?php echo $c_path; ?>'
+var lang = '<?php echo $lang->lang; ?>'
+var lang_path = '<?php echo $lang->path_2; ?>'
 
-var s_interadmin_preview='<?= $s_session['preview'] ?>'
+var s_interadmin_preview = '<?php echo $s_session['preview']; ?>'
 
-var fullpath='http://'+location.host+'/'+path+lang_path
+var fullpath = 'http://'+location.host+'/'+path+lang_path
 
-<? if ($s_session['preview'] && !$isPopup) { ?>
+<?php if ($s_session['preview'] && !$isPopup) { ?>
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
-<? } ?>
+<?php } ?>
 </script>
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_checkflash.js?build=<?php echo $c_build; ?>"></script>
@@ -77,15 +77,18 @@ var fullpath='http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.3.2.min.js?build=<?php echo $c_build; ?>"></script>
-<? if ($c_menu != "none") { ?>
-	<? if (strpos($c_menu, "../") !== false) { ?>
-		<script type="text/javascript" src="<?= $c_menu ?>"></script>
-	<? }else{ ?>
-		<script type="text/javascript" src="<? if($c_menu) { ?><?= $c_path_js ?>interdyn_menu_<?= $c_menu ?><? }else{ ?>../../js/interdyn_menu_<?= $c_site ?><? } ?>.js?build=<?php echo $c_build; ?>"></script>
-		<script type="text/javascript" src="../../js/interdyn_menu_str.php?build=<?php echo $c_build; ?>&lang=<?= $lang->lang ?><? if($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?= $interadmin_gerar_menu ?><? } ?>"></script>
-	<? } ?>
-<? } ?>
-<script type="text/javascript" src="<?= $c_path_js ?>interdyn_menu.js?build=<?php echo $c_build; ?>"></script>
+<?php if ($c_menu != 'none') { ?>
+	<?php if (strpos($c_menu, '../') !== false) { ?>
+		<script type="text/javascript" src="<?php echo $c_menu; ?>"></script>
+	<?php } else { ?>
+		<script type="text/javascript" src="<?php if ($c_menu) { ?><?php echo $c_path_js; ?>interdyn_menu_<?php echo $c_menu; ?><?php } else { ?>../../js/interdyn_menu_<?php echo $c_site; ?><?php } ?>.js?build=<?php echo $c_build; ?>"></script>
+		<script type="text/javascript" src="../../js/interdyn_menu_str.php?build=<?php echo $c_build; ?>&lang=<?php echo $lang->lang; ?><?php if ($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?php echo $interadmin_gerar_menu; ?><?php } ?>"></script>
+	<?php } ?>
+<?php } ?>
+<script type="text/javascript" src="<?php echo $c_path_js; ?>interdyn_menu.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="../../js/functions.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="../../js/init.js?build=<?php echo $c_build; ?>"></script>
-<? $debugger->setSafePoint(true); // Flag indicating that from this point the debugger can output data ?>
+<?php
+// Flag indicating that from this point the debugger can output data
+$debugger->setSafePoint(true);
+?>
