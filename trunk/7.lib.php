@@ -902,7 +902,7 @@ function interadmin_mysql_query($sql,$sql_db="",$sql_debug=false){
  * @version (2007/03/04)
  */
 function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NULL, $offset = NULL){	
-	global $config;
+	global $c_publish;
 	global $c_path_upload;
 	global $s_session;
 	global $db;
@@ -942,7 +942,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 				" AND (" . $alias . ".date_expire>'" . $DbNow . "' OR " . $alias . ".date_expire IS NULL OR " . $alias . ".date_expire='0000-00-00 00:00:00')" .
 				" AND (" . $alias . ".char_key<>'' OR " . $alias . ".char_key IS NULL)" .
 				" AND (" . $alias . ".deleted='' OR " . $alias . ".deleted IS NULL)" .
-				(($config->interadmin_preview && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish IS NULL)" : "") . " AND ";
+				(($c_publish && !$s_session['preview']) ? " AND (" . $alias . ".publish<>'' OR " . $alias . ".publish IS NULL)" : "") . " AND ";
 				$sql_where = str_replace("WHERE ", $sql_where_replace, $sql_where);
 			}
 			if ($c_path_upload) {
@@ -960,7 +960,7 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos') !== false || strpos($value, $db_prefix . '_arquivos') !== false) {
 				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
 			} else {
-				$sql_where = str_replace("WHERE ","WHERE date_publish<='" . $DbNow . "' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)" . (($config->interadmin_preview && !$s_session['preview']) ? " AND (publish<>'' OR publish IS NULL)" : "") . " AND ", $sql_where);
+				$sql_where = str_replace("WHERE ","WHERE date_publish<='" . $DbNow . "' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)" . (($c_publish && !$s_session['preview']) ? " AND (publish<>'' OR publish IS NULL)" : "") . " AND ", $sql_where);
 			}
 		}
 		if ($c_path_upload) {
@@ -1036,7 +1036,7 @@ function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
  * @version (2009/06/13)
  */
 function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_publish,varchar_key",$field="varchar_key",$sql_where="",$seo=FALSE) {
-	global $db, $s_session, $l_selecione, $config;
+	global $db, $s_session, $l_selecione, $c_publish;
 	//global $id;
 	if($type=="list"){
 		$S="".
@@ -1050,7 +1050,7 @@ function interadmin_list($table,$id_tipo,$id,$type="list",$order="int_key,date_p
 	$sql = "SELECT id,".$field." AS field FROM ".$table.
 	" WHERE id_tipo=".$id_tipo.
 	" AND char_key<>''".
-	(($s_session['preview'] || !$config->interadmin_preview)?"":" AND publish<>''").
+	(($s_session['preview'] || !$c_publish)?"":" AND publish<>''").
 	" AND (deleted='' OR deleted IS NULL)".
 	" AND date_publish<='".date("Y/m/d H:i:s")."'".
 	$sql_where.
@@ -1221,13 +1221,12 @@ class jp7_lang{
 	 * @version (2006/09/12)
 	 */
 	function jp7_lang($lang = '', $force = FALSE) {
-		global $config;
-		if (!$lang) {
-			$lang = $config->lang_default;
-		}
-		if ($force) {
-			$this->lang = $lang;
-		} else {
+		global $c_lang_default;
+		if (!$lang) $lang = $c_lang_default;
+		if ($force) $this->lang = $lang;
+		else{
+			global $c_path;
+			//global $c_site;
 			$this->lang=($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:$_SERVER['SCRIPT_NAME'];
 			if($_SERVER['QUERY_STRING']){
 				$pos1=strpos($this->lang,$_SERVER['QUERY_STRING']);
@@ -1235,7 +1234,7 @@ class jp7_lang{
 			}
 			$this->lang = explode("/",$this->lang);
 			//if($c_path){ // Old Way
-				$path_size = explode("/", jp7_path($config->server->path));
+				$path_size = explode("/",$c_path);
 				$path_size = count($path_size);
 				//$this->lang=$this->lang[$path_size]; // Old Way
 				$this->lang = $this->lang[count($this->lang)-3]; // For Hotsites
@@ -1243,8 +1242,8 @@ class jp7_lang{
 			$this->lang = str_replace("_","",$this->lang); // Apache Redirect
 		}
 		$langs = array('de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'); 
-		//if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$config->name_id||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
-		if (!in_array($this->lang, $langs) || $this->lang == $config->lang_default) {
+		//if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$c_site||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
+		if (!in_array($this->lang, $langs) || $this->lang == $c_lang_default || !$c_lang_default) {
 			$this->lang = $lang;
 			$this->prefix = "";
 			$this->path = "";
@@ -1267,11 +1266,9 @@ class jp7_lang{
 	 * @version (2008/06/26)
 	 */
 	function getUri($new_lang, $uri = '') {
-		global $config;
+		global $c_url, $c_lang_default;
 		$newLang = new jp7_lang($new_lang, TRUE);
-		if (!$uri) {
-			$uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		}
+		if (!$uri) $uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		// Separates Query String from Uri
 		$uri_parts = explode('?', $uri);
 		if ($uri_parts[1]) {
@@ -1281,18 +1278,13 @@ class jp7_lang{
 				$arr = explode('=', $value);
 				if ($arr[0] != 'id') $values[] = $arr[0] . '=' . $arr[1];
 			}
-			if ($values) {
-				$querystring = '?' . implode('&', (array) $values);
-			}
+			if ($values) $querystring = '?' . implode('&', (array) $values);
 		}
 		// Home
-		$uri_lang = jp7_path(str_replace($config->url, '', $uri));
-		if ($config->url == $uri || $uri_lang == $this->path_url) {
-			return $config->url . (($newLang->path_url == 'site/') ? '' : $newLang->path_url) . $querystring;
-		} else {
-			// Default
-			return str_replace($config->url . $this->path_url, $config->url . $newLang->path_url, $uri . $querystring);
-		}
+		$uri_lang = jp7_path(str_replace($c_url, '', $uri));
+		if ($c_url == $uri || $uri_lang == $this->path_url) return $c_url . (($newLang->path_url == 'site/') ? '' : $newLang->path_url) . $querystring;
+		// Default
+		else return str_replace($c_url . $this->path_url, $c_url . $newLang->path_url, $uri . $querystring);
 	}
 }
 
@@ -1317,9 +1309,9 @@ class interadmin_tipos{
 	 * @return NULL
 	 */
 	function interadmin_tipos_tipos($id_tipo){
-		global $db, $db_prefix, $lang, $config;
+		global $db, $db_prefix, $lang, $c_lang_default;
 		settype($id_tipo,'integer');
-		$sql = "SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!=$config->lang_default)?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
+		$sql = "SELECT parent_id_tipo,model_id_tipo,nome,nome".(($lang->lang!=$c_lang_default)?"_".$lang->lang:"")." AS nome_lang,template,menu,busca,restrito,admin FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
 		$rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
 			$this->id_tipo[]=$id_tipo;
@@ -1577,6 +1569,38 @@ function jp7_flash($src,$w,$h,$alt="",$id="",$xtra="",$parameters=""){
 	}
 }
 
+// jp7_interlog (2005/06/09)
+function jp7_interlog($id_cliente, $host = 'jp7.com.br', $db_name_interlog = 'interlog'){
+	global $c_site;
+	global $c_server_type;
+	global $db;
+	global $db_name;
+	//if(!$SERVER_ADDR)$SERVER_ADDR=$LOCAL_ADDR;
+	if($_SERVER['REMOTE_ADDR'] != '127.0.0.1' && strpos($REMOTE_ADDR, '192.168') !== 0) {
+	//if($REMOTE_ADDR!="127.0.0.1"&&strpos($REMOTE_ADDR,"192.168")!==0&&($c_server_type=="Principal"||$host=="localhost")){
+		if($host == "localhost"){
+			if(!$db){
+				$only_info=true;
+				include "inc/connection_open.php";
+				$db = mysql_connect($db_host, $db_user, $db_pass) or print(mysql_error());
+			}
+			if($db){
+				$servidor_date = date("Y/m/d H:i:s");
+				$separador = "{;}";
+				$dados = $id_cliente . $separador . $_SERVER['SERVER_ADDR'] . $separador . $servidor_date . $separador . $_SERVER['REMOTE_ADDR'] . $separador . $_SERVER['HTTP_USER_AGENT'];
+				mysql_select_db($db_name_interlog, $db);
+				mysql_query("INSERT INTO interlog_" . $c_site . " (dados) VALUES ('".$dados."')", $db)or print(mysql_error());
+				mysql_select_db($db_name, $db);
+			}
+			if ($only_info) mysql_close($db);
+		}else{
+			ob_start();
+			readfile('http://' . $host . '/interlog/site/aplicacao/acessos_inserir_ok.php?id_cliente=' . $id_cliente . '&servidor_ip=' . $_SERVER['SERVER_ADDR'] . '&visitante_ip=' . $_SERVER['REMOTE_ADDR'] . '&visitante_useragent=' . urlencode($_SERVER['HTTP_USER_AGENT']));
+			ob_end_clean();
+		}
+	}
+}
+
 /**
  * Adds a trailing slash on a path, in case it doesn't have one.
  *
@@ -1586,11 +1610,8 @@ function jp7_flash($src,$w,$h,$alt="",$id="",$xtra="",$parameters=""){
  * @version (2003/08/25)
  */
 function jp7_path($S, $reverse = FALSE){
-	if ($reverse) {
-		return (substr($S, strlen($S) - 1) == '/') ? substr($S, 0, strlen($S) - 1) : $S;
-	} else {
-		return (substr($S, -1) == '/' || !$S) ? $S : $S . '/';
-	}
+	if ($reverse) return (substr($S, strlen($S) - 1) == '/') ? substr($S, 0, strlen($S) - 1) : $S; 
+	else return (strrpos($S,'/') + 1 == strlen($S) || !$S) ? $S : $S . '/';
 }
 
 /**
@@ -1705,7 +1726,7 @@ function jp7_extension($S) {
  * @version (2007/08/01)
  */
 function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=TRUE,$attachments=""){
-	global $debug, $config;
+	global $debug;
 	// TEXT
 	if(strpos($message,"<br>")!==false){
 		$text_hr="";
@@ -1804,9 +1825,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 		$headers=str_replace("\r\n","\n",$headers);
 	}
 	// Send
-	if ($config->server->type != InterSite::PRODUCAO) {
-		$to = 'debug@jp7.com.br';
-	}
+	if($GLOBALS['c_server_type']!="Principal")$to="debug@jp7.com.br";
 	$mail=mail($to,$subject,$message,$headers,$parameters);
 	if(!$mail)$mail=mail($to,$subject,$message,$headers); // Safe Mode
 	if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
@@ -2080,7 +2099,7 @@ function jp7_encode_mimeheader($S,$charset="iso-8859-1",$transfer_encoding="Q"){
 function jp7_index($lang=""){
 	session_start();
 	//global $HTTP_ACCEPT;
-	global $is, $path, $publish, $s_session, $config;
+	global $is, $path, $publish, $s_session, $c_lang_default;
 	$path=dirname($_SERVER["SCRIPT_NAME"]);
 	$path=jp7_path("http://".$_SERVER['HTTP_HOST'].$path);
 	// Publish Check
@@ -2091,7 +2110,7 @@ function jp7_index($lang=""){
 	//if(strpos($_SERVER['HTTP_ACCEPT'],"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
 	//elseif($is->v<4&&!$is->robot)header("Location: /_default/oldbrowser.htm");
 	//else{
-		$path=$path.(($lang&&$lang!=$config->lang_default)?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_session['preview'])?"?s_interadmin_preview=".$s_session['preview']:"");
+		$path=$path.(($lang&&$lang!=$c_lang_default)?$lang:"site")."/home/".(($publish||!$admin_time||!$index_time)?"index.php":"index_P.htm").(($s_session['preview'])?"?s_interadmin_preview=".$s_session['preview']:"");
 		@ini_set("allow_url_fopen","1");
 		//if(!@include $path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
 		if(!@readfile($path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT'])))header("Location: ".$path);
@@ -2149,16 +2168,18 @@ function jp7_file_size($file){
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
-	global $debugger, $config, $s_interadmin_cliente, $jp7_app;
+	global $debugger;
+	global $s_interadmin_cliente, $jp7_app;
+	global $c_site, $c_server_type;
 	if (!$traceArr) {
 		$traceArr = debug_backtrace();
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::PRODUCAO) {
-		if (trim($config->name_id)) {
-			$cliente = $config->name_id;
+	if ($c_server_type == 'Principal') {
+		if (trim($c_site)) {
+			$cliente = $c_site;
 		} elseif (trim($s_interadmin_cliente)) {
 			$cliente = $s_interadmin_cliente;
 		}
@@ -2184,7 +2205,7 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	} else {
 		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']);
 	}
-	return $backtrace;
+	return $backtrace;	
 }
 
 /**

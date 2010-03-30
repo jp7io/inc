@@ -8,7 +8,7 @@ if ($seo_baseurl) {
 	if (!$uriSemQueryString || $uriSemQueryString == '/' . $c_path) {
 		// Home
 		$baseHref .= '/' . $c_path . 'site/home/index.php';		
-	} elseif ($lang->lang != $config->lang_default && $go_url) {
+	} elseif ($lang->lang != $c_lang_default && $go_url) {
 		// Língua
 		$baseHref .= '/' . $c_path . $lang->path_url . $go_url;
 	} else {
@@ -36,17 +36,17 @@ $c_build = interadmin_get_version($config->name_id, '{build}');
 <?php if ($config->google_site_verification) { ?>
 	<meta name="google-site-verification" content="<?php echo $config->google_site_verification; ?>" />
 <?php } ?>
-<title><?php echo ($s_session['preview']) ? 'PREVIEW | ' : ''; ?><?php if ($p_title) { ?><?php echo $p_title; ?><?php } else { ?><?php echo $config->lang->title; ?><?php if ($secao && $secao != 'home') { ?> | <?php echo $secaoTitle; ?><?php if ($subsecao && $subsecao != 'home') { ?> | <?php echo $subsecaoTitle; ?><?php } ?><?php } ?><?php } ?></title>
+<title><?php echo ($s_session['preview']) ? 'PREVIEW | ' : ''; ?><?php if ($p_title) { ?><?php echo $p_title; ?><?php } else { ?><?php echo $c_site_title; ?><?php if ($secao && $secao != 'home') { ?> | <?php echo $secaoTitle; ?><?php if ($subsecao && $subsecao != 'home') { ?> | <?php echo $subsecaoTitle; ?><?php } ?><?php } ?><?php } ?></title>
 <base href="<?php echo $baseHref; ?>" />
 <link rel="stylesheet" type="text/css" href="<?php echo $c_path_css; ?>7_w3c.css?build=<?php echo $c_build; ?>" />
-<link rel="stylesheet" type="text/css" href="../../css/<?php echo $config->name_id; ?>.css?build=<?php echo $c_build; ?>" />
+<link rel="stylesheet" type="text/css" href="../../css/<?php echo $c_site; ?>.css?build=<?php echo $c_build; ?>" />
 <?php if($c_template) { ?>
 	<link rel="stylesheet" type="text/css" href="/_default/css/7_templates.css?build=<?php echo $c_build; ?>" />
 	<link rel="stylesheet" type="text/css" href="/_templates/<?php echo $c_template; ?>/css/style.css?build=<?php echo $c_build; ?>" />
 <?php } ?>
 <script type="text/javascript">
 var d = document;
-var site = '<?php echo $config->name_id; ?>';
+var site = '<?php echo $c_site; ?>';
 var secao = '<?php echo $secao; ?>';
 var subsecao = '<?php echo $subsecao; ?>';
 var isPopup = '<?php echo $isPopup; ?>';
@@ -77,11 +77,11 @@ var fullpath = 'http://'+location.host+'/'+path+lang_path
 <script type="text/javascript" src="<?= $c_path_js ?>interdyn_form_lang_<?= $lang->lang ?>.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>swfobject<? if ($c_swfobject) { ?>_<?= $c_swfobject ?><? } ?>.js?build=<?php echo $c_build; ?>"></script>
 <script type="text/javascript" src="<?= $c_path_js ?>jquery/jquery-1.3.2.min.js?build=<?php echo $c_build; ?>"></script>
-<?php if ($config->menu != 'none') { ?>
-	<?php if (strpos($config->menu, '../') !== false) { ?>
-		<script type="text/javascript" src="<?php echo $config->menu; ?>"></script>
+<?php if ($c_menu != 'none') { ?>
+	<?php if (strpos($c_menu, '../') !== false) { ?>
+		<script type="text/javascript" src="<?php echo $c_menu; ?>"></script>
 	<?php } else { ?>
-		<script type="text/javascript" src="<?php if ($config->menu) { ?><?php echo $c_path_js; ?>interdyn_menu_<?php echo $config->menu; ?><?php } else { ?>../../js/interdyn_menu_<?php echo $config->name_id; ?><?php } ?>.js?build=<?php echo $c_build; ?>"></script>
+		<script type="text/javascript" src="<?php if ($c_menu) { ?><?php echo $c_path_js; ?>interdyn_menu_<?php echo $c_menu; ?><?php } else { ?>../../js/interdyn_menu_<?php echo $c_site; ?><?php } ?>.js?build=<?php echo $c_build; ?>"></script>
 		<script type="text/javascript" src="../../js/interdyn_menu_str.php?build=<?php echo $c_build; ?>&lang=<?php echo $lang->lang; ?><?php if ($interadmin_gerar_menu) { ?>&interadmin_gerar_menu=<?php echo $interadmin_gerar_menu; ?><?php } ?>"></script>
 	<?php } ?>
 <?php } ?>

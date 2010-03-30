@@ -1,7 +1,8 @@
 <?php
-// Paths
-$c_root = $c_doc_root . $config->name_id . '/';
 
+// Paths
+$c_path = jp7_path($c_path);
+$c_root = $c_doc_root . $config->name_id . '/';
 if (!$c_path_js) {
 	$c_path_js = '/_default/js/';
 }
@@ -11,6 +12,12 @@ if (!$c_path_css) {
 if (!$c_path_default) {
 	$c_path_default = '/_default/';
 }
+if (!$c_lang_default) {
+	$c_lang_default = 'pt-br';
+}
+
+$config->server->url = 'http://' . $HTTP_HOST . '/' . $c_path; // FIXME - Delete it when InterSite Class get finished
+$c_url = $config->server->url;
 
 // Check IDs
 foreach ($_REQUEST as $key => $value) {
@@ -33,10 +40,10 @@ if (!session_id()) {
 	session_start();
 }
 
-if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
-	$_SESSION[$config->name_id]['interadmin'] = array();
+if (!is_array($_SESSION[$c_site]['interadmin'])) {
+	$_SESSION[$c_site]['interadmin'] = array();
 }
-$s_session = &$_SESSION[$config->name_id]['interadmin'];
+$s_session = &$_SESSION[$c_site]['interadmin'];
 $s_user = &$s_session['user'];
 
 // PHPMyAdmin
@@ -44,14 +51,18 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	// Language
 	$lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
 	$config->lang = $config->langs[$lang->lang];
-		
+	if  (!$c_site_title) $c_site_title = $config->lang->title;
+	
 	@include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 	@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
 	
+	if (!$db_type) {
+		$db_type = 'mysql';
+	}
 	include jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
-	$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
+	$dsn = "{$db_type}://{$db_user}:{$db_pass}@{$db_host}/{$db_name}";
 	if ($config->db->flags) {
 		$dsn .= $config->db->flags;
 	}
