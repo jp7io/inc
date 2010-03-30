@@ -2443,7 +2443,6 @@ function array_trim($var) {
 }
 
 if (!function_exists('json_encode')) {
-	require_once dirname(__FILE__) . "/3thparty/JSON.php";
 	function json_encode($array) {
 		$json = new Services_JSON();
 		return $json->encode($array);
