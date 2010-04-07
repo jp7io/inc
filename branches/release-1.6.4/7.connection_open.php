@@ -39,12 +39,13 @@ if ($c_template) {
 if (!session_id()) {
 	session_start();
 }
-
-if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
-	$_SESSION[$config->name_id]['interadmin'] = array();
+if (is_null($s_session)) {
+	if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
+		$_SESSION[$config->name_id]['interadmin'] = array();
+	}
+	$s_session = &$_SESSION[$config->name_id]['interadmin'];
+	$s_user = &$s_session['user'];
 }
-$s_session = &$_SESSION[$config->name_id]['interadmin'];
-$s_user = &$s_session['user'];
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
