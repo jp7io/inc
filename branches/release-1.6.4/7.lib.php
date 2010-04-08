@@ -525,6 +525,11 @@ function jp7_date_format($date,$format="d/m/Y"){
 	} else {
 		global $lang;
 	}
+	
+	if ($date instanceof Jp7_Date) {
+		$date = $date->format('Y-m-d H:m:i');
+	}
+	
 	if($date){
 		if($lang->lang=="en"){
 			$format=str_replace("d/m","m/d",$format);
