@@ -52,7 +52,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	// Language
 	$lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
 	$config->lang = $config->langs[$lang->lang];
-			
+	
 	@include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 	@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
 	
@@ -77,7 +77,11 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 		$subsecao = toId($tipos->nome[1]);
 		$subsecaoTitle = $tipos->nome[1];
 		if (!$seo) {
-			$tipoObj = new InterAdminTipo($id_tipo);
+			if (class_exists(ucfirst($config->name_id) . '_InterAdminTipo')) {
+				$tipoObj = call_user_func(array(ucfirst($config->name_id) . '_InterAdminTipo', 'getInstance'), $id_tipo);
+			} else {
+				$tipoObj = InterAdminTipo::getInstance($id_tipo);
+			}
 			if ($id) {
 				$interAdminObj = new InterAdmin($id);
 			}
