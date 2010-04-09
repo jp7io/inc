@@ -579,10 +579,18 @@ function jp7_date_week($w, $sigla = FALSE) {
 function jp7_date_month($m, $sigla = FALSE) {
 	global $lang;
 	switch($lang->lang) {
-		case "en": $M = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"); break;
-		case "de": $M = array("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"); break;
-		case "es": $M = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"); break;
-		default: $M = array("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"); break;
+		case 'en':
+			$M = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+			break;
+		case 'de':
+			$M = array('Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
+			break;
+		case 'es':
+			$M = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			break;
+		default:
+			$M = array('Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
+			break;
 	}
 	$return = $M[$m - 1];
 	return ($sigla) ? substr($return, 0, 3) : $return;
