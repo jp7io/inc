@@ -2402,7 +2402,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 {
 	global $c_doc_root;
 	$cacheFile = $c_doc_root . $packageDir . '/.version';
-	
+	/*
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
 		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
@@ -2427,13 +2427,22 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	
 	$retorno = str_replace('{release}', $version->release, $format);
 	$retorno = str_replace('{build}', $version->build, $retorno);
+	*/
 	return $retorno;
 }
 
+/**
+ * DEPRECATED: Criada incorretamente, deve ser excluida.
+ * 
+ * @param string $var
+ * @return string
+ * @deprecated Essa função faz a mesma coisa que trim(), não deveria ter sido criada.
+ */
 function array_trim($var) {
 	return trim($var);
 }
 
+// Suporte para json_encode() em hospedagens que não possuem o pacote JSON
 if (!function_exists('json_encode')) {
 	function json_encode($array) {
 		$json = new Services_JSON();
