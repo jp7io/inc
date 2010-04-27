@@ -1749,27 +1749,17 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 				//$template=substr($template,0,$pos1+1).urlencode(substr($template,$pos1+1));
 				$template=str_replace(" ","%20",$template);
 			}
-			
+			if (strpos($template, 'http://') !== 0) {
+				$template = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $template;
+			}
 			//valida usuário logado e caso o template inicie em http
-			if($_SERVER["PHP_AUTH_USER"]){
-				$template=str_replace("http://","http://".$_SERVER["PHP_AUTH_USER"].":".$_SERVER["PHP_AUTH_PW"]."@", $template);
+			if ($_SERVER['PHP_AUTH_USER']) {
+				$template = str_replace('http://', 'http://' . $_SERVER['PHP_AUTH_USER'] . ':' . $_SERVER['PHP_AUTH_PW'] . '@', $template);
 			}
-			
-			if (strpos($template,"http://") === 0){
-				if(function_exists("file_get_contents")){
-					$template=file_get_contents($template);
-				}else{
-					ob_start();
-					readfile($template);
-					$template=ob_get_contents();
-					ob_end_clean();
-				}
-			} else {
-				$template = file_get_contents('http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $template);
-			}
+			$template = file_get_contents($template);
 			
 			//echo "template: ".$template;
-			$message_html=str_replace("%MESSAGE%",$message_html,$template);
+			$message_html = str_replace("%MESSAGE%", $message_html, $template);
 		}
 		$message_html=str_replace("=","=3D",$message_html);
 		// Boundaries
