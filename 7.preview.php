@@ -1,9 +1,14 @@
-<? if ($s_session['preview'] || $c_server_type=="QA") { // Precisa ser Global ?>
+<? if ($s_session['preview'] || $config->server->type == InterSite::QA) { // Precisa ser Global ?>
 	<?
-	if ($c_server_type=="QA") $S = "QA";
+	if ($config->server->type == InterSite::QA) {
+		$S = "QA";
+	}
 	if ($s_session['preview']) {
-		if ($c_server_type=="QA") $S .= " - " . strtoupper("Preview");
-		else $S = strtoupper("Preview");
+		if ($config->server->type == InterSite::QA) {
+			$S .= " - " . strtoupper("Preview");
+		} else {
+			$S = strtoupper("Preview");
+		}
 	}
 	?>
 	<script>
