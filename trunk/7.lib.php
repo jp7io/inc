@@ -973,7 +973,12 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
 			} elseif (strpos($value, $db_prefix . $lang->prefix . '_arquivos') !== false || strpos($value, $db_prefix . '_arquivos') !== false) {
 				$sql_where = str_replace("WHERE ","WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
 			} else {
-				$sql_where = str_replace("WHERE ","WHERE date_publish<='" . $DbNow . "' AND char_key<>'' AND (deleted LIKE '' OR deleted IS NULL)" . (($config->interadmin_preview && !$s_session['preview']) ? " AND (publish<>'' OR publish IS NULL)" : "") . " AND ", $sql_where);
+				$sql_where = str_replace("WHERE ", "WHERE" .
+					" date_publish <= '" . $DbNow . "'" .
+					" AND char_key <> ''" .
+					" AND (deleted LIKE '' OR deleted IS NULL)" . 
+					" AND (date_expire > '" . $DbNow . "' OR date_expire IS NULL OR date_expire = '0000-00-00 00:00:00')" .
+				(($config->interadmin_preview && !$s_session['preview']) ? " AND (publish <> '' OR publish IS NULL)" : "") . " AND ", $sql_where);
 			}
 		}
 		if ($c_path_upload) {
@@ -2364,6 +2369,10 @@ function interadmin_bootstrap() {
 	return $url;
 }
 
+function jp7_is_windows() {
+	return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+}
+
 /**
  * Checks if an executable program exists. On Windows it works only for .exe files.
  * Searchs for the executable file inside the directories on the %PATH% variable.
@@ -2372,7 +2381,7 @@ function interadmin_bootstrap() {
  * @return bool
  */
 function jp7_is_executable($executable) {
-	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+	if (jp7_is_windows()) {
 		$comando = 'for %G in ("%path:;=" "%") do @IF EXIST %G/' . $executable . '.exe echo 1';
 	} else { 
 		$comando = 'type -P ' . $executable;
@@ -2395,7 +2404,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
-		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
+		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || jp7_is_windows() || !jp7_is_executable('svn')) {
             $version = unserialize(file_get_contents($cacheFile));
         }
 	}
