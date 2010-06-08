@@ -52,6 +52,10 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	// Language
 	$lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
 	$config->lang = $config->langs[$lang->lang];
+	// Compatibilidade temporária 
+	if (!$c_site_title) {
+		$c_site_title = $config->lang->title;
+	}
 	
 	@include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
 	@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
