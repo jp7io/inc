@@ -2367,12 +2367,11 @@ function moveFiles($from_path,$to_path){
  */
 function jp7_explode($separator, $string, $useTrim = true) {
 	$array = explode($separator, $string);
-	foreach($array as $key => $value) {
-		if ($useTrim) $value = trim($value);
-		if (!$value) unset($array[$key]);
-		else $array[$key] = $value;
+	if ($useTrim) {
+		return array_filter($array, 'trim');
+	} else {
+		return array_filter($array, create_function('$a', 'return (bool) $a;'));
 	}
-	return $array;
 }
 
 /**
@@ -2381,17 +2380,15 @@ function jp7_explode($separator, $string, $useTrim = true) {
  * @param string $separator
  * @param string $string
  * @param bool $useTrim If set the function will trim() each part of the string. Defaults to <tt>TRUE</tt>.
- * @return array Array of parts withuot any empty value.
+ * @return string
  */
 function jp7_implode($separator, $array, $useTrim = true) {
-	if (!$array) return $array;
-	foreach($array as $key => $value) {
-		if ($useTrim) $value = trim($value);
-		if (!$value) unset($array[$key]);
-		else $array[$key] = $value;
+	if ($useTrim) {
+		$array = array_filter($array, 'trim');
+	} else {
+		$array = array_filter($array, create_function('$a', 'return (bool) $a;'));
 	}
-	$string = implode($separator, $array);
-	return $string;
+	return implode($separator, $array);
 }
 
 /**
