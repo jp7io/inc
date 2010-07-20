@@ -778,12 +778,16 @@ class jp7_db_pages extends Pagination{
  * @author JP
  * @version (2007/07/13)
  */
-function jp7_db_checkbox($name,$value="S",$var="",$readonly="",$xtra=""){
-	if(!$var)$var=$name;
-	$var_value=$GLOBALS[$var];
-	if($GLOBALS["interadmin_visualizar"]){
-		return (($var_value)?"Sim":"Não");
-	}else{
+function jp7_db_checkbox($name, $value = "S", $var = "", $readonly="", $xtra="", $var_value = null) {
+	if (!$var) {
+		$var = $name;
+	}
+	if (is_null($var_value)) {
+		$var_value = $GLOBALS[$var];
+	}
+	if ($GLOBALS["interadmin_visualizar"]) {
+		return (($var_value) ? "Sim" : "Não");
+	} else {
 		return "".
 		"<input type=\"checkbox\" name=\"jp7_db_checkbox_".$name."\" id=\"jp7_db_checkbox_".$name."\" value=\"".$value."\"".(($var_value)?" checked=\"checked\"":"").$readonly." onclick=\"form['".$name."'].value=(checked)?value:''\"".(($xtra)?" ".$xtra:"")." />".
 		"<input type=\"hidden\" name=\"".$name."\" value=\"".(($var_value)?$value:"")."\" />";
