@@ -302,37 +302,62 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 }
 
 // 2006/10/19 by JP
-function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$prefix="",$sql_where="",$style="select",$field_name="",$classes=false,$readonly=""){
+function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$prefix="",$sql_where="",$style="select",$field_name="",$classes=false,$readonly="", $obrigatorio="", $opcoes = null) {
 	global $id_tipo;
 	global $db;
 	global $db_prefix;
-	$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
-	" WHERE parent_id_tipo=".$parent_id_tipo_2.
-	$sql_where.
-	" ORDER BY ordem,nome";
-	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	$S='';
-	for($i = 0;$i<$nivel*5;$i++){
-		if($i<$nivel*5-1)$S.='-';
-		else $S.='> ';
+	
+	if (is_null($opcoes)) {
+		$rows = array();
+		$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+			" WHERE 1=1".
+			((is_numeric($parent_id_tipo_2))?" AND parent_id_tipo=".$parent_id_tipo_2:" AND parent_id_tipo=0").
+			$sql_where.
+			" ORDER BY ordem,nome";
+		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		while ($row = $rs->FetchNextObj()) {
+			$rows[] = $row;
+		}
+		$rs->Close();
+	} else {
+		$rows = $opcoes;
+	}
+	
+	$S = '';
+	for ($i = 0; $i < $nivel * 5; $i++) {
+		if ($i < $nivel * 5 - 1) {
+			$S .= '-';
+		} else {
+			$S .= '> ';
+		}
 	}
 	$i = 0;
-	while ($row = $rs->FetchNextObj()) {
+	foreach ($rows as $row) {
 		if(is_array($current_id_tipo))$selected=in_array($row->id_tipo,$current_id_tipo);
 		else $selected=($row->id_tipo==$current_id_tipo);
 		if(interadmin_tipos_nome($parent_id_tipo_2)=="Classes"||$classes)$classes=true;
-		if($style=="checkbox"){
-			if(!$i&&!$nivel){
-				if(is_array($current_id_tipo))$selected_2=in_array("N",$current_id_tipo);
-				else $selected_2=("N"==$current_id_tipo);
-				echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_N\" value=\"N\"".$readonly.(($selected_2)?" checked style=\"color:blue\"":"").(($row->id_tipo=="N")?" style=\"color:red\"":"").(($classes)?" style=\"background:#DDD\"":"")."><label for=\"".$field_name."_N\" unselectable=\"on\"".(($selected_2)?" style=\"color:blue\"":"").">NENHUM</label><br>\n";
-			}
-			echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id_tipo."\" value=\"".$row->id_tipo."\"".$readonly.(($selected)?" checked style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")."><label for=\"".$field_name."_".$row->id_tipo."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->nome."</label><br>\n";
-		}else echo "<option value=\"".$row->id_tipo."\"".$readonly.(($selected)?" SELECTED style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").(($classes)?" style=\"background:#DDD\"":"").">".substr($row->nome,0,1).")".$S.$row->nome."</option>\n";
-		if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name,$classes,$readonly);
+		switch ($style) {
+            case 'checkbox':
+                if(!$i&&!$nivel){
+                    if(is_array($current_id_tipo))$selected_2=in_array("N",$current_id_tipo);
+                    else $selected_2=("N"==$current_id_tipo);
+                    echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_N\" value=\"N\"".$readonly.(($selected_2)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo=="N")?" style=\"color:red\"":"").(($classes)?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_N\" unselectable=\"on\"".(($selected_2)?" style=\"color:blue\"":"").">NENHUM</label><br />\n";
+                }
+                echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id_tipo."\" value=\"".$row->id_tipo."\"".$readonly.(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_".$row->id_tipo."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->nome."</label><br />\n";
+                break;
+			case 'radio':
+				$R .= "<div><input type=\"radio\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id_tipo."\" label=\"".$field_label."\" value=\"".$row->id_tipo."\"".(($obrigatorio)?" obligatory=\"yes\"":"").(($readonly)?" disabled":"").(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_".$row->id_tipo."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->nome."</label></div>\n";
+				break;
+			default:
+                echo "<option value=\"".$row->id_tipo."\"".$readonly.(($selected)?" SELECTED style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").(($classes)?" style=\"background:#DDD\"":"").">".substr($row->nome,0,1).")".$S.$row->nome."</option>\n";
+                break;
+		}
+		if (!$opcoes && ($style != 'checkbox' || $nivel < 2)) {
+			interadmin_tipos_combo($current_id_tipo, $row->id_tipo, $nivel + 1, $prefix, "", $style, $field_name, $classes, $readonly);
+		}
 		$i++;
 	}
-	$rs->Close();
+	return $R;
 }
 
 // jp7_DF_sendMail (2007/08/06 by JP)
