@@ -266,7 +266,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		else $S.='> ';
 	}
 	$numRows = $rs->RecordCount();
-	if($style=="checkbox")$R.="<input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".strtoupper($GLOBALS['l_todos'])."</label><br>\n";
+	if($style=="checkbox")$R.="<input type=\"hidden\" name=\"".$field_name."\" value=\"\" /><input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".strtoupper($GLOBALS['l_todos'])."</label><br>\n";
 	elseif($style=="combo"){
 		$R.="<option value=\"\" style=\"color:#ccc\">".$select_campos_2_nomes."</option>";
 	}
@@ -301,7 +301,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	return $R;
 }
 
-// 2006/10/19 by JP
+// 2008/01/09 by JP
 function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$prefix="",$sql_where="",$style="select",$field_name="",$classes=false,$readonly="", $obrigatorio="", $opcoes = null) {
 	global $id_tipo;
 	global $db;
@@ -339,9 +339,17 @@ function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$pre
 		switch ($style) {
             case 'checkbox':
                 if(!$i&&!$nivel){
-                    if(is_array($current_id_tipo))$selected_2=in_array("N",$current_id_tipo);
-                    else $selected_2=("N"==$current_id_tipo);
-                    echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_N\" value=\"N\"".$readonly.(($selected_2)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo=="N")?" style=\"color:red\"":"").(($classes)?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_N\" unselectable=\"on\"".(($selected_2)?" style=\"color:blue\"":"").">NENHUM</label><br />\n";
+                    if (is_array($current_id_tipo)) {
+                    	$selected_2=in_array("N",$current_id_tipo);
+                    } else {
+                    	$selected_2=("N"==$current_id_tipo);
+					}
+					echo "<input type=\"hidden\" name=\"".$field_name."\" value=\"\" />
+						<input type=\"checkbox\" id=\"".$field_name."_all\" 
+						value=\"\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" 
+						checked=\"checked\" style=\"color:blue\"":"").(($readonly)?" disabled":"").(($row->id_tipo==$id_tipo)?" 
+						style=\"color:red\"":"")." onclick=\"DFselectAll(this)\" /><label for=\"".$field_name."_all\" 
+						unselectable=\"on\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" style=\"color:blue\"":"").">TODOS</label><br />\n";
                 }
                 echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id_tipo."\" value=\"".$row->id_tipo."\"".$readonly.(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_".$row->id_tipo."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->nome."</label><br />\n";
                 break;
