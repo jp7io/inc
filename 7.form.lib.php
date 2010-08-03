@@ -344,12 +344,20 @@ function interadmin_tipos_combo($current_id_tipo,$parent_id_tipo_2,$nivel=0,$pre
                     } else {
                     	$selected_2=("N"==$current_id_tipo);
 					}
-					echo "<input type=\"hidden\" name=\"".$field_name."\" value=\"\" />
-						<input type=\"checkbox\" id=\"".$field_name."_all\" 
-						value=\"\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" 
-						checked=\"checked\" style=\"color:blue\"":"").(($readonly)?" disabled":"").(($row->id_tipo==$id_tipo)?" 
-						style=\"color:red\"":"")." onclick=\"DFselectAll(this)\" /><label for=\"".$field_name."_all\" 
-						unselectable=\"on\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" style=\"color:blue\"":"").">TODOS</label><br />\n";
+					if (is_null($opcoes)) {
+						echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_N\" 
+							value=\"N\"".$readonly.(($selected_2)?" checked=\"checked\" 
+							style=\"color:blue\"":"").(($row->id_tipo=="N")?" style=\"color:red\"":"").
+							(($classes)?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_N\" 
+							unselectable=\"on\"".(($selected_2)?" style=\"color:blue\"":"").">NENHUM</label><br />\n";
+					} else {
+						echo "<input type=\"hidden\" name=\"".$field_name."\" value=\"\" />
+							<input type=\"checkbox\" id=\"".$field_name."_all\" 
+							value=\"\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" 
+							checked=\"checked\" style=\"color:blue\"":"").(($readonly)?" disabled":"").(($row->id_tipo==$id_tipo)?" 
+							style=\"color:red\"":"")." onclick=\"DFselectAll(this)\" /><label for=\"".$field_name."_all\" 
+							unselectable=\"on\"".((is_array($current_id_tipo) && count($rows) == count($current_id_tipo))?" style=\"color:blue\"":"").">TODOS</label><br />\n";
+					}
                 }
                 echo "<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id_tipo."\" value=\"".$row->id_tipo."\"".$readonly.(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id_tipo==$id_tipo)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_".$row->id_tipo."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->nome."</label><br />\n";
                 break;
