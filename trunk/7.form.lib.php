@@ -147,13 +147,14 @@ function interadmin_returnCampo($campo){
 			echo "".
 			"<tr>\r\n".
 				$_th.
-				"<td colspan=\"2\">
+				"<td colspan=\"3\">
 					<input type=\"file\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." class=\"inputs_width\" />
-					<input type=\"hidden\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." />
-				</td>\r\n";
-				if ($campo_array['thumb']) {
-					echo "<td><img src=\"" . $campo_array['thumb'] . "\" alt=\"\" class=\"file_thumb\" /></td>\r\n";
-				}
+					<input type=\"hidden\" name=\"".$campo."[".$j."]\" value=\"".$valor."\" maxlength=\"255\"".$readonly." />";
+					if ($campo_array['thumb']) {
+						echo "<img src=\"" . $campo_array['thumb'] . "\" alt=\"\" class=\"file_thumb\" />\r\n";
+					}
+				echo "</td>\r\n";
+				
 			echo "</tr>\r\n";
 		}elseif(strpos($campo,"date_")===0){
 			$S="".
