@@ -1677,9 +1677,17 @@ function jp7_path_find($file, $autoload = false) {
 	global $debugger;
 	static $path_levels;
 	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
+	static $web_root;
+	if (!$web_root) {
+		$web_root = dirname(dirname(__FILE__));
+	}
 	for ($i = 0; $i <= $path_levels; $i++) {
 		($i) ? $path .= '../' : $path = '';
-		if ($ok = @file_exists($path . $file)) break;
+		if ($ok = @file_exists($path . $file)) {
+			break;	
+		} elseif (strpos($path . $file, $web_root) === 0) {
+			break; // já na raiz, evita erros de open_base_dir()
+		}
 	}
 	if (!$ok && !$autoload) {
 		// Necessário para localização de includes em templates
