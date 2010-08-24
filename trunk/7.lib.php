@@ -1988,15 +1988,9 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		$dst_w = $w;
 		$dst_h = $h;
 	// Destination is square (with same width and height - crop if needed)
-	} elseif ($w == $h) {
-		$dst_w = $w;
-		$dst_h = $h;
-		if ($src_w > $src_h) $src_w = $src_h;
-		else $src_h = $src_w;
-	// The image is resized until it gets the maximum width or height (with crop)
 	} elseif ($crop && $crop !== 'border') {
-		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
-		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
+		$pre_dst_w = ceil(($h * $src_w) / $src_h);
+		$pre_dst_h = ceil(($w * $src_h) / $src_w);
 		if ($pre_dst_h > $h) {
 			$dst_w = $w;
 			$dst_h = $pre_dst_h;
