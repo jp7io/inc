@@ -29,9 +29,18 @@ $c_jp7 = ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['REMOTE_ADDR'] == '20
  */
 setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
 setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
-if ($c_jp7) error_reporting(E_ALL ^ E_NOTICE);
-else error_reporting(0);
-if (!@ini_get('allow_url_fopen')) @ini_set('allow_url_fopen', '1');
+if ($c_jp7) {
+    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+        error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
+    } else {
+        error_reporting(E_ALL ^ E_NOTICE);
+    }
+} else {
+    error_reporting(0);
+}
+if (!@ini_get('allow_url_fopen')) {
+    @ini_set('allow_url_fopen', '1');
+}
 jp7_register_globals();
 
 /**
