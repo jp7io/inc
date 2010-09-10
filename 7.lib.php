@@ -2267,7 +2267,7 @@ function jp7_file_size($file){
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
-	global $debugger, $config, $jp7_app, $c_jp7, $jp7_cache;
+	global $debugger, $config, $jp7_app, $jp7_cache;
 	
 	// Web Services
 	if ($debugger->isExceptionsEnabled()) {
