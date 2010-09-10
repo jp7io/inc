@@ -2267,33 +2267,21 @@ function jp7_file_size($file){
  * @return string HTML formatted backtrace.
  */
 function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
-	global $debugger, $config, $s_interadmin_cliente, $jp7_app, $c_jp7;
+	global $debugger, $config, $jp7_app, $c_jp7, $jp7_cache;
 	
 	// Web Services
 	if ($debugger->isExceptionsEnabled()) {
-		throw new Exception($msgErro);
+		$exception = new Jp7_InterAdmin_Exception($msgErro);
+		$exception->setSql($sql);
+		throw $exception;
 	}
 	if (!$traceArr) {
 		$traceArr = debug_backtrace();
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
-	$nome_app = ($jp7_app) ? $jp7_app : 'Site';
 	//Envia email e exibe tela de manutenção
 	if ($config->server->type == InterSite::PRODUCAO) {
-		if (trim($config->name_id)) {
-			$cliente = $config->name_id;
-		} elseif (trim($s_interadmin_cliente)) {
-			$cliente = $s_interadmin_cliente;
-		}
-		$subject = '['. $cliente . '][' . $nome_app . '][Erro]';
-		$message = 'Ocorreram erros no ' . $nome_app . ' - ' . $cliente . '<br />' . $backtrace;
-		$to = 'debug+' . $cliente . '@jp7.com.br';
-		$headers = 'To: ' . $to . " <" . $to . ">\r\n";
-		$headers .= 'From: ' . $to . " <" . $to . ">\r\n";
-		$parameters = '';
-		//$template="form_htm.php";
-		$html = true;
-		jp7_mail($to, $subject, $message, $headers, $parameters, $template, $html);
+		$debugger->sendTraceByEmail($backtrace);
 		if (!$jp7_app || $jp7_cache) {
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
 			header('Location: /_default/index_manutencao.htm');
@@ -2305,9 +2293,9 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 			exit();
 		}
 	} else {
-		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']);
+		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	}
-	return $backtrace;
+	return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
 }
 
 /**
