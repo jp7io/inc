@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -9,6 +9,20 @@
  * @category JP7
  * @package 7lib
  */
+
+/**
+ * Checks for Fatal Error preventing White Screen
+ * 
+ * @return void
+ */
+function jp7_check_shutdown() {
+	$lasterror = error_get_last();
+	if ($lasterror['type'] == E_ERROR) { // Is it a Fatal Error?
+		die(jp7_debug($lasterror['message'] . ' - ' . $lasterror['file'] . ':' .  $lasterror['line']));
+	}
+}
+//Register the shutdown
+register_shutdown_function('jp7_check_shutdown');
 
 /**
  * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
