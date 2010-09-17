@@ -17,8 +17,11 @@
  */
 function jp7_check_shutdown() {
 	$lasterror = error_get_last();
-	if ($lasterror['type'] == E_ERROR) { // Is it a Fatal Error?
-		die(jp7_debug($lasterror['message'] . ' - ' . $lasterror['file'] . ':' .  $lasterror['line']));
+	switch ($lasterror['type']) {  // Is it a Fatal Error?
+		case E_ERROR:
+		case E_RECOVERABLE_ERROR:
+			die(jp7_debug($lasterror['message'] . ' - ' . $lasterror['file'] . ':' .  $lasterror['line']));
+			break;
 	}
 }
 //Register the shutdown
