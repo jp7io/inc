@@ -99,7 +99,7 @@ function __autoload($className){
 		foreach ($paths as $path) {
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
-				if (JP7_IS_WINDOWS && basename($file) != basename(realpath($file))) {
+				if (JP7_IS_WINDOWS && str_replace('\\', '/', $file) != str_replace('\\', '/', realpath($file))) {
 					die(jp7_debug('Classname is case sensitive: ' . $className));
 				}
 				require_once $file;
@@ -2485,7 +2485,7 @@ function interadmin_bootstrap() {
 		interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
 	}
 	
-	set_include_path('.' . PATH_SEPARATOR . jp7_doc_root() . $jp7_app);
+	set_include_path(get_include_path() . PATH_SEPARATOR . jp7_doc_root() . $jp7_app);
 	if ($jp7_app != 'interadmin') {
 		set_include_path(get_include_path() . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
 	}
