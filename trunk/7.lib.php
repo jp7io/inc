@@ -60,6 +60,9 @@ if (!@ini_get('allow_url_fopen')) {
 }
 jp7_register_globals();
 
+// Necessário antes de loadar as classes
+set_include_path(realpath(jp7_doc_root() . 'classes'). PATH_SEPARATOR .  get_include_path());
+
 /**
  * @global Jp7_Debugger $debugger
  */
@@ -70,6 +73,7 @@ $debugger = new Jp7_Debugger();
  * @global Browser $is
  */
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
+define('JP7_IS_WINDOWS', jp7_is_windows());
 
 /**
  * Define o diretório com os arquivos do Krumo
@@ -86,26 +90,28 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 function __autoload($className){
 	global $debugger;
 	
-	if (!$className) return;
-	
-	$classNameArr = explode('_', $className);
-	$filename = implode('/', $classNameArr) . (($classNameArr[0] == 'Zend') ? '' : '.class') . '.php';
-	
-	$paths = explode(PATH_SEPARATOR, get_include_path());
-	$paths[] = '../classes';
-	
-	$i = 0;
-	$file = '';
-	while (!@file_exists($file)) {
-		if (isset($paths[$i])) { 
-			$file = jp7_path_find($paths[$i] . '/' . $filename, true);
-		} else {
-			if ($debugger) $debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
-			return;
+	if ($className) {
+		$ext = ((strpos($className, 'Zend_') === 0) ? '' : '.class') . '.php';
+		$filename = str_replace('_', '/', $className) . $ext;
+		
+		$paths = explode(PATH_SEPARATOR, get_include_path());
+		
+		foreach ($paths as $path) {
+			$file = $path . '/' . $filename;
+			if (@file_exists($file)) {
+				if (JP7_IS_WINDOWS && basename($file) != basename(realpath($file))) {
+					die(jp7_debug('Classname is case sensitive: ' . $className));
+				}
+				require_once $file;
+				return $className;
+			}
 		}
-		$i++;
+		// Arquivo não encontrado
+		if ($debugger) {
+			$debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
+		}
 	}
-	require_once($file);
+	return false;
 }
 
 /**
@@ -1699,7 +1705,7 @@ function jp7_include($file){
  * @author JP, Carlos
  * @version (2009/02/25)
  */
-function jp7_path_find($file, $autoload = false) {
+function jp7_path_find($file) {
 	global $debugger;
 	static $path_levels;
 	if (!$path_levels) $path_levels = count(explode('/', $_SERVER['PHP_SELF'])) - 1; // Total de pastas.
@@ -1715,18 +1721,18 @@ function jp7_path_find($file, $autoload = false) {
 			break; // já na raiz, evita erros de open_base_dir()
 		}
 	}
-	if (!$ok && !$autoload) {
+	if (!$ok) {
 		// Necessário para localização de includes em templates
 		$path = jp7_path($GLOBALS['c_doc_root'], TRUE) . dirname($_SERVER['REQUEST_URI']) . '/';
 		$ok = @file_exists($path . $file);
 	}
-	if (!$ok && !$autoload) {
+	if (!$ok) {
 		if (strpos($file,'/head.php') !== FALSE) return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
 		if ($GLOBALS['c_template'] && strpos($file, '../../inc/') !== FALSE) return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
 		$path = '';
 		if (@file_exists(jp7_doc_root() . $file)) $path = jp7_doc_root();
 	}
-	return ($debugger && !$autoload) ? $debugger->showFilename($path . $file) : $path . $file;
+	return ($debugger) ? $debugger->showFilename($path . $file) : $path . $file;
 }
 
 /**
@@ -2498,7 +2504,7 @@ function jp7_is_windows() {
  * @return bool
  */
 function jp7_is_executable($executable) {
-	if (jp7_is_windows()) {
+	if (JP7_IS_WINDOWS) {
 		$comando = 'for %G in ("%path:;=" "%") do @IF EXIST %G/' . $executable . '.exe echo 1';
 	} else { 
 		$comando = 'type -P ' . $executable;
@@ -2521,7 +2527,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
-		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || jp7_is_windows() || !jp7_is_executable('svn')) {
+		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || JP7_IS_WINDOWS || !jp7_is_executable('svn')) {
             $version = unserialize(file_get_contents($cacheFile));
         }
 	}
