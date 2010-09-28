@@ -99,8 +99,10 @@ function __autoload($className){
 		foreach ($paths as $path) {
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
-				if (JP7_IS_WINDOWS && str_replace('\\', '/', $file) != str_replace('\\', '/', realpath($file))) {
-					die(jp7_debug('Classname is case sensitive: ' . $className));
+				if (JP7_IS_WINDOWS) {
+					if (str_replace('\\', '/', realpath($file)) != str_replace('\\', '/', realpath($path)) . '/' . $filename) {
+						die(jp7_debug('Classname is case sensitive: ' . $className));
+					}
 				}
 				require_once $file;
 				return $className;
