@@ -20,6 +20,11 @@ function jp7_check_shutdown() {
 	switch ($lasterror['type']) {  // Is it a Fatal Error?
 		case E_ERROR:
 		case E_RECOVERABLE_ERROR:
+			global $debugger;
+			if ($debugger) {
+				// Nesse ponto as exceções não podem mais ser tratadas
+				$debugger->setExceptionsEnabled(false);
+			}
 			die(jp7_debug($lasterror['message'] . ' - ' . $lasterror['file'] . ':' .  $lasterror['line']));
 			break;
 	}
@@ -100,7 +105,8 @@ function __autoload($className){
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
 				if (JP7_IS_WINDOWS) {
-					if (str_replace('\\', '/', realpath($file)) != str_replace('\\', '/', realpath($path)) . '/' . $filename) {
+					$realFilename = trim(str_replace('\\', '/', str_replace(realpath($path), '', realpath($file))), '/');
+					if ($filename != $realFilename) {
 						die(jp7_debug('Classname is case sensitive: ' . $className));
 					}
 				}
