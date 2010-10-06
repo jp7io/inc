@@ -102,6 +102,9 @@ function __autoload($className){
 		$paths = explode(PATH_SEPARATOR, get_include_path());
 		
 		foreach ($paths as $path) {
+			if (strpos($path, 'classes') === false) {
+				continue; // Evita verificação desnecessária
+			}
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
 				if (JP7_IS_WINDOWS) {
