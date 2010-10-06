@@ -1,6 +1,6 @@
 <?php
 // Include path para as classes do Cliente
-set_include_path(realpath('../../classes') . PATH_SEPARATOR .  get_include_path());
+set_include_path(jp7_path_find('../classes') . PATH_SEPARATOR .  get_include_path());
 
 if (!$config) {
 	die(jp7_debug('Configuration object not found: $config'));
