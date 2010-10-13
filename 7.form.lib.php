@@ -222,7 +222,7 @@ function interadmin_returnCampo($campo){
 }
 
 // 2007/01/04 by JP
-function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql_where="",$style="select",$field_name="",$field_label="",$obrigatorio=""){
+function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql_where="",$style="select",$field_name="",$field_label="",$obrigatorio="", $readonly=""){
 	global $id_tipo;
 	global $db;
 	global $db_prefix;
@@ -230,9 +230,8 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	global $lang;
 	$sql = "SELECT tabela,campos,language FROM ".$db_prefix."_tipos".
 	" WHERE id_tipo=".$parent_id_tipo_2;
-	
-	$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-	while($row=$rs->FetchNextObj()){
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+	while ($row = $rs->FetchNextObj()) {
 		$campos=interadmin_tipos_campos($row->campos);
 		$select_lang=$row->language;
 		$select_tabela=$row->tabela;
@@ -259,25 +258,37 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 	// Loop
 	if($select_tabela){
 		$sql = "SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix."_".$select_tabela.
+		" WHERE id_tipo=".$parent_id_tipo_2.
+		$sql_where.
+		" AND (deleted='' OR deleted IS NULL) ".
 		" ORDER BY varchar_key";
 	}else{
 		$sql = "SELECT id,varchar_key,deleted".$select_campos_2." FROM ".$db_prefix.(($select_lang)?$lang->prefix:"").
 		" WHERE id_tipo=".$parent_id_tipo_2.
 		$sql_where.
+		" AND (deleted='' OR deleted IS NULL) ".
 		" ORDER BY int_key,varchar_key,select_key";
 	}
-	$rs=interadmin_query($sql);
+	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 	$S='';
 	for($i = 0;$i<$nivel*5;$i++){
 		if($i<$nivel*5-1)$S.='-';
 		else $S.='> ';
 	}
-	$numRows = $rs->RecordCount();
-	if($style=="checkbox")$R.="<input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$numRows==count($current_id))?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\"><label for=\"".$field_name."_all\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".strtoupper($GLOBALS['l_todos'])."</label><br>\n";
-	elseif($style=="combo"){
-		$R.="<option value=\"\" style=\"color:#ccc\">".$select_campos_2_nomes."</option>";
+	switch ($style) {
+		case 'checkbox':
+			$R .= "<div><input type=\"hidden\" name=\"".$field_name."\" value=\"\" /><input type=\"checkbox\" id=\"".$field_name."_all\" value=\"\"".((is_array($current_id)&&$rs->RecordCount()==count($current_id))?" checked=\"checked\" style=\"color:blue\"":"").(($readonly)?" disabled":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAll(this)\" /><label for=\"".$field_name."_all\" unselectable=\"on\"".((is_array($current_id)&&$rs->RecordCount()==count($current_id))?" style=\"color:blue\"":"").">TODOS</label></div>\n";
+			break;
+		case 'radio':
+			if (!$obrigatorio) {
+				$R .= "<div><input type=\"radio\" name=\"".$field_name."\" id=\"".$field_name."\" label=\"".$field_label."\" value=\"\"".(($readonly)?" disabled":"").((!$current_id)?" checked=\"checked\" style=\"color:blue\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."\" unselectable=\"on\"".((!$current_id)?" style=\"color:blue\"":"").">Nenhum</label></div>\n";
+			}
+			break;
+		case 'combo':
+			$R.="<option value=\"\" style=\"color:#ccc\">".$select_campos_2_nomes."</option>";
+			break;
 	}
-	while($row=$rs->FetchNextObj()){
+	while ($row = $rs->FetchNextObj()) {
 		if(is_array($current_id))$selected=in_array($row->id,$current_id);
 		else $selected=($row->id==$current_id);
 		if ($row->select_key&&!in_array("select_key",$select_campos_2_array)){
@@ -293,16 +304,25 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 					if(strpos($value,"special_")===0){
 						$select_campos_sql.=(($key||$row->varchar_key)?" - ":"").$select_campos_2_nomes_arr[$key]("select_campos_sql_temp",$select_campos_sql_temp,"list");
 					}else{
-						if(is_numeric($select_campos_sql_temp)&&strpos($value,"varchar_")===false&&strpos($value,"int_")===false)$select_campos_sql_temp=($select_campos_2_xtra[$key])?interadmin_tipos_nome($select_campos_sql_temp):jp7_fields_values($select_campos_sql_temp);
+						if(is_numeric($select_campos_sql_temp)&&strpos($value,"varchar_")=== FALSE&&strpos($value,"int_")=== FALSE)$select_campos_sql_temp=($select_campos_2_xtra[$key])?interadmin_tipos_nome($select_campos_sql_temp):jp7_fields_values($select_campos_sql_temp);
 						$select_campos_sql.=(($key||$row->varchar_key)?" - ":"").$select_campos_sql_temp;
 					}
 				}
 			}
 		}
 		// Output
-		if($style=="checkbox")$R.="<input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id."\" label=\"".$field_label."\" value=\"".$row->id."\"".(($obrigatorio)?" obligatory=\"yes\"":"").(($selected)?" checked style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAllCheck(this)\"><label for=\"".$field_name."_".$row->id."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</label><br>\n";
-		else $R.="<option value=\"".$row->id."\"".(($selected)?" SELECTED style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"").">"./*substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</option>\n";
-		//if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
+		switch ($style) {
+			case 'checkbox':
+				$R .= "<div><input type=\"checkbox\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id."\" label=\"".$field_label."\" value=\"".$row->id."\"".(($obrigatorio)?" obligatory=\"yes\"":"").(($readonly)?" disabled":"").(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." onclick=\"DFselectAllCheck(this)\" /><label for=\"".$field_name."_".$row->id."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</label></div>\n";
+				break;
+			case 'radio':
+				$R .= "<div><input type=\"radio\" name=\"".$field_name."\" id=\"".$field_name."_".$row->id."\" label=\"".$field_label."\" value=\"".$row->id."\"".(($obrigatorio)?" obligatory=\"yes\"":"").(($readonly)?" disabled":"").(($selected)?" checked=\"checked\" style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"")." /><label for=\"".$field_name."_".$row->id."\" unselectable=\"on\"".(($selected)?" style=\"color:blue\"":"").">".$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</label></div>\n";
+				break;
+			default:
+				$R .= "<option value=\"".$row->id."\"".(($selected)?" selected=\"selected\" style=\"color:blue\"":"").(($row->id==$id)?" style=\"color:red\"":"").((interadmin_tipos_nome($parent_id_tipo_2)=="Classes")?" style=\"background:#DDD\"":"").">"./*substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql,100)."</option>\n";
+				break;
+				//if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
+		}
 	}
 	$rs->Close();
 	return $R;
