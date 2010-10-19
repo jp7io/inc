@@ -43,6 +43,10 @@ if (!session_id()) {
 	session_start();
 }
 if (is_null($s_session)) {
+	// Anti register-globals
+	if (@ini_get('register_globals')) {
+		unset($GLOBALS[$config->name_id]);
+	}
 	if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
 		$_SESSION[$config->name_id]['interadmin'] = array();
 	}
