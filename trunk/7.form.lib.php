@@ -14,6 +14,12 @@ function interadmin_returnCampo($campo){
 	global $select_campos_sql_temp;
 	global $tit_start;
 	global $lang, $l_selecione, $c_lang_varchar;
+	// Utilizado $xtra_disabledfields_arr_final para desabilitar algum campo
+	if (!empty($xtra_disabledfields_arr_final)) {
+		if (in_array($xtra_disabledfields_arr_final, $campo)) {
+			return;
+		}
+	}
 	if(is_array($campo)){
 		$campo_array=$campo;
 		$campo_nome=$campo["nome"];
