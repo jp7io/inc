@@ -24,8 +24,8 @@ if (!$c_path_default) {
 
 // Check IDs
 foreach ($_REQUEST as $key => $value) {
-	if ($key == 'id' || strpos($key, '_id') !== false || strpos($key, 'id_') !== false) {
-		if ($value && strpos($value, 'http://') !== false) {
+	if ($key == 'id' || substr($key, -3) === '_id') {
+		if (is_string($value) && strpos($value, 'http://') !== false) {
 			jp7_debug('ID com URL');
 			header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $GLOBALS['c_path']);
 			exit();
