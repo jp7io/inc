@@ -849,7 +849,7 @@ function jp7_db_checkbox($name, $value = "S", $var = "", $readonly="", $xtra="",
  * @author JP
  * @version (2006/04/18)
  */
-function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
+function jp7_db_update($table, $table_id_name, $table_id_value, $fields) {
 	global $db;
 	$fields_arr=explode(",",$fields);
 	// Variáveis
@@ -890,18 +890,18 @@ function jp7_db_update($table,$table_id_name,$table_id_value,$fields){
  * @author JP
  * @version (2007/03/10)
  */
-function interadmin_tipos_campos($campos){
-	$campos_parameters=array("tipo","nome","ajuda","tamanho","obrigatorio","separador","xtra","lista","orderby","combo","readonly","form","label","permissoes","default","nome_id");
-	$campos=explode("{;}",$campos);
-	for($i = 0;$i<count($campos);$i++){
-		$parameters=explode("{,}",$campos[$i]);
-		if($parameters[0]){
-			$A[$parameters[0]][ordem]=($i+1);
-			for($j=0;$j<count($parameters);$j++){
-				$A[$parameters[0]][$campos_parameters[$j]]=$parameters[$j];
-			}
-		}
-	}
+function interadmin_tipos_campos($campos) {
+	$campos_parameters = array('tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id');
+	$campos = explode('{;}', $campos);
+	for ($i = 0; $i < count($campos); $i++) {
+		$parameters = explode('{,}', $campos[$i]);
+		if ($parameters[0]) {
+			$A[$parameters[0]][ordem] = ($i + 1);
+			for ($j = 0; $j < count($parameters); $j++) {
+				$A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
+			} 
+		} 
+	} 
 	return $A;
 }
 
@@ -917,19 +917,19 @@ function interadmin_tipos_campos($campos){
  * @return array Array containing "nome" and "xtra" values of the field.
  * @version (2004/11/03)
  */
-function interadmin_tipos_campo($db_prefix,$id_tipo,$var_key){
+function interadmin_tipos_campo($db_prefix, $id_tipo, $var_key) {
 	global $db, $tipo_campos, $tipo_model_id_tipo;
-	$tipo_model_id_tipo=$id_tipo;
-	while($tipo_model_id_tipo){
+	$tipo_model_id_tipo = $id_tipo;
+	while ($tipo_model_id_tipo) {
 		jp7_db_select($db_prefix."_tipos","id_tipo",$tipo_model_id_tipo,"tipo_");
 	}
-	$tipo_campos=explode("{;}",$tipo_campos);
-	foreach($tipo_campos as $campo){
-		$campo=explode("{,}",$campo);
-		if($campo[0]==$var_key){
+	$tipo_campos = explode('{;}', $tipo_campos);
+	foreach ($tipo_campos as $campo) {
+		$campo = explode('{,}', $campo);
+		if ($campo[0] == $var_key){
 			return array(
-				nome=>$campo[1],
-				xtra=>$campo[6]
+				'nome' => $campo[1],
+				'xtra' => $campo[6]
 			);
 			break;
 		}
@@ -1709,7 +1709,6 @@ function jp7_include($file){
  * Attempts to find a file on the directories above the current directory and, if it fails, it points to the root.
  *
  * @param string $file Filename.
- * @param bool $autoload Is called by __autoload.
  * @global Jp7_Debugger
  * @staticvar int $path_levels Number of paths from the root to the current folder.
  * @return string Path to the file.
