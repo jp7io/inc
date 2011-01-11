@@ -1065,20 +1065,21 @@ function interadmin_query($sql, $sql_db = "", $sql_debug = FALSE, $numrows = NUL
  * @author JP
  * @version (2008/01/09)
  */
-function interadmin_tipos_nome($id_tipo,$nolang=FALSE){
-	if(!$id_tipo)return FALSE;
-	elseif(is_numeric($id_tipo)){
+function interadmin_tipos_nome($id_tipo, $nolang = false) {
+	if (!$id_tipo) {
+		return false;
+	} elseif(is_numeric($id_tipo)) {
 		global $db;
 		global $db_prefix;
 		global $lang;
 		$sql = "SELECT nome,nome".$lang->prefix." AS nome_lang FROM ".$db_prefix."_tipos WHERE id_tipo=".$id_tipo;
-		$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-		$row=$rs->FetchNextObj();
-		$nome=($row->nome_lang&&!$nolang)?$row->nome_lang:$row->nome;
+		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		$row = $rs->FetchNextObj();
+		$nome = ($row->nome_lang&&!$nolang)?$row->nome_lang:$row->nome;
 		$rs->Close();
 		return $nome;
-	}else{
-		return "Tipos";
+	} else {
+		return 'Tipos';
 	}
 }
 
