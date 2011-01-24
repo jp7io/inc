@@ -2630,5 +2630,6 @@ function jp7_absolute_path($path) {
             $absolutes[] = $part;
         }
     }
-    return DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $absolutes);
+	$path = implode(DIRECTORY_SEPARATOR, $absolutes);
+	return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
