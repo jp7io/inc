@@ -19,6 +19,7 @@ function jp7_check_shutdown() {
 	$lasterror = error_get_last();
 	switch ($lasterror['type']) {  // Is it a Fatal Error?
 		case E_ERROR:
+		case E_USER_ERROR:
 		case E_RECOVERABLE_ERROR:
 			global $debugger;
 			if ($debugger) {
