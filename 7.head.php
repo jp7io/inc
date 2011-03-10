@@ -12,6 +12,7 @@ if ($seo_baseurl) {
 		// Língua
 		$baseHref .= '/' . $c_path . $lang->path_url . $go_url;
 	} else {
+		// Base href ficava incorreto quando haviam duas barras no endereço
 		$baseHref .= str_replace('//', '/', $uriSemQueryString);
 	}
 }
