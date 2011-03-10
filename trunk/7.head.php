@@ -12,7 +12,7 @@ if ($seo_baseurl) {
 		// Língua
 		$baseHref .= '/' . $c_path . $lang->path_url . $go_url;
 	} else {
-		$baseHref .= $uriSemQueryString;
+		$baseHref .= str_replace('//', '/', $uriSemQueryString);
 	}
 }
 
