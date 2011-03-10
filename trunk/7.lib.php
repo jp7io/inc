@@ -1755,6 +1755,10 @@ function jp7_path_find($file) {
  * @version (2003/08/25)
  */
 function jp7_extension($S) {
+	if (strpos($S, '?') !== false) {
+		// Tirando a Query String
+		$S = preg_replace('/([^?]*)(.*)/', '\1', $S);
+	}
 	$path_parts = pathinfo($S);
 	$ext = trim($path_parts['extension'] . ' ');
 	return (!$ext) ? "---" : $ext;
