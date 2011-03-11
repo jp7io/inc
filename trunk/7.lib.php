@@ -1785,7 +1785,7 @@ function jp7_extension($S) {
 function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=TRUE,$attachments=""){
 	global $debug, $config;
 	// Mensagem alternativa em texto
-	if (strpos($message, '<br>') !== false) {
+	if (strpos($message, '<br>') !== false && strpos($message, '<html>') !== false) {
 		$text_hr = '';
 		for ($i = 0; $i < 80; $i++) {
 			$text_hr .= '-';
