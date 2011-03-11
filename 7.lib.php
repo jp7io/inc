@@ -1784,35 +1784,35 @@ function jp7_extension($S) {
  */
 function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=TRUE,$attachments=""){
 	global $debug, $config;
-	// TEXT
-	if(strpos($message,"<br>")!==false){
-		$text_hr="";
-		for($i = 0;$i<80;$i++){
-			$text_hr.="-";
+	// Mensagem alternativa em texto
+	if (strpos($message, '<br>') !== false) {
+		$text_hr = '';
+		for ($i = 0; $i < 80; $i++) {
+			$text_hr .= '-';
 		}
-		$message_text=str_replace("\r","",$message);
-		$message_text=str_replace("\n","",$message_text);
-		$message_text=str_replace("&nbsp;"," ",$message_text);
-		$message_text=str_replace("<hr size=1 color=\"#666666\">",$text_hr."\r\n",$message_text);
-		$message_text=str_replace("<br>","\r\n",$message_text);
+		$message_text = str_replace("\r", "", $message);
+		$message_text = str_replace("\n", "", $message_text);
+		$message_text = str_replace("&nbsp;", " ", $message_text);
+		$message_text = str_replace("<hr size=1 color=\"#666666\">", $text_hr . "\r\n", $message_text);
+		$message_text = str_replace("<br>", "\r\n", $message_text);
 	}
-	$message_text=strip_tags($message_text);
+	$message_text = strip_tags($message_text);
 	// HTML
-	if($html){
-		$message_html=str_replace("\r\n","\n",$message); // PC to Linux
-		$message_html=str_replace("\r","\n",$message_html); // Mac to Linux
-		$message_html=str_replace("\n","\r\n",$message_html); // Linux to Mail Format
-		if(strpos($message_html,"<br>")===false){
-			$message_html=str_replace("\r\n","<br>\r\n",$message_html); // Linux to Mail Format
+	if ($html) {
+		$message_html = str_replace("\r\n", "\n", $message); // PC to Linux
+		$message_html = str_replace("\r", "\n", $message_html); // Mac to Linux
+		$message_html = str_replace("\n", "\r\n", $message_html); // Linux to Mail Format
+		if (strpos($message_html, '<br>') === false) {
+			$message_html = str_replace("\r\n", "<br>\r\n", $message_html); // Linux to Mail Format
 		}
-		if($template){
+		if ($template) {
 			@ini_set("allow_url_fopen","1");
 			if((!dirname($template)||dirname($template)==".")&&@ini_get("allow_url_fopen")){
 				$template="http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME'])."/".$template;
 			}
-			if($pos1=strpos($template,"?")){
+			if ($pos1 = strpos($template, '?')) {
 				//$template=substr($template,0,$pos1+1).urlencode(substr($template,$pos1+1));
-				$template=str_replace(" ","%20",$template);
+				$template = str_replace(" ", "%20", $template);
 			}
 			if (strpos($template, 'http://') !== 0) {
 				$template = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $template;
@@ -1826,58 +1826,64 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 			//echo "template: ".$template;
 			$message_html = str_replace("%MESSAGE%", $message_html, $template);
 		}
-		$message_html=str_replace("=","=3D",$message_html);
+		// Evitar que a quebra de linha deixe tags quebradas - Bug
+		$message_html = str_replace('<b', "\r\n<b", $message_html); 
+		$message_html = str_replace("=","=3D",$message_html);
 		// Boundaries
-		$mime_boundary_1="==Multipart_Boundary_x".md5(time()+1)."x";
-		$mime_boundary_2="==Multipart_Boundary_x".md5(time()+2)."x";
+		$mime_boundary_1 = "==Multipart_Boundary_x".md5(time()+1)."x";
+		$mime_boundary_2 = "==Multipart_Boundary_x".md5(time()+2)."x";
 		// Headers
-		$headers="MIME-Version: 1.0\r\n".
-		$headers.
-		"Return-Errors-To: sites@jp7.com.br\r\n".
-		"Content-Type: multipart/alternative;\r\n".
-		"	boundary=\"".$mime_boundary_2."\"";
-		//"Content-Type: multipart/mixed;\r\n".
-		//"	boundary=\"".$mime_boundary_1."\"";
-		// Message
-	 	$message="This is a multi-part message in MIME format.\r\n\r\n".
-		//"--".$mime_boundary_1."\r\n".
-		//"Content-Type: multipart/alternative;\r\n".
-		//"	boundary=\"".$mime_boundary_2."\"\r\n\r\n".
-		// TEXT
-		"--".$mime_boundary_2."\r\n".
-		"Content-Type: text/plain; charset=\"iso-8859-1\"\r\n".
-		"Content-Transfer-Encoding: quoted-printable\r\n\r\n".
-		$message_text."\r\n\r\n".
-		// HTML
-		"--".$mime_boundary_2."\r\n".
-		"Content-Type: text/html; charset=\"iso-8859-1\"\r\n".
-		"Content-Transfer-Encoding: quoted-printable\r\n\r\n".
-		$message_html."\r\n\r\n".
-		// Footer
-		"--".$mime_boundary_2."--\r\n\r\n";
-	}else{
+		$headers = "MIME-Version: 1.0\r\n".
+			$headers.
+			"Return-Errors-To: sites@jp7.com.br\r\n".
+			"Content-Type: multipart/alternative;\r\n".
+			"	boundary=\"".$mime_boundary_2."\"";
+			//"Content-Type: multipart/mixed;\r\n".
+			//"	boundary=\"".$mime_boundary_1."\"";
+			// Message
+	 	$message = "This is a multi-part message in MIME format.\r\n\r\n".
+			//"--".$mime_boundary_1."\r\n".
+			//"Content-Type: multipart/alternative;\r\n".
+			//"	boundary=\"".$mime_boundary_2."\"\r\n\r\n".
+			// TEXT
+			"--".$mime_boundary_2."\r\n".
+			"Content-Type: text/plain; charset=\"iso-8859-1\"\r\n".
+			"Content-Transfer-Encoding: quoted-printable\r\n\r\n".
+			$message_text."\r\n\r\n".
+			// HTML
+			"--".$mime_boundary_2."\r\n".
+			"Content-Type: text/html; charset=\"iso-8859-1\"\r\n".
+			"Content-Transfer-Encoding: quoted-printable\r\n\r\n".
+			$message_html."\r\n\r\n".
+			// Footer
+			"--".$mime_boundary_2."--\r\n\r\n";
+	} else {
 		// Headers
 		$headers.=
-		"Return-Errors-To: sites@jp7.com.br\r\n".
-		"Content-Type: text/plain";// charset=\"iso-8859-1\"\r\n".
+			"Return-Errors-To: sites@jp7.com.br\r\n".
+			"Content-Type: text/plain";// charset=\"iso-8859-1\"\r\n".
 		//"Content-Transfer-Encoding: quoted-printable";
 		// Message
-		$message=$message_text;
+		$message = $message_text;
 	}
 	// Encode
-	$subject=jp7_encode_mimeheader($subject);
+	$subject = jp7_encode_mimeheader($subject);
 	// Check CRLF
-	if(strpos($_ENV["OS"],"Windows")===false||!$_ENV["OS"]){
-		$message=str_replace("\r\n","\n",$message);
-		$headers=str_replace("\r\n","\n",$headers);
+	if (strpos($_ENV['OS'], 'Windows') === false || !$_ENV['OS']) {
+		$message = str_replace("\r\n", "\n", $message);
+		$headers = str_replace("\r\n", "\n", $headers);
 	}
 	// Send
 	if ($config->server->type != InterSite::PRODUCAO) {
 		$to = 'debug@jp7.com.br';
 	}
-	$mail=mail($to,$subject,$message,$headers,$parameters);
-	if(!$mail)$mail=mail($to,$subject,$message,$headers); // Safe Mode
-	if($debug)echo "jp7_mail(".htmlentities($to)."): ".$mail."<br>";
+	$mail = mail($to, $subject, $message, $headers, $parameters);
+	if (!$mail) {
+		$mail = mail($to, $subject, $message, $headers); // Safe Mode
+	}
+	if ($debug) {
+		echo 'jp7_mail(' . htmlentities($to) . ': ' . $mail . '<br>';
+	}
 	return $mail;
 }
 
