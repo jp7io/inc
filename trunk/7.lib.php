@@ -1827,6 +1827,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 			$message_html = str_replace("%MESSAGE%", $message_html, $template);
 		}
 		// Evitar que a quebra de linha deixe tags quebradas - Bug
+		$message_html = str_replace('<td', "\r\n<td", $message_html);
 		$message_html = str_replace('<br', "\r\n<br", $message_html); 
 		$message_html = str_replace("=","=3D",$message_html);
 		// Boundaries
