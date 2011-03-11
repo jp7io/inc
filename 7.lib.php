@@ -1785,7 +1785,7 @@ function jp7_extension($S) {
 function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",$html=TRUE,$attachments=""){
 	global $debug, $config;
 	// Mensagem alternativa em texto
-	if (strpos($message, '<br>') !== false && strpos($message, '<html>') !== false) {
+	if (strpos($message, '<br>') !== false) {
 		$text_hr = '';
 		for ($i = 0; $i < 80; $i++) {
 			$text_hr .= '-';
@@ -1802,7 +1802,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 		$message_html = str_replace("\r\n", "\n", $message); // PC to Linux
 		$message_html = str_replace("\r", "\n", $message_html); // Mac to Linux
 		$message_html = str_replace("\n", "\r\n", $message_html); // Linux to Mail Format
-		if (strpos($message_html, '<br>') === false) {
+		if (strpos($message_html, '<br>') === false && strpos($message, '<html>') === false) {
 			$message_html = str_replace("\r\n", "<br>\r\n", $message_html); // Linux to Mail Format
 		}
 		if ($template) {
