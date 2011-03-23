@@ -88,11 +88,10 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 		$subsecao = toId($tipos->nome[1]);
 		$subsecaoTitle = $tipos->nome[1];
 		if (!$seo) {
-			if (class_exists(ucfirst($config->name_id) . '_InterAdminTipo')) {
-				$tipoObj = call_user_func(array(ucfirst($config->name_id) . '_InterAdminTipo', 'getInstance'), $id_tipo);
-			} else {
-				$tipoObj = InterAdminTipo::getInstance($id_tipo);
-			}
+			if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists(ucfirst($config->name_id) . '_InterAdminTipo')) {
+				InterAdminTipo::setDefaultClass(ucfirst($config->name_id) . '_InterAdminTipo');
+			}			
+			$tipoObj = InterAdminTipo::getInstance($id_tipo);
 			if ($id) {
 				$interAdminObj = new InterAdmin($id);
 			}
