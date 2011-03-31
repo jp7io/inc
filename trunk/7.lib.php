@@ -1979,25 +1979,30 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 /**
  * Resizes an image to the specified dimensions.
  *
- * @param resource $im_src An image resource, returned by one of the image creation functions, such as imagecreatefromjpeg().
- * @param string $src Path to the source image. 
- * @param string $dst Path to the destination image. 
- * @param int $w Destination width. 
- * @param int $h Destination height. 
- * @param int $q Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
- * @param int $s Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
+ * @param resource 	$im_src An image resource, returned by one of the image creation functions, such as imagecreatefromjpeg(). If null creates automatically.
+ * @param string 	$src 	Path to the source image. 
+ * @param string 	$dst 	Path to the destination image. 
+ * @param int 		$w 		Destination width. 
+ * @param int 		$h 		Destination height. 
+ * @param int 		$q 		Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
+ * @param int 		$s 		Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
+ * @param mixed		$crop	Boolean values TRUE, FALSE or the string 'border'. Defaults to FALSE.
+ * @param bool		$imagemagick
+ * @param bool		$enlarge	Sets whether the image can be resized to a bigger resolution or not.
  * @return NULL
  * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
+function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $maxsize = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
 	// Param Parser
 	if (is_array($q)) {
 		$options = $q;
 		if ($options['quality']) {
 			$q = $options['quality'];
+		} else {
+			$q = 90;
 		}
 		if ($options['maxsize']) {
-			$s = $options['maxsize'];
+			$maxsize = $options['maxsize'];
 		}
 		if ($options['crop']) {
 			$crop = $options['crop'];
@@ -2027,8 +2032,10 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 	// Check Size and Orientation (Horizontal x Vertical)
 	if ($c_gd) {
 		// GD Get Size
-		$src_w = imagesx($im_src);
-		$src_h = imagesy($im_src);
+		$imageinfo = getimagesize($src);
+		$src_w = $imageinfo[0];
+		$src_h = $imageinfo[1];
+		$mime = $imageinfo['mime'];
 	} else {
 		// Magick Get Size
 		$command = $command_path . 'identify -verbose ' . $src;
@@ -2036,6 +2043,15 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 		$src_geometry = explode('x', substr($a[2], strpos($a[2], ':') + 2));
 		$src_w = $src_geometry[0];
 		$src_h = $src_geometry[1];
+	}
+	if (is_null($im_src)) {
+		if ($mime == 'image/gif') {
+			$im_src = imagecreatefromgif($src);
+		} elseif ($mime == 'image/png') {
+			$im_src = imagecreatefrompng($src);
+		} else {
+			$im_src = imagecreatefromjpeg($src);
+		}
 	}
 	// Source and destination with the same dimensions or the same proportions (just resize if needed)
 	if (($src_w == $w && $src_h == $h) || ($src_w / $src_h == $w / $h)) {
@@ -2084,26 +2100,39 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 	// Checks if destination image is bigger than source image
 	if ($dst_w >= $src_w && $dst_h >= $src_h && !$enlarge) {
 		// No-Resize and Check Weight
-		if (filesize($src) > $s) {
+		if (filesize($src) > $maxsize) {
 			$im_dst = $im_src;
 			if ($c_gd) {
 				// GD Convert Quality
-				imagejpeg($im_dst, $dst, $q);
+				if ($mime == 'image/gif') {
+					imagegif($im_dst, $dst);
+				} elseif ($mime == 'image/png') {
+					imagepng($im_dst, $dst);
+				} else {
+					imagejpeg($im_dst, $dst, $q);
+				}
 			} else {
 				// Magick Convert Quality
 				$command = $command_path . "convert " . $src . " -quality " . $q . " +profile '*' " . $dst;
 				exec($command, $a, $b);
 			}
 		} else {
-			if (jp7_extension($src)=="gif") {
-				$dst = str_replace(".jpg", ".gif", $dst);
-			}
-			copy($src,$dst);
+			copy($src, $dst);
 		}
 	} else {
 		if ($c_gd) {
 			// GD Resize
-			$im_dst = imagecreatetruecolor($new_w, $new_h);
+			if ($mime == 'image/gif') {
+				$im_dst = imagecreate($new_w, $new_h);
+				$transparent = imagecolorallocatealpha($im_dst, 255, 255, 255, 127);
+				imagecolortransparent($im_dst, $transparent);
+			} else {
+				$im_dst = imagecreatetruecolor($new_w, $new_h);
+			}
+			if ($mime == 'image/png') {
+				imagealphablending($im_dst, false);
+				imagesavealpha($im_dst, true);
+			}
 			if ($crop === 'border') {
 				if ($bgcolor) {
 					$bg = imagecolorallocate($im_src, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
@@ -2117,9 +2146,14 @@ function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $s = 10000000, $c
 				$im_dst = jp7_imageRoundedCorner($im_dst, $options['borderRadius'], $options['borderColor']);
 				imagepng($im_dst, $dst, 9);
 			} else {
-				imagejpeg($im_dst, $dst, $q);
-			}
-			
+				if ($mime == 'image/gif') {
+					imagegif($im_dst, $dst);
+				} elseif ($mime == 'image/png') {
+					imagepng($im_dst, $dst, round($q / 10));
+				} else {
+					imagejpeg($im_dst, $dst, $q);
+				}
+			}			
 			imagedestroy($im_dst);
 		} else {
 			// Magick Resize
