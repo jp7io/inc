@@ -1976,191 +1976,291 @@ function jp7_image_text($filename_src,$filename_dst,$size,$angle,$x,$y,$col,$fon
 	}
 }
 
+function jp7_imageCreateFromBmp($filename) {
+    //Ouverture du fichier en mode binaire
+    if (!$f1 = fopen($filename, 'rb')) {
+    	return false;
+    }
+    
+    //1 : Chargement des entêtes FICHIER
+	$file = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
+    if ($file['file_type'] != 19778) {
+       return false;
+	}
+    //2 : Chargement des entêtes BMP
+    $bmp = unpack(
+		'Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
+		'/Vcompression/Vsize_bitmap/Vhoriz_resolution' . 
+		'/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
+    $bmp['colors'] = pow(2, $bmp['bits_per_pixel']);
+    if ($bmp['size_bitmap'] == 0) {
+        $bmp['size_bitmap'] = $file['file_size'] - $file['bitmap_offset'];
+	}
+    $bmp['bytes_per_pixel'] = $bmp['bits_per_pixel'] / 8;
+    $bmp['bytes_per_pixel2'] = ceil($bmp['bytes_per_pixel']);
+    $bmp['decal'] = ($bmp['width'] * $bmp['bytes_per_pixel'] / 4);
+    $bmp['decal'] -= floor($bmp['width'] * $bmp['bytes_per_pixel'] / 4);
+    $bmp['decal'] = 4 - (4 * $bmp['decal']);
+    if ($bmp['decal'] == 4) {
+        $bmp['decal'] = 0;
+	}
+    
+    //3 : Chargement des couleurs de la palette
+    $palette = array();
+    if ($bmp['colors'] < 16777216) {
+        $palette = unpack('V' . $bmp['colors'], fread($f1, $bmp['colors'] * 4));
+    }
+    
+    //4 : Création de l'image
+    $img = fread($f1, $bmp['size_bitmap']);
+    $vide = chr(0);
+    
+    $res = imagecreatetruecolor($bmp['width'], $bmp['height']);
+    $p = 0;
+    $y = $bmp['height'] - 1;
+    while ($y >= 0) {
+        $x = 0;
+        while ($x < $bmp['width']) {
+            if ($bmp['bits_per_pixel'] == 24) {
+                $color = unpack('V', substr($img, $p, 3).$vide);
+           	} elseif ($bmp['bits_per_pixel'] == 16) {
+                $color = unpack('n', substr($img, $p, 2));
+                $color[1] = $palette[$color[1] + 1];
+            } elseif ($bmp['bits_per_pixel'] == 8) {
+                $color = unpack('n', $vide . substr($img, $p, 1));
+                $color[1] = $palette[$color[1] + 1];
+            } elseif ($bmp['bits_per_pixel'] == 4) {
+                $color = unpack('n', $vide . substr($img, floor($p), 1));
+                if (($p * 2) % 2 == 0) {
+                    $color[1] = ($color[1] >> 4);
+                } else {
+                    $color[1] = ($color[1] & 0x0F);
+				}
+                $color[1] = $palette[$color[1] + 1];
+            } elseif ($bmp['bits_per_pixel'] == 1) {
+                $color = unpack('n', $vide . substr($img, floor($p), 1));
+                if (($p * 8) % 8 == 0) {
+                    $color[1] = $color[1] >> 7;
+                } elseif (($p * 8) % 8 == 1) {
+                    $color[1] = ($color[1] & 0x40) >> 6;
+                } elseif (($p * 8) % 8 == 2) {
+                    $color[1] = ($color[1] & 0x20) >> 5;
+                } elseif (($p * 8) % 8 == 3) {
+                    $color[1] = ($color[1] & 0x10) >> 4;
+                } elseif (($p * 8) % 8 == 4) {
+                    $color[1] = ($color[1] & 0x8) >> 3;
+                } elseif (($p * 8) % 8 == 5) {
+                	$color[1] = ($color[1] & 0x4) >> 2;
+                } elseif (($p * 8) % 8 == 6) {
+                    $color[1] = ($color[1] & 0x2) >> 1;
+                } elseif (($p * 8) % 8 == 7) {
+                    $color[1] = ($color[1] & 0x1);
+				}
+                $color[1] = $palette[$color[1] + 1];
+            } else {
+                return false;
+			}
+            imagesetpixel($res, $x, $y, $color[1]);
+            $x++;
+            $p += $bmp['bytes_per_pixel'];
+        }
+        $y--;
+        $p += $bmp['decal'];
+    }
+    //Fermeture du fichier
+    fclose($f1);
+    return $res;
+}
+
 /**
  * Resizes an image to the specified dimensions.
  *
- * @param resource 	$im_src An image resource, returned by one of the image creation functions, such as imagecreatefromjpeg(). If null creates automatically.
- * @param string 	$src 	Path to the source image. 
- * @param string 	$dst 	Path to the destination image. 
- * @param int 		$w 		Destination width. 
- * @param int 		$h 		Destination height. 
- * @param int 		$q 		Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
- * @param int 		$s 		Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
- * @param mixed		$crop	Boolean values TRUE, FALSE or the string 'border'. Defaults to FALSE.
- * @param bool		$imagemagick
- * @param bool		$enlarge	Sets whether the image can be resized to a bigger resolution or not.
- * @return NULL
+ * @param 	resource	$resource 	An image resource, returned by one of the image creation functions, such as imagecreatefromjpeg(). If null it is created automatically.
+ * @param 	string 		$source		Path to the source image. 
+ * @param 	string 		$dest		Path to the destination image. 
+ * @param 	int 		$width 		Destination width. 
+ * @param 	int 		$height		Destination height. 
+ * @param 	int 		$quality	Ranges from 0 (worst quality, smaller file) to 100 (best quality, biggest file). The default value is 90. 
+ * @param 	int 		$maxsize	Maximum filesize in bytes, from this size the quality is changed to the $q value (used only if the destination dimensions are bigger). The default value is 10000000 (10MB).
+ * @param 	bool|string	$crop		Boolean values TRUE, FALSE or the string 'border'. Defaults to FALSE.
+ * @param 	bool		$imagemagick
+ * @param 	bool		$enlarge 	Sets whether the image can be resized to a bigger resolution or not.
+ * @return 	string		Returns the mime type of the generated image.
  * @version (2008/08/29)
  */
-function jp7_resizeImage($im_src, $src, $dst, $w, $h, $q = 90, $maxsize = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
-	// Param Parser
-	if (is_array($q)) {
-		$options = $q;
-		if ($options['quality']) {
-			$q = $options['quality'];
+function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 90, $maxsize = 10000000, $crop = false, $imagemagick = false, $enlarge = false) {
+	// Params can also be passed as an array of options 
+	if (is_array($quality)) {
+		$options = $quality;
+		if (isset($options['quality'])) {
+			$quality = $options['quality'];
 		} else {
-			$q = 90;
+			$quality = 90; // default value
 		}
-		if ($options['maxsize']) {
+		if (isset($options['maxsize'])) {
 			$maxsize = $options['maxsize'];
 		}
-		if ($options['crop']) {
+		if (isset($options['crop'])) {
 			$crop = $options['crop'];
 		}
-		if ($options['bgcolor']) {
+		if (isset($options['bgcolor'])) {
 			$bgcolor = $options['bgcolor'];
 			if (is_string($bgcolor)) {
 				$bgcolor = explode(',', $bgcolor);
 			}
 		}
-		if ($options['imagemagick']) {
+		if (isset($options['imagemagick'])) {
 			$imagemagick = $options['imagemagick'];
 		}
-		if ($options['enlarge']) {
+		if (isset($options['enlarge'])) {
 			$enlarge = $options['enlarge'];
 		}
-		if ($options['borderRadius']) {
+		if (isset($options['borderRadius'])) {
 			$borderRadius = $options['borderRadius'];
 		}
-		if ($options['borderColor']) {
+		if (isset($options['borderColor'])) {
 			$borderColor = $options['borderColor'];
 		}
 	}
 	// Check GD
-	$c_gd = function_exists('imagecreatefromjpeg');
+	$isGdEnabled = function_exists('imagecreatefromjpeg');
 	$command_path = '/usr/bin/';
 	// Check Size and Orientation (Horizontal x Vertical)
-	if ($c_gd) {
+	if ($isGdEnabled) {
 		// GD Get Size
-		$imageinfo = getimagesize($src);
-		$src_w = $imageinfo[0];
-		$src_h = $imageinfo[1];
+		$imageinfo = @getimagesize($source);
+		$source_w = $imageinfo[0];
+		$source_h = $imageinfo[1];
 		$mime = $imageinfo['mime'];
 	} else {
 		// Magick Get Size
-		$command = $command_path . 'identify -verbose ' . $src;
-		exec($command, $a, $b);
-		$src_geometry = explode('x', substr($a[2], strpos($a[2], ':') + 2));
-		$src_w = $src_geometry[0];
-		$src_h = $src_geometry[1];
+		$command = $command_path . 'identify -verbose ' . $source;
+		exec($command, $output, $return_var);
+		$source_geometry = explode('x', substr($output[2], strpos($output[2], ':') + 2));
+		$source_w = $source_geometry[0];
+		$source_h = $source_geometry[1];
 	}
-	if (is_null($im_src)) {
+	// Creating resource from source file.
+	if (is_null($resource)) {
 		if ($mime == 'image/gif') {
-			$im_src = imagecreatefromgif($src);
+			$resource = imagecreatefromgif($source);
 		} elseif ($mime == 'image/png') {
-			$im_src = imagecreatefrompng($src);
+			$resource = imagecreatefrompng($source);
+		} elseif ($mime == 'image/bmp') {
+			$resource = jp7_imageCreateFromBmp($source);
 		} else {
-			$im_src = imagecreatefromjpeg($src);
+			$resource = imagecreatefromjpeg($source);
 		}
 	}
-	// Source and destination with the same dimensions or the same proportions (just resize if needed)
-	if (($src_w == $w && $src_h == $h) || ($src_w / $src_h == $w / $h)) {
-		$dst_w = $w;
-		$dst_h = $h;
+	// Source and destination with the same proportions, no complicated math required
+	if ($source_w / $source_h == $width / $height) {
+		$dest_w = $width;
+		$dest_h = $height;
 	// Destination is square (with same width and height - crop if needed)
 	} elseif ($crop && $crop !== 'border') {
-		$pre_dst_w = ceil(($h * $src_w) / $src_h);
-		$pre_dst_h = ceil(($w * $src_h) / $src_w);
-		if ($pre_dst_h > $h) {
-			$dst_w = $w;
-			$dst_h = $pre_dst_h;
-			$dif_h = round(($h - $pre_dst_h) / 2);
+		$pre_dst_w = ceil(($height * $source_w) / $source_h);
+		$pre_dst_h = ceil(($width * $source_h) / $source_w);
+		if ($pre_dst_h > $height) {
+			$dest_w = $width;
+			$dest_h = $pre_dst_h;
+			$dif_h = round(($height - $pre_dst_h) / 2);
 		} else {
-			$dst_h = $h;
-			$dst_w = $pre_dst_w;
-			$dif_w = round(($w - $pre_dst_w) / 2);
+			$dest_h = $height;
+			$dest_w = $pre_dst_w;
+			$dif_w = round(($width - $pre_dst_w) / 2);
 		}
-		$new_w = $w;
-		$new_h = $h;
+		$new_width = $width;
+		$new_height = $height;
 	// The image is resized until it gets the maximum width or height (without crop)
 	} else {
-		$pre_dst_w = intval(round(($h * $src_w) / $src_h));
-		$pre_dst_h = intval(round(($w * $src_h) / $src_w));
-		if ($pre_dst_h <= $h){
-			$dst_w = $w;
-			$dst_h = $pre_dst_h;
+		$pre_dst_w = intval(round(($height * $source_w) / $source_h));
+		$pre_dst_h = intval(round(($width * $source_h) / $source_w));
+		if ($pre_dst_h <= $height){
+			$dest_w = $width;
+			$dest_h = $pre_dst_h;
 		} else {
-			$dst_h = $h;
-			$dst_w = $pre_dst_w;
+			$dest_h = $height;
+			$dest_w = $pre_dst_w;
 		}
 		if ($crop === 'border') {
-			$new_w = $w;
-			$new_h = $h;
-			$dif_w = ($new_w - $dst_w) / 2;
-			$dif_h = ($new_h - $dst_h) / 2;
+			$new_width = $width;
+			$new_height = $height;
+			$dif_w = ($new_width - $dest_w) / 2;
+			$dif_h = ($new_height - $dest_h) / 2;
 		}
 	}
-	// 
-	if (!$new_w) {
-		$new_w = $dst_w;
+	if (!$new_width) {
+		$new_width = $dest_w;
 	}
-	if (!$new_h) {
-		$new_h = $dst_h;
+	if (!$new_height) {
+		$new_height = $dest_h;
 	}
 	// Checks if destination image is bigger than source image
-	if ($dst_w >= $src_w && $dst_h >= $src_h && !$enlarge) {
-		// No-Resize and Check Weight
-		if (filesize($src) > $maxsize) {
-			$im_dst = $im_src;
-			if ($c_gd) {
+	if ($dest_w >= $source_w && $dest_h >= $source_h && !$enlarge) {
+		// No-Resize and Check Size
+		if (filesize($source) > $maxsize) {
+			$im_dest = $resource;
+			if ($isGdEnabled) {
 				// GD Convert Quality
 				if ($mime == 'image/gif') {
-					imagegif($im_dst, $dst);
+					imagegif($im_dest, $dest);
 				} elseif ($mime == 'image/png') {
-					imagepng($im_dst, $dst);
+					imagepng($im_dest, $dest);
 				} else {
-					imagejpeg($im_dst, $dst, $q);
+					imagejpeg($im_dest, $dest, $quality);
 				}
 			} else {
 				// Magick Convert Quality
-				$command = $command_path . "convert " . $src . " -quality " . $q . " +profile '*' " . $dst;
-				exec($command, $a, $b);
+				$command = $command_path . "convert " . $source . " -quality " . $quality . " +profile '*' " . $dest;
+				exec($command, $output, $return_var);
 			}
 		} else {
-			copy($src, $dst);
+			copy($source, $dest);
 		}
 	} else {
-		if ($c_gd) {
+		if ($isGdEnabled) {
 			// GD Resize
 			if ($mime == 'image/gif') {
-				$im_dst = imagecreate($new_w, $new_h);
-				$transparent = imagecolorallocatealpha($im_dst, 255, 255, 255, 127);
-				imagecolortransparent($im_dst, $transparent);
+				$im_dest = imagecreate($new_width, $new_height);
+				$transparent = imagecolorallocatealpha($im_dest, 255, 255, 255, 127);
+				imagecolortransparent($im_dest, $transparent);
+			} elseif ($mime == 'image/png') {
+				$im_dest = imagecreatetruecolor($new_width, $new_height);
+				imagealphablending($im_dest, false);
+				imagesavealpha($im_dest, true);
 			} else {
-				$im_dst = imagecreatetruecolor($new_w, $new_h);
-			}
-			if ($mime == 'image/png') {
-				imagealphablending($im_dst, false);
-				imagesavealpha($im_dst, true);
+				$im_dest = imagecreatetruecolor($new_width, $new_height);
 			}
 			if ($crop === 'border') {
 				if ($bgcolor) {
-					$bg = imagecolorallocate($im_src, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
+					$bg = imagecolorallocate($resource, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
 				} else {
-					$bg = imagecolorat($im_src, 1, 1);
+					$bg = imagecolorat($resource, 1, 1);
 				}
-				imagefill($im_dst, 0, 0, $bg);
+				imagefill($im_dest, 0, 0, $bg);
 			}
-			imagecopyresampled($im_dst, $im_src, $dif_w, $dif_h, 0, 0, $dst_w, $dst_h, $src_w, $src_h);
+			imagecopyresampled($im_dest, $resource, $dif_w, $dif_h, 0, 0, $dest_w, $dest_h, $source_w, $source_h);
 			if ($options['borderRadius']) {
-				$im_dst = jp7_imageRoundedCorner($im_dst, $options['borderRadius'], $options['borderColor']);
-				imagepng($im_dst, $dst, 9);
+				$im_dest = jp7_imageRoundedCorner($im_dest, $options['borderRadius'], $options['borderColor']);
+				imagepng($im_dest, $dest, 9);
 			} else {
 				if ($mime == 'image/gif') {
-					imagegif($im_dst, $dst);
+					imagegif($im_dest, $dest);
 				} elseif ($mime == 'image/png') {
-					imagepng($im_dst, $dst, round($q / 10));
+					imagepng($im_dest, $dest, round($quality / 10));
 				} else {
-					imagejpeg($im_dst, $dst, $q);
+					imagejpeg($im_dest, $dest, $quality);
+					$mime = 'image/jpeg'; // It´s being saved as a JPEG file
 				}
 			}			
-			imagedestroy($im_dst);
+			imagedestroy($im_dest);
 		} else {
 			// Magick Resize
-			$command = $command_path . "convert " . $src . " -resize " . $dst_w . "x" . $dst_h . "! -quality " . $q . " +profile '*' " . $dst;
-			exec($command, $a, $b);
+			$command = $command_path . "convert " . $source . " -resize " . $dest_w . "x" . $dest_h . "! -quality " . $quality . " +profile '*' " . $dest;
+			exec($command, $output, $return_var);
 		}
 	}
+	return $mime;
 }
 
 function jp7_imageRoundedCorner($im, $radius = 20, $color = '255, 255, 255') {
