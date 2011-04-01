@@ -2220,16 +2220,10 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 	} else {
 		if ($isGdEnabled) {
 			// GD Resize
-			if ($mime == 'image/gif') {
-				$im_dest = imagecreate($new_width, $new_height);
-				$transparent = imagecolorallocatealpha($im_dest, 255, 255, 255, 127);
-				imagecolortransparent($im_dest, $transparent);
-			} elseif ($mime == 'image/png') {
-				$im_dest = imagecreatetruecolor($new_width, $new_height);
+			$im_dest = imagecreatetruecolor($new_width, $new_height);
+			if ($mime == 'image/gif' || $mime == 'image/png') {
 				imagealphablending($im_dest, false);
 				imagesavealpha($im_dest, true);
-			} else {
-				$im_dest = imagecreatetruecolor($new_width, $new_height);
 			}
 			if ($crop === 'border') {
 				if ($bgcolor) {
@@ -2242,12 +2236,10 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 			imagecopyresampled($im_dest, $resource, $dif_w, $dif_h, 0, 0, $dest_w, $dest_h, $source_w, $source_h);
 			if ($options['borderRadius']) {
 				$im_dest = jp7_imageRoundedCorner($im_dest, $options['borderRadius'], $options['borderColor']);
-				imagepng($im_dest, $dest, 9);
+				imagepng($im_dest, $dest, round(($quality / 10) - 1));
 			} else {
-				if ($mime == 'image/gif') {
-					imagegif($im_dest, $dest);
-				} elseif ($mime == 'image/png') {
-					imagepng($im_dest, $dest, round($quality / 10));
+				if ($mime == 'image/gif' || $mime == 'image/png') {
+					imagepng($im_dest, $dest, round(($quality / 10) - 1));
 				} else {
 					imagejpeg($im_dest, $dest, $quality);
 					$mime = 'image/jpeg'; // It´s being saved as a JPEG file
