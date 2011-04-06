@@ -2455,7 +2455,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 		$debugger->sendTraceByEmail($backtrace);
 		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' . 
 			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
-		header('Location: ' . $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI']);
+		header('Location: ' . $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . XOREncrypt($msgErro, 'cryptK31'));
 		//Caso nao funcione o header, tenta por javascript
 		?>
         <script language="javascript" type="text/javascript">
