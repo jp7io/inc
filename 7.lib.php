@@ -2431,16 +2431,16 @@ function jp7_file_size($file){
 /**
  * Gets and formats the backtrace of an error, optionally sends it on an e-mail and shows user friendly maintenance screen.
  *
- * @param string $msgErro Error message, the default is <tt>NULL</tt>.
- * @param string $sql SQL it tried to execute, the default is <tt>NULL</tt>.
- * @param array $traceArr Debugging data, like the return of debug_backtrace().
+ * @param string 	$msgErro 	Error message, the default is <tt>NULL</tt>.
+ * @param string 	$sql 		SQL it tried to execute, the default is <tt>NULL</tt>.
+ * @param array 	$traceArr 	Debugging data, like the return of debug_backtrace().
  * @global Jp7_Debugger
- * @return string HTML formatted backtrace.
+ * @return string 	HTML formatted backtrace.
  */
-function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
-	global $debugger, $config, $jp7_app, $jp7_cache;
+function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
+	global $debugger, $config;
 	
-	// Web Services
+	// Lançando exceção, utilizado no Web Services, por exemplo
 	if ($debugger->isExceptionsEnabled()) {
 		$exception = new Jp7_InterAdmin_Exception($msgErro);
 		$exception->setSql($sql);
@@ -2453,16 +2453,16 @@ function jp7_debug($msgErro = NULL, $sql = NULL, $traceArr = NULL) {
 	//Envia email e exibe tela de manutenção
 	if ($config->server->type == InterSite::PRODUCAO) {
 		$debugger->sendTraceByEmail($backtrace);
-		if (!$jp7_app || $jp7_cache) {
-			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para <a href="debug@jp7.com.br">debug@jp7.com.br</a>';
-			header('Location: /_default/index_manutencao.htm');
-			//Caso nao funcione o header, tenta por javascript	?>
-            <script language="javascript" type="text/javascript">
-			document.location.href="/_default/index_manutencao.htm";
-			</script>
-            <?
-			exit();
-		}
+		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' . 
+			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
+		header('Location: ' . $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI']);
+		//Caso nao funcione o header, tenta por javascript
+		?>
+        <script language="javascript" type="text/javascript">
+		document.location.href = "<?php echo $debugger->getMaintenancePage(); ?>";
+		</script>
+        <?php
+		exit();
 	} else {
 		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	}
