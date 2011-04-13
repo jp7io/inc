@@ -2109,17 +2109,8 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 				$bgcolor = explode(',', $bgcolor);
 			}
 		}
-		if (isset($options['imagemagick'])) {
-			$imagemagick = $options['imagemagick'];
-		}
 		if (isset($options['enlarge'])) {
 			$enlarge = $options['enlarge'];
-		}
-		if (isset($options['borderRadius'])) {
-			$borderRadius = $options['borderRadius'];
-		}
-		if (isset($options['borderColor'])) {
-			$borderColor = $options['borderColor'];
 		}
 	}
 	// Check GD
@@ -2225,11 +2216,13 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 				imagealphablending($im_dest, false);
 				imagesavealpha($im_dest, true);
 			}
-			if ($crop === 'border') {
+			if ($crop == 'border') {
 				if ($bgcolor) {
-					$bg = imagecolorallocate($resource, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
+					$bg = imagecolorallocate($im_dest, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
 				} else {
 					$bg = imagecolorat($resource, 1, 1);
+					$color = imagecolorsforindex($resource,$bg);
+					$bg = rgba2int($color['red'], $color['green'], $color['blue'], $color['alpha']);
 				}
 				imagefill($im_dest, 0, 0, $bg);
 			}
@@ -2255,7 +2248,29 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 	return $mime;
 }
 
-function jp7_imageRoundedCorner($im, $radius = 20, $color = '255, 255, 255') {
+/**
+ * Convert RGBA to Long Int
+ * 
+ * @author Lucas Martins at JP7
+ * @param int $red
+ * @param int $green
+ * @param int $blue
+ * @param int $alpha [optional]
+ * @return 
+ */
+function rgba2int($red, $green, $blue, $alpha = 0) {
+    //return ($a << 24) + ($b << 16) + ($g << 8) + $r; 
+	return ($alpha << 24) + (256 * 256 * $red) + (256 * $green) + $blue;
+}
+
+/**
+ * Adiciona radius na imagem
+ * @param resource $im
+ * @param int $radius [optional] Pixels
+ * @param string $color [optional] RGB, ex.: 255,255,255
+ * @return resource
+ */
+function jp7_imageRoundedCorner($im, $radius = 20, $color = '255,255,255') {
 	$image_file = $_GET['src'];
 	$corner_radius = ($radius) ? $radius : 20; // The default corner radius is set to 20px
 	$angle = isset($_GET['angle']) ? $_GET['angle'] : 0; // The default angle is set to 0º
@@ -2267,13 +2282,13 @@ function jp7_imageRoundedCorner($im, $radius = 20, $color = '255, 255, 255') {
 	$images_dir = 'images/';
 	$corner_source = imagecreatefrompng('D:/Inetpub/WWWRoot/_default/img/rounded_corner.png');
 	$color = explode(',', $color);
-	$corner_color = ImageColorAllocate($corner_source, $color[0], $color[1], $color[2]);
+	$corner_color = imagecolorallocate($corner_source, $color[0], $color[1], $color[2]);
 	imagefill($corner_source, 0, 0, $corner_color);
 
 	$corner_width = imagesx($corner_source);  
 	$corner_height = imagesy($corner_source);  
-	$corner_resized = ImageCreateTrueColor($corner_radius, $corner_radius);
-	ImageCopyResampled($corner_resized, $corner_source, 0, 0, 0, 0, $corner_radius, $corner_radius, $corner_width, $corner_height);
+	$corner_resized = imagecreatetruecolor($corner_radius, $corner_radius);
+	imagecopyresampled($corner_resized, $corner_source, 0, 0, 0, 0, $corner_radius, $corner_radius, $corner_width, $corner_height);
 
 	$corner_width = imagesx($corner_resized);  
 	$corner_height = imagesy($corner_resized);  
@@ -2282,9 +2297,9 @@ function jp7_imageRoundedCorner($im, $radius = 20, $color = '255, 255, 255') {
 	$image = $im;
 	$size[0] = imagesx($image); // replace filename with $_GET['src'] 
 	$size[1] = imagesy($image); // replace filename with $_GET['src'] 
-	$white = ImageColorAllocate($image,255,255,255);
-	$black = ImageColorAllocate($image,0,0,0);
-	$color_image = ImageColorAllocate($image, $color[0], $color[1], $color[2]);
+	$white = imagecolorallocate($image,255,255,255);
+	$black = imagecolorallocate($image,0,0,0);
+	$color_image = imagecolorallocate($image, $color[0], $color[1], $color[2]);
 
 	// Top-left corner
 	if ($topleft == true) {
