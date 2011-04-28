@@ -26,12 +26,22 @@ function jp7_check_shutdown() {
 				// Nesse ponto as exceções não podem mais ser tratadas
 				$debugger->setExceptionsEnabled(false);
 			}
-			die(jp7_debug($lasterror['message'] . ' - ' . $lasterror['file'] . ':' .  $lasterror['line']));
+			die(jp7_debug($lasterror['message'] . ' in <b>' . $lasterror['file'] . '</b> on line ' .  $lasterror['line']));
 			break;
 	}
 }
+function jp7_check_exception($e) {
+	global $debugger;
+	if ($debugger) {
+		// Nesse ponto as exceções não podem mais ser tratadas
+		$debugger->setExceptionsEnabled(false);
+	}
+	die(jp7_debug('Uncaught <b>' . get_class($e) . '</b> with message <b>' . $e->getMessage() . '</b> in ' . $e->getFile() . ' on line ' . $e->getLine(), null, $e->getTrace()));
+}
+
 //Register the shutdown
 register_shutdown_function('jp7_check_shutdown');
+set_exception_handler('jp7_check_exception');
 
 /**
  * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
