@@ -2785,3 +2785,55 @@ function jp7_absolute_path($path) {
 	$path = implode(DIRECTORY_SEPARATOR, $absolutes);
 	return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
+
+/**
+ * Converts a string with mixed encodings (ASCII, ISO-8859-1, CP1252) to UTF-8
+ * @param string $str
+ * @return string
+ */
+function jp7_utf8_encode($str) {
+	static $cp1252_map = array(
+		"\x80" => "\xE2\x82\xAC",  // EURO SIGN
+		"\x82" => "\xE2\x80\x9A",  // SINGLE LOW-9 QUOTATION MARK
+		"\x83" => "\xC6\x92",      // LATIN SMALL LETTER F WITH HOOK
+		"\x84" => "\xE2\x80\x9E",  // DOUBLE LOW-9 QUOTATION MARK
+		"\x85" => "\xE2\x80\xA6",  // HORIZONTAL ELLIPSIS
+		"\x86" => "\xE2\x80\xA0",  // DAGGER
+		"\x87" => "\xE2\x80\xA1",  // DOUBLE DAGGER
+		"\x88" => "\xCB\x86",      // MODIFIER LETTER CIRCUMFLEX ACCENT
+		"\x89" => "\xE2\x80\xB0",  // PER MILLE SIGN
+		"\x8A" => "\xC5\xA0",      // LATIN CAPITAL LETTER S WITH CARON
+		"\x8B" => "\xE2\x80\xB9",  // SINGLE LEFT-POINTING ANGLE QUOTATION MARK
+		"\x8C" => "\xC5\x92",      // LATIN CAPITAL LIGATURE OE
+		"\x8E" => "\xC5\xBD",      // LATIN CAPITAL LETTER Z WITH CARON
+		"\x91" => "\xE2\x80\x98",  // LEFT SINGLE QUOTATION MARK
+		"\x92" => "\xE2\x80\x99",  // RIGHT SINGLE QUOTATION MARK
+		"\x93" => "\xE2\x80\x9C",  // LEFT DOUBLE QUOTATION MARK
+		"\x94" => "\xE2\x80\x9D",  // RIGHT DOUBLE QUOTATION MARK
+		"\x95" => "\xE2\x80\xA2",  // BULLET
+		"\x96" => "\xE2\x80\x93",  // En Dash
+		"\x97" => "\xE2\x80\x94",  // Em Dash
+		"\x98" => "\xCB\x9C",      // Small Tilde
+		"\x99" => "\xE2\x84\xA2",  // Trade Mark Sign
+		"\x9A" => "\xC5\xA1",      // Latin Small Letter S With Caron
+		"\x9B" => "\xE2\x80\xBA",  // Single Right-Pointing Angle Quotation Mark
+		"\x9C" => "\xC5\x93",      // Latin Small Ligature Oe
+		"\x9E" => "\xC5\xBE",      // Latin Small Letter Z With Caron
+		"\x9F" => "\xC5\xB8"       // Latin Capital Letter Y With Diaeresis
+	);
+	
+	if (preg_match('/[\x80-\x9F]/', $str)) {
+		$output = '';
+		for ($i = 0; $i < strlen($str); $i++) {
+			$utf8_char = $cp1252_map[$str[$i]];
+			if (is_null($utf8_char)) {
+				$output .= utf8_encode($str[$i]);
+			} else {
+				$output .= $utf8_char;
+			}
+		}
+		return $output;
+	} else {
+		return utf8_encode($str);
+	}
+}
