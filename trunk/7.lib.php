@@ -55,7 +55,11 @@ if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 /**
  * @global bool $c_jp7
  */
-$c_jp7 = ((strpos($_SERVER['REMOTE_ADDR'], '186.220') === 0 && $_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br')) || strpos($_SERVER['REMOTE_ADDR'], '192.168.0') === 0);
+$c_jp7 = (
+	$_SERVER['HTTP_HOST'] == 'localhost' ||
+	(strpos($_SERVER['REMOTE_ADDR'], '186.220') === 0 && $_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br')) || 
+	strpos($_SERVER['REMOTE_ADDR'], '192.168.0') === 0
+);
 
 /**
  * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
