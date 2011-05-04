@@ -2585,7 +2585,9 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::PRODUCAO) {
+	if ($config->server->type == InterSite::QA || $config->server->type == InterSite::DESENVOLVIMENTO) {
+		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
+	} else {
 		$debugger->sendTraceByEmail($backtrace);
 		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' . 
 			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
@@ -2597,8 +2599,6 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 		</script>
         <?php
 		exit();
-	} else {
-		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	}
 	return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
 }
