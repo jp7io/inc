@@ -80,10 +80,10 @@ if (!@ini_get('allow_url_fopen')) {
 }
 jp7_register_globals();
 
-defined('ROOT_PATH') || define('ROOT_PATH', dirname(dirname(__FILE__)) . '/');
+defined('ROOT_PATH') || define('ROOT_PATH', dirname(dirname(__FILE__)));
 
 // Necessário antes de loadar as classes
-set_include_path(realpath(ROOT_PATH . 'classes'). PATH_SEPARATOR .  get_include_path());
+set_include_path(realpath(ROOT_PATH . '/classes'). PATH_SEPARATOR .  get_include_path());
 
 /**
  * @global Jp7_Debugger $debugger
