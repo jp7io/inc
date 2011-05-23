@@ -2585,7 +2585,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::QA || $config->server->type == InterSite::DESENVOLVIMENTO) {
+	if ($config->server->type == InterSite::QA || $config->server->type == InterSite::DESENVOLVIMENTO || $_SERVER['HTTP_HOST'] == 'localhost') {
 		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	} else {
 		$debugger->sendTraceByEmail($backtrace);
