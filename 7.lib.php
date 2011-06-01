@@ -2904,3 +2904,15 @@ function jp7_absolute_path($path) {
 	$path = implode(DIRECTORY_SEPARATOR, $absolutes);
 	return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
+
+if (!function_exists('startsWith')) {
+	function startsWith($needle, $haystack) {
+		return strpos($haystack, $needle) === 0;
+	}
+}
+if (!function_exists('endsWith')) {
+	function endsWith($needle, $haystack) {
+		$start = strlen($needle) * -1; //negative
+		return (substr($haystack, $start) === $needle);
+	}
+}
