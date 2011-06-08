@@ -57,7 +57,11 @@ if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
  */
 $c_jp7 = (
 	$_SERVER['HTTP_HOST'] == 'localhost' ||
-	(strpos($_SERVER['REMOTE_ADDR'], '186.220') === 0 && $_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br')) || 
+	((
+		startsWith('186.', $_SERVER['REMOTE_ADDR']) ||
+		startsWith('187.', $_SERVER['REMOTE_ADDR']) ||
+		startsWith('189.', $_SERVER['REMOTE_ADDR'])
+	) && $_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br')) ||
 	strpos($_SERVER['REMOTE_ADDR'], '192.168.0') === 0
 );
 
