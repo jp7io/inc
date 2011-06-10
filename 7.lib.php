@@ -2920,3 +2920,11 @@ function jp7_absolute_path($path) {
 	$path = implode(DIRECTORY_SEPARATOR, $absolutes);
 	return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
+
+function jp7_replace_beginning($search, $replace, $subject) {
+	if (strpos($subject, $search) === 0) {
+		return $replace . substr($subject, strlen($search));
+	} else {
+		return $subject;
+	}	
+}
