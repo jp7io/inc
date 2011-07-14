@@ -52,30 +52,23 @@ if (!$_SERVER['SERVER_ADDR']) $_SERVER['SERVER_ADDR'] = $_SERVER['LOCAL_ADDR'];
  */
 if (!$_SERVER['REMOTE_ADDR']) $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 
-if (!function_exists('startsWith')) {
-	function startsWith($needle, $haystack) {
-		return strpos($haystack, $needle) === 0;
-	}
+function startsWith($needle, $haystack) {
+	return strpos($haystack, $needle) === 0;
 }
-if (!function_exists('endsWith')) {
-	function endsWith($needle, $haystack) {
-		$start = strlen($needle) * -1; //negative
-		return (substr($haystack, $start) === $needle);
-	}
+function endsWith($needle, $haystack) {
+	$start = strlen($needle) * -1; //negative
+	return (substr($haystack, $start) === $needle);
 }
 
 /**
  * @global bool $c_jp7
  */
-$c_jp7 = (
-	$_SERVER['HTTP_HOST'] == 'localhost' ||
-	((
-		startsWith('186.', $_SERVER['REMOTE_ADDR']) ||
-		startsWith('187.', $_SERVER['REMOTE_ADDR']) ||
-		startsWith('189.', $_SERVER['REMOTE_ADDR'])
-	) && $_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br')) ||
-	strpos($_SERVER['REMOTE_ADDR'], '192.168.0') === 0
-);
+$c_jp7 = false;
+if ($_SERVER['HTTP_HOST'] == 'localhost' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
+	$c_jp7 = true;
+} elseif (startsWith('186.', $_SERVER['REMOTE_ADDR']) || startsWith('187.', $_SERVER['REMOTE_ADDR']) || startsWith('189.', $_SERVER['REMOTE_ADDR'])) {
+	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
+}
 
 /**
  * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
@@ -2601,21 +2594,22 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::QA || $config->server->type == InterSite::DESENVOLVIMENTO || $_SERVER['HTTP_HOST'] == 'localhost') {
-		error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
-	} else {
+	if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') === false)) {
 		$debugger->sendTraceByEmail($backtrace);
-		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' . 
+		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' .
 			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
-		header('Location: ' . $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . jp7_encrypt($msgErro, 'cryptK31'));
+		
+		$maintenanceHref = $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . jp7_encrypt($msgErro, 'cryptK31');
+		header('Location: ' . $maintenanceHref);
 		//Caso nao funcione o header, tenta por javascript
 		?>
         <script language="javascript" type="text/javascript">
-		document.location.href = "<?php echo $debugger->getMaintenancePage(); ?>";
+		document.location.href = "<?php echo $maintenanceHref; ?>";
 		</script>
         <?php
-		exit();
+		exit;
 	}
+	error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
 }
 
@@ -2903,6 +2897,16 @@ function jp7_xml_encode($data, $options = array()) {
 	return $xml;
 }
 
+/**
+ * Handles relative paths ignoring symlinks. Used on Jp7 Express.
+ * Let's assume "dir/" is a symlink do "/usr/share/dir".
+ * Without this function "dir/../interadmin" will be relative to the symlink directory,
+ * so it is resolved to "/usr/share/interadmin".
+ * This function removes "../", leaving "dir/interadmin" that is not relative to the symlink.
+ * 
+ * @param string $path
+ * @return string
+ */
 function jp7_absolute_path($path) {
 	$path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
     $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
@@ -2921,6 +2925,14 @@ function jp7_absolute_path($path) {
 	return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
 
+/**
+ * Same as str_replace but only if the string starts with $search.
+ * 
+ * @param string $search
+ * @param string $replace
+ * @param string $subject
+ * @return string
+ */
 function jp7_replace_beginning($search, $replace, $subject) {
 	if (strpos($subject, $search) === 0) {
 		return $replace . substr($subject, strlen($search));
