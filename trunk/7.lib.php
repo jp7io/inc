@@ -2744,21 +2744,21 @@ function krumo() {
 }
 
 /**
- * Works as a bootstrap for custom pages inside /APP_config/CLIENT or /CLIENT/APP.
+ * Works as a bootstrap for custom pages inside /_config/CLIENT/APP or /CLIENT/APP.
  * Parses the URI and sets the include_path.
  * 
  * @return string Filename to be included.
  */
 function interadmin_bootstrap() {
 	global $config;
-
+		
 	$urlArr = explode('/', $_SERVER['REQUEST_URI']);
-
-	if (preg_match('/_config/', $urlArr[1])) {
-		// APP_config/CLIENTE
-		$jp7_app = $_GET['jp7_app'] = str_replace('_config', '', $urlArr[1]);
+	
+	if ($urlArr[1] == '_config') {
+		// _config/CLIENTE
+		$jp7_app = $_GET['jp7_app'] = $urlArr[3];
         $cliente = $_GET['cliente'] = $urlArr[2];
-        $url = str_replace('/' . $jp7_app . '_config/' . $cliente . '/', '', $_SERVER['REQUEST_URI']);
+        $url = str_replace('/_config/' . $cliente . '/' . $jp7_app . '/', '', $_SERVER['REQUEST_URI']);
 	} else {
 		// CLIENTE/APP
 		$jp7_app = $_GET['jp7_app'] = $urlArr[2];
