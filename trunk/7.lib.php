@@ -2940,3 +2940,16 @@ function jp7_replace_beginning($search, $replace, $subject) {
 		return $subject;
 	}	
 }
+
+/**
+ * Formats a DSN from an object with 'type', 'host', 'user', 'pass' and 'name'.
+ * @param object $db	Object with the database information.
+ * @return string DSN
+ */
+function jp7_formatDsn($db) {
+	$dsn = $db->type . '://' . $db->user . ':' . $db->pass . '@' . $db->host . '/' . $db->name;
+	if ($db->flags) {
+		$dsn .= $db->flags;
+	}
+	return $dsn;
+}
