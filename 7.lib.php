@@ -2953,3 +2953,15 @@ function jp7_formatDsn($db) {
 	}
 	return $dsn;
 }
+
+/**
+ * Alias to krumo();die;
+ * @return void
+ */
+function kd() {
+	$_ = func_get_args();
+    call_user_func_array(
+        array('Krumo', 'dump'), $_
+    );
+	die();
+}
