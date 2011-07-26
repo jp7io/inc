@@ -108,4 +108,37 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	if ($tipos->restrito[1] || $tipos->restrito[$tipos->i-1]) {
 		include '../../inc/login_check.php';
 	}
+	
+	$config->build = interadmin_get_version($config->name_id, '{build}');
+	$c_view = new Zend_View();
+	// JavaScript
+	$c_view->headScript()->appendFile($c_path_js . 'interdyn.js');
+	$c_view->headScript()->appendFile($c_path_js . 'interdyn_checkflash.js');
+	$c_view->headScript()->appendFile($c_path_js . 'interdyn_form.js');
+	$c_view->headScript()->appendFile($c_path_js . 'interdyn_form_lang_' . $lang->lang . '.js');
+	$c_view->headScript()->appendFile($c_path_js . 'swfobject' . ($c_swfobject ? '_' . $c_swfobject : '') . '.js');
+	$c_view->headScript()->appendFile($c_path_js . 'jquery/jquery-1.3.2.min.js');
+	if ($config->menu != 'none') {
+		if (strpos($config->menu, '../') !== false) {
+			$c_view->headScript()->appendFile($config->menu);
+		} else {
+			if ($config->menu) {
+				$c_view->headScript()->appendFile($c_path_js . 'interdyn_menu_' . $config->menu);
+			} else {
+				$c_view->headScript()->appendFile('../../js/interdyn_menu_' . $config->name_id);
+			}
+			$c_view->headScript()->appendFile('../../js/interdyn_menu_str.php&lang=' . $lang->lang . ($interadmin_gerar_menu ? '&interadmin_gerar_menu=' . $interadmin_gerar_menu : ''));
+		}
+	}
+	$c_view->headScript()->appendFile($c_path_js . 'interdyn_menu.js');
+	$c_view->headScript()->appendFile('../../js/functions.js');
+	$c_view->headScript()->appendFile('../../js/init.js');
+	
+	// CSS
+	$c_view->headLink()->appendStylesheet($c_path_css . '7_w3c.css');
+	$c_view->headLink()->appendStylesheet('../../css/' . $config->name_id . '.css');
+	if ($c_template) {
+		$c_view->headLink()->appendStylesheet('/_default/css/7_templates.css');
+		$c_view->headLink()->appendStylesheet('/_templates/' . $c_template . '/css/style.css');
+	}
 }
