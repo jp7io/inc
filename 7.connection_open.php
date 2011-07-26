@@ -110,7 +110,8 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	}
 	
 	$config->build = interadmin_get_version($config->name_id, '{build}');
-	$c_view = new Zend_View();
+	$c_view = new Jp7_View();
+	Zend_Registry::set('config', $config);
 	// JavaScript
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn.js');
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn_checkflash.js');
