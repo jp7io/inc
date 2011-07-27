@@ -1,4 +1,7 @@
 <?php
+// Mantendo B.C. (Compatibilidade Reversa)
+$c_build = $config->build;
+
 if ($seo_baseurl) {
 	// Com SEO
 	$baseHref = $seo_baseurl;
