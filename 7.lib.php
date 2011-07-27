@@ -2594,7 +2594,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') === false)) {
+	if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
 		$debugger->sendTraceByEmail($backtrace);
 		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' .
 			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
