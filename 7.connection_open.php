@@ -76,10 +76,8 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	require_once jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
-	$dsn = "{$config->db->type}://{$config->db->user}:{$config->db->pass}@{$config->db->host}/{$config->db->name}";
-	if ($config->db->flags) {
-		$dsn .= $config->db->flags;
-	}
+	
+	$dsn = jp7_formatDsn($config->db);
 	/**
 	 * @global ADOConnection $db
 	 */
