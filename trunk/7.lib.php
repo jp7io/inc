@@ -2965,3 +2965,49 @@ function kd() {
     );
 	die();
 }
+
+function jp7_get_object_vars($object) {
+	// Por estar fora de escopo do objeto enviará somente os valores visíveis
+	return get_object_vars($object); 
+}
+
+/**
+ * Check value to find if it was serialized.
+ *
+ * If $data is not an string, then returned value will always be false.
+ * Serialized data is always a string.
+ *
+ * @param mixed $data Value to check to see if was serialized.
+ * @return bool False if not serialized and true if it was.
+ */
+function jp7_is_serialized($data) {
+	// if it isn't a string, it isn't serialized
+	if (!is_string($data)) {
+		return false;
+	}
+ 	if ('N;' == $data) {
+		return true;
+	}
+	$length = strlen($data);
+	if ($length < 4) {
+		return false;
+	}
+	if (':' !== $data[1]) {
+		return false;
+	}
+	$lastc = $data[$length - 1];
+	if (';' !== $lastc && '}' !== $lastc) {
+		return false;
+	}
+	$token = $data[0];
+	switch ($token) {
+		case 's':
+		case 'a' :
+		case 'O' :
+		case 'b' :
+		case 'i' :
+		case 'd' :
+			return true;
+	}
+	return false;
+}
