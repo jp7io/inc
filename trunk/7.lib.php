@@ -64,7 +64,7 @@ function endsWith($needle, $haystack) {
  * @global bool $c_jp7
  */
 $c_jp7 = false;
-if ($_SERVER['HTTP_HOST'] == 'localhost' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
+if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
 	$c_jp7 = true;
 } elseif (startsWith('186.', $_SERVER['REMOTE_ADDR']) || startsWith('187.', $_SERVER['REMOTE_ADDR']) || startsWith('189.', $_SERVER['REMOTE_ADDR'])) {
 	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
