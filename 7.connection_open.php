@@ -62,17 +62,6 @@ if (is_null($s_session)) {
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
-	// Language
-	$lang = ($_GET['lang'] && is_string($_GET['lang'])) ? new jp7_lang($_GET['lang'], $_GET['lang']) : new jp7_lang();
-	$config->lang = $config->langs[$lang->lang];
-	// Compatibilidade temporária 
-	if (!$c_site_title) {
-		$c_site_title = $config->lang->title;
-	}
-	
-	@include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
-	@include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
-	
 	require_once jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
@@ -84,6 +73,35 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	$db = ADONewConnection($dsn);
 	//$db->debug = true;
 	
+	// Language
+	$lang = null;
+	if ($_GET['lang'] && is_string($_GET['lang'])) {
+		if ($_GET['lang'] == $config->lang_default) {
+			$lang = new jp7_lang($_GET['lang'], $_GET['lang']);
+		} else {
+			$columns = $db->MetaColumns($db_prefix . '_tipos');
+			if ($columns['NOME_' . strtoupper($_GET['lang'])]) {
+				$lang = new jp7_lang($_GET['lang'], $_GET['lang']);
+			}
+		}
+	}
+	if (!$lang) {
+		$lang = new jp7_lang();
+	}
+	
+	$config->lang = $config->langs[$lang->lang];
+	// Compatibilidade temporária 
+	if (!$c_site_title) {
+		$c_site_title = $config->lang->title;
+	}
+	// Arquivos de idioma
+	if (is_file($c_doc_root . '_default/inc/lang_' . $lang->lang . '.php')) {
+		include $c_doc_root . '_default/inc/lang_' . $lang->lang . '.php';
+	}
+	if (is_file($c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php')) {
+		include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
+	}
+		
 	// Tipos (Navegação) (2007/05/16 by JP)
 	if (!$wap) {
 		$tipos = new interadmin_tipos($id_tipo, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
