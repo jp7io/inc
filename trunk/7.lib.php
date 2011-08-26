@@ -3011,3 +3011,11 @@ function jp7_is_serialized($data) {
 	}
 	return false;
 }
+/**
+ * Similar to preg_quote, but for using in the replacement parameter.
+ * @param string $str
+ * @return string
+ */
+function preg_replacement_quote($str) {
+    return addcslashes($str, '$\\');
+}
