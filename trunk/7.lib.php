@@ -2777,6 +2777,7 @@ function interadmin_bootstrap() {
 		interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
 	}
 	
+	chdir(jp7_doc_root() . $jp7_app);
 	set_include_path(get_include_path() . PATH_SEPARATOR . jp7_doc_root() . $jp7_app);
 	if ($jp7_app != 'interadmin') {
 		set_include_path(get_include_path() . PATH_SEPARATOR . jp7_doc_root() . 'interadmin');
