@@ -1885,7 +1885,7 @@ function jp7_path_find($file) {
 function jp7_extension($S) {
 	if (strpos($S, '?') !== false) {
 		// Tirando a Query String
-		$S = preg_replace('/([^?]*)(.*)/', '\1', $S);
+		$S = reset(explode('?', $S));
 	}
 	$path_parts = pathinfo($S);
 	$ext = trim($path_parts['extension'] . ' ');
