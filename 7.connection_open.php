@@ -140,11 +140,11 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 			$c_view->headScript()->appendFile($config->menu);
 		} else {
 			if ($config->menu) {
-				$c_view->headScript()->appendFile($c_path_js . 'interdyn_menu_' . $config->menu);
+				$c_view->headScript()->appendFile($c_path_js . 'interdyn_menu_' . $config->menu . '.js');
 			} else {
-				$c_view->headScript()->appendFile('../../js/interdyn_menu_' . $config->name_id);
+				$c_view->headScript()->appendFile('../../js/interdyn_menu_' . $config->name_id . '.js');
 			}
-			$c_view->headScript()->appendFile('../../js/interdyn_menu_str.php&lang=' . $lang->lang . ($interadmin_gerar_menu ? '&interadmin_gerar_menu=' . $interadmin_gerar_menu : ''));
+			$c_view->headScript()->appendFile('../../js/interdyn_menu_str.php?lang=' . $lang->lang . ($interadmin_gerar_menu ? '&interadmin_gerar_menu=' . $interadmin_gerar_menu : ''));
 		}
 	}
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn_menu.js');
