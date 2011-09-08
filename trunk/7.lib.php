@@ -138,13 +138,10 @@ function __autoload($className){
 			}
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
-				if (JP7_IS_WINDOWS) {
-					$realFilename = trim(str_replace('\\', '/', str_replace(realpath($path), '', realpath($file))), '/');
-					if ($filename != $realFilename) {
-						die(jp7_debug('Classname is case sensitive: ' . $className));
-					}
-				}
 				require_once $file;
+				if (JP7_IS_WINDOWS && !in_array($className, get_declared_classes())) {
+					die(jp7_debug('Class not found (case sensitive): ' . $className));
+				}
 				return $className;
 			}
 		}
