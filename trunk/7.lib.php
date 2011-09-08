@@ -11,7 +11,7 @@
  */
 
 /**
- * Checks for Fatal Error preventing White Screen
+ * Checks for Fatal Error preventing White Screen of Death
  * 
  * @return void
  */
@@ -30,6 +30,11 @@ function jp7_check_shutdown() {
 			break;
 	}
 }
+/**
+ * Checks for uncaught exceptions, preventing White Screen of Death
+ * 
+ * @return void
+ */
 function jp7_check_exception($e) {
 	global $debugger;
 	if ($debugger) {
@@ -39,7 +44,6 @@ function jp7_check_exception($e) {
 	die(jp7_debug('Uncaught <b>' . get_class($e) . '</b> with message <b>' . $e->getMessage() . '</b> in ' . $e->getFile() . ' on line ' . $e->getLine(), null, $e->getTrace()));
 }
 
-//Register the shutdown
 register_shutdown_function('jp7_check_shutdown');
 set_exception_handler('jp7_check_exception');
 
@@ -70,11 +74,6 @@ if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.
 	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
-/**
- * Setting "setlocale", "allow_url_fopen" and "error_reporting". And calling jp7_register_globals().
- */
-setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
-setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
 if ($c_jp7) {
     if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
         error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
@@ -84,6 +83,12 @@ if ($c_jp7) {
 } else {
     error_reporting(0);
 }
+
+setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
+setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
+
+date_default_timezone_set('America/Sao_Paulo');
+
 if (!@ini_get('allow_url_fopen')) {
     @ini_set('allow_url_fopen', '1');
 }
