@@ -139,7 +139,7 @@ function __autoload($className){
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
 				require_once $file;
-				if (JP7_IS_WINDOWS && !in_array($className, get_declared_classes())) {
+				if (JP7_IS_WINDOWS && !in_array($className, get_declared_classes()) && !in_array($className, get_declared_interfaces())) {
 					die(jp7_debug('Class not found (case sensitive): ' . $className));
 				}
 				return $className;
