@@ -73,6 +73,11 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	$db = ADONewConnection($dsn);
 	//$db->debug = true;
 	
+	if (!$db) {
+		$config->db->pass = '{pass}';
+		die(jp7_debug('Unable to connect to the database ' . jp7_formatDsn($config->db)));	
+	}
+	
 	// Language
 	$lang = null;
 	if ($_GET['lang'] && is_string($_GET['lang'])) {
