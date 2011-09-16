@@ -8,3 +8,6 @@ if ($debugger instanceof Jp7_Debugger) {
 if ($db instanceof ADOConnection) {
 	$db->Close();
 }
+//asort($GLOBALS['sql_execute_queries']);
+//krumo($GLOBALS['sql_execute_count']);
+//krumo($GLOBALS['sql_execute_queries']);
