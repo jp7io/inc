@@ -821,6 +821,8 @@
 	 */
 	function &Execute($sql,$inputarr=false) 
 	{
+		//$GLOBALS['sql_execute_queries'][$sql]++;
+		//$GLOBALS['sql_execute_count']++;
 		if ($this->fnExecute) {
 			$fn = $this->fnExecute;
 			$ret =& $fn($this,$sql,$inputarr);
