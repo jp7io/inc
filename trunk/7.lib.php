@@ -2824,7 +2824,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	
 	if (@is_file($cacheFile)) {
         // If .version was saved this day or SVN is not available, keep .version cache
-		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || !jp7_is_executable('svn')) {
+		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || JP7_IS_WINDOWS || !jp7_is_executable('svn')) {
             $version = unserialize(file_get_contents($cacheFile));
         }
 	}
