@@ -3024,3 +3024,6 @@ function jp7_is_serialized($data) {
 function preg_replacement_quote($str) {
     return addcslashes($str, '$\\');
 }
+function array_full_diff($array_a, $array_b) {
+    return array_diff(array_merge($array_a, $array_b), array_intersect($array_a, $array_b));
+}
