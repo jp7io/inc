@@ -265,10 +265,10 @@ function wap_toHTML($S){
  */
 function toBase($S,$force_magic_quotes_gpc=FALSE){
 	global $db;
-	if($S){
-		$S=$db->qstr($S,get_magic_quotes_gpc()&&!$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
-		$S=trim($S);
-	}else{
+	if (strlen($S)) {
+		$S = $db->qstr($S,get_magic_quotes_gpc()&&!$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
+		$S = trim($S);
+	} else {
 		$S="''";
 	}
 	return $S;
