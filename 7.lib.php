@@ -298,10 +298,10 @@ function toForm($S){
  * @return string Formatted string.
  * @version (2004/06/14)
  */
-function toHTML($S,$HTML=FALSE,$busca_replace=FALSE){
+function toHTML($S, $HTML = FALSE,$busca_replace = FALSE){
 	global $busca_varchar, $busca_text;
-	$busca=($busca_varchar)?$busca_varchar:$busca_text;
-	if($S){
+	$busca = ($busca_varchar) ? $busca_varchar : $busca_text;
+	if (strlen($S)) {
 		if(!$HTML)$S=str_replace(chr(13)," <br /> ",$S);
 		//elseif(strpos(strtolower($S),"<p>")===false)$S="<p>".$S."</p>";
 		$S=str_replace("\'","'",$S);// Bug LocaWeb
