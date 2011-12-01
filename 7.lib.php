@@ -1285,10 +1285,10 @@ function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
 /**
  * Gets values from a specified record on the database. It has 3 behaviors as explained on the parameters' description.
  *
- * @param int|string $param_0 If it is numeric, it will be the ID value, otherwise it will be the name of the table.
- * @param int|string $param_1 If $param_0 is numeric it will be the name of the fields, if $param_0 is not numeric and it is numeric, it will be the ID value, otherwise it will be the name of the key field.  
- * @param string $param_2 If $param_0 is not numeric and $param_1 is numeric, it will be the name of the fields, if both are not numeric it will be the ID value.
- * @param string $param_3 If $param_0 and $param_1 are not numeric, it will be the name of the fields.
+ * @param int|string $table_or_id If it is numeric, it will be the ID value, otherwise it will be the name of the table.
+ * @param int|string $field_or_id If $table_or_id is numeric it will be the name of the fields, if $table_or_id is not numeric and it is numeric, it will be the ID value, otherwise it will be the name of the key field.  
+ * @param string $id_value If $table_or_id is not numeric and $field_or_id is numeric, it will be the name of the fields, if both are not numeric it will be the ID value.
+ * @param string $field_name If $table_or_id and $field_or_id are not numeric, it will be the name of the fields.
  * @param bool $OOP If <tt>TRUE</tt> an object will be returned even when there is only one result, the default value is <tt>FALSE</tt>.
  * @global ADOConnection
  * @global string
@@ -1298,31 +1298,35 @@ function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
  * @todo ($GLOBALS["jp7_app"]=='intermail') will not be TRUE, since the previous condition ($GLOBALS['db_type']) is TRUE on the Intermail.
  * @version (2008/09/17)
  */
-function jp7_fields_values($param_0,$param_1="",$param_2="",$param_3="",$OOP = FALSE){
+function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $field_name = '', $OOP = false) {
 	global $db;
 	global $s_session;
 	// Force objects as strings (eg.: select_key, etc.)
-	if (is_object($param_0)) $param_0 = strval($param_0);
-	if (is_object($param_1)) $param_1 = strval($param_1);
-	if (is_numeric($param_0)) {
+	if (is_object($table_or_id)) {
+		$table_or_id = strval($table_or_id);
+	}
+	if (is_object($field_or_id)) {
+		$field_or_id = strval($field_or_id);
+	}
+	if (is_numeric($table_or_id)) {
 		// ($id,$field)
 		global $db_prefix, $lang;
-		$table=$db_prefix.$lang->prefix;
-		$table_id_name="id";
-		$table_id_value=$param_0;
-		$fields=$param_1;
-	} elseif (is_numeric($param_1)) {
+		$table = $db_prefix . $lang->prefix;
+		$table_id_name = 'id';
+		$table_id_value = $table_or_id;
+		$fields = $field_or_id;
+	} elseif (is_numeric($field_or_id)) {
 		// ($table,$id,$field)
-		$table = $param_0;
-		$table_id_name = "id";
-		$table_id_value = $param_1;
-		$fields = $param_2;
+		$table = $table_or_id;
+		$table_id_name = 'id';
+		$table_id_value = $field_or_id;
+		$fields = $id_value;
 	} else {
 		// ($table,$table_id_name,$table_id_value,$field)
-		$table=$param_0;
-		$table_id_name=$param_1;
-		$table_id_value=$param_2;
-		$fields=$param_3;
+		$table = $table_or_id;
+		$table_id_name = $field_or_id;
+		$table_id_value = $id_value;
+		$fields = $field_name;
 	}
 	
 	if(!$fields)$fields="varchar_key";
