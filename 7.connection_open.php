@@ -59,6 +59,8 @@ if (is_null($s_session)) {
 	$s_session = &$_SESSION[$config->name_id]['interadmin'];
 	$s_user = &$s_session['user'];
 }
+Zend_Registry::set('config', $config);
+Jp7_Bootstrap::initAdminBar();
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
