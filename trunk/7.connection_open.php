@@ -60,7 +60,9 @@ if (is_null($s_session)) {
 	$s_user = &$s_session['user'];
 }
 Zend_Registry::set('config', $config);
-Jp7_Bootstrap::initAdminBar();
+if (method_exists('Jp7_Bootstrap', 'initAdminBar')) {
+	Jp7_Bootstrap::initAdminBar();
+}
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
