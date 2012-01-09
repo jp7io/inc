@@ -692,4 +692,3 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 	}
 	return $vars_out;
 }
-?>
