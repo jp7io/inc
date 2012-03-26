@@ -71,7 +71,7 @@ var lang_path = '<?php echo $lang->path_2; ?>'
 
 var s_interadmin_preview = '<?php echo $s_session['preview']; ?>'
 
-var fullpath = 'http://'+location.host+'/'+path+lang_path
+var fullpath = '<?php echo ($_SERVER['HTTPS'] ? 'https' : 'http'); ?>://'+location.host+'/'+path+lang_path
 
 <?php if ($s_session['preview'] && !$isPopup) { ?>
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
