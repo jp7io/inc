@@ -6,7 +6,7 @@ if ($seo_baseurl) {
 	// Com SEO
 	$baseHref = $seo_baseurl;
 } else {
-	$baseHref = 'http://' . $_SERVER['HTTP_HOST'];
+	$baseHref = ($_SERVER['HTTPS'] ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
 	$uriSemQueryString = preg_replace('/([^?]*)(.*)/', '\1', $_SERVER['REQUEST_URI']);
 	if (!$uriSemQueryString || $uriSemQueryString == '/' . $c_path) {
 		// Home
