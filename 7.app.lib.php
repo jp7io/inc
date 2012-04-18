@@ -51,7 +51,7 @@ function jp7_app_checkPermission(){
 // jp7_app_createSelect() (2004/04/29)
 function jp7_app_createSelect($name,$label,$div,$start,$finish,$value,$xtra=""){
 	$S="".
-	"<select name=\"".$name."\"".(($xtra)?" ".$xtra:"").">".
+	"<select name=\"".$name."\"".(($xtra)?" ".$xtra:"")." label=\"" . $label . "\">".
 	"<option value=\"\">".$label."</option>".
 	"<option value=\"\">".$div."</option>";
 	for($i=$start;$i<=$finish;$i++){
@@ -107,31 +107,31 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 		"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
 			"<tr>".
 				(($lang->lang == 'en') ? $month . $day : $day . $month ) .
-				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_Y".$i."\" maxlength=\"4\" value=\"".(($date[Y]!="0000"&&$valor)?$date[Y]:$l_ano)."\" ".$readonly." helpvalue=\"" . $l_ano . "\" style=\"width:5em".(($date[Y]=="0000"||!$valor)?";color:#ccc;font-style:italic":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\"".((!$time_xtra)?" onkeyup=\"DFchangeField(this, event)\"":"")." /></td>".
+				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_Y".$i."\" maxlength=\"4\" value=\"".(($date['Y']!="0000"&&$valor)?$date['Y']:$l_ano)."\" ".$readonly." helpvalue=\"" . $l_ano . "\" style=\"width:5em".(($date[Y]=="0000"||!$valor)?";color:#ccc;font-style:italic":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\"".((!$time_xtra)?" onkeyup=\"DFchangeField(this, event)\"":"")." /></td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>" .
-				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_H".$i."\" maxlength=\"2\" value=\"".(($date[H]&&$valor!="0000-00-00 00:00:00")?$date[H]:$l_hora)."\" ".$readonly." helpvalue=\"" . $l_hora . "\" style=\"width:3em".((!$date[H]||$valor=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this, event)\" /></td>".
+				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_H".$i."\" maxlength=\"2\" value=\"".(($date['H']&&$valor!="0000-00-00 00:00:00")?$date['H']:$l_hora)."\" ".$readonly." helpvalue=\"" . $l_hora . "\" style=\"width:3em".((!$date['H']||$valor=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" onkeyup=\"DFchangeField(this, event)\" /></td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
-				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_i".$i."\" maxlength=\"2\" value=\"".(($date[i]&&$valor!="0000-00-00 00:00:00")?$date[i]:$l_min)."\" ".$readonly." helpvalue=\"".$l_min."\" style=\"width:3em".((!$date[i]||$valor=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" /></td>".
+				"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_i".$i."\" maxlength=\"2\" value=\"".(($date['i']&&$valor!="0000-00-00 00:00:00")?$date['i']:$l_min)."\" ".$readonly." helpvalue=\"".$l_min."\" style=\"width:3em".((!$date['i']||$valor=="0000-00-00 00:00:00")?";color:#ccc;font-style:italic":"").(($time_xtra)?";visibility:hidden":"")."\" onfocus=\"refreshDateStyle(this,'focus')\" onblur=\"refreshDateStyle(this,'blur')\" onkeypress=\"return DFonlyThisChars(true)\" /></td>".
 				(($s)?"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>":"").
 				(($s)?"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_s".$i."\" value=\"".$date[s]."\" style=\"color:#ccc;width:20px\"></td>":"").
 			"</tr>".
 		"</table>";
 	} else {
-		$day = "<td>".jp7_app_createSelect($var."_d".$i,$l_dia,"---",1,31,$date[d],$readonly)."</td>".
+		$day = "<td>".jp7_app_createSelect($var."_d".$i,$l_dia,"---",1,31,$date['d'],$readonly . (($obligatory)?" obligatory=\"yes\"":""))."</td>".
 				"<td>&nbsp;/&nbsp;</td>";
-		$month = "<td>".jp7_app_createSelect($var."_m".$i,$l_mes,"---",1,12,$date[m],$readonly)."</td>".
+		$month = "<td>".jp7_app_createSelect($var."_m".$i,$l_mes,"---",1,12,$date['m'],$readonly . (($obligatory)?" obligatory=\"yes\"":""))."</td>".
 				"<td>&nbsp;/&nbsp;</td>"; 
 		return "".
 		"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
 			"<tr>".
 				(($lang->lang == 'en') ? $month . $day : $day . $month ) .
-				"<td>".jp7_app_createSelect($var."_Y".$i,$l_ano,"---",date(Y)-100,date(Y)+20,$date[Y],$readonly)."</td>".
+				"<td>".jp7_app_createSelect($var."_Y".$i,$l_ano,"---",date('Y')-100,date('Y')+20,$date['Y'],(($obligatory)?" obligatory=\"yes\"":""))."</td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>".
-				"<td>".jp7_app_createSelect($var."_H".$i,"H","---",0,23,$date[H],$time_xtra)."</td>".
+				"<td>".jp7_app_createSelect($var."_H".$i,"H","---",0,23,$date['H'],$time_xtra)."</td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
-				"<td>".jp7_app_createSelect($var."_i".$i,"M","---",0,59,$date[i],$time_xtra)."</td>".
+				"<td>".jp7_app_createSelect($var."_i".$i,"M","---",0,59,$date['i'],$time_xtra)."</td>".
 				(($s)?"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>":"").
-				(($s)?"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_s".$i."\" value=\"".$date[s]."\" style=\"color:#ccc;width:20px\"></td>":"").
+				(($s)?"<td><input " .  (($obligatory)?" obligatory=\"yes\"":"") .  " type=\"text\" name=\"".$var."_s".$i."\" value=\"".$date['s']."\" style=\"color:#ccc;width:20px\"></td>":"").
 			"</tr>".
 		"</table>";
 	}
