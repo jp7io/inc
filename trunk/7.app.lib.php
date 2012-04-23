@@ -125,7 +125,7 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 		"<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">".
 			"<tr>".
 				(($lang->lang == 'en') ? $month . $day : $day . $month ) .
-				"<td>".jp7_app_createSelect($var."_Y".$i,$l_ano,"---",date('Y')-100,date('Y')+20,$date['Y'],(($obligatory)?" obligatory=\"yes\"":""))."</td>".
+				"<td>".jp7_app_createSelect($var."_Y".$i,$l_ano,"---",date('Y')-100,date('Y')+20,$date['Y'],$readonly . (($obligatory)?" obligatory=\"yes\"":""))."</td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"")." nowrap>&nbsp;-&nbsp;</td>".
 				"<td>".jp7_app_createSelect($var."_H".$i,"H","---",0,23,$date['H'],$time_xtra)."</td>".
 				"<td".(($time_xtra)?" ".$time_xtra:"").">&nbsp;:&nbsp;</td>".
