@@ -138,12 +138,12 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	$c_view = new Jp7_View();
 	Zend_Registry::set('config', $config);
 	// JavaScript
+	$c_view->headScript()->appendFile($c_path_js . 'jquery/jquery-1.3.2.min.js');
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn.js');
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn_checkflash.js');
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn_form.js');
 	$c_view->headScript()->appendFile($c_path_js . 'interdyn_form_lang_' . $lang->lang . '.js');
 	$c_view->headScript()->appendFile($c_path_js . 'swfobject' . ($c_swfobject ? '_' . $c_swfobject : '') . '.js');
-	$c_view->headScript()->appendFile($c_path_js . 'jquery/jquery-1.3.2.min.js');
 	if ($config->menu != 'none') {
 		if (strpos($config->menu, '../') !== false) {
 			$c_view->headScript()->appendFile($config->menu);
