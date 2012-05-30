@@ -70,11 +70,14 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 	$ADODB_LANG = 'pt-br';
 	
-	$dsn = jp7_formatDsn($config->db);
-	/**
-	 * @global ADOConnection $db
-	 */
-	$db = ADONewConnection($dsn);
+	if (!$db instanceof ADOConnection) {
+		$dsn = jp7_formatDsn($config->db);
+		/**
+		 * @global ADOConnection $db
+		 */
+		$db = ADONewConnection($dsn);
+	}
+	
 	//$db->debug = true;
 	
 	if (!$db) {
