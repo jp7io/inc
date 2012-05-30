@@ -2589,7 +2589,7 @@ function jp7_file_size($file){
  * @return string 	HTML formatted backtrace.
  */
 function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
-	global $debugger, $config;
+	global $debugger, $config, $c_jp7;
 	
 	// Lançando exceção, utilizado no Web Services, por exemplo
 	if ($debugger->isExceptionsEnabled()) {
@@ -2601,21 +2601,24 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 		$traceArr = debug_backtrace();
 	}
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
-	//Envia email e exibe tela de manutenção
-	if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
-		$debugger->sendTraceByEmail($backtrace);
-		$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' .
-			'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
-		
-		$maintenanceHref = $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . jp7_encrypt($msgErro, 'cryptK31');
-		header('Location: ' . $maintenanceHref);
-		//Caso nao funcione o header, tenta por javascript
-		?>
-        <script language="javascript" type="text/javascript">
-		document.location.href = "<?php echo $maintenanceHref; ?>";
-		</script>
-        <?php
-		exit;
+	
+	if (!$c_jp7) {
+		//Envia email e exibe tela de manutenção
+		if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
+			$debugger->sendTraceByEmail($backtrace);
+			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' .
+				'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
+			
+			$maintenanceHref = $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . jp7_encrypt($msgErro, 'cryptK31');
+			header('Location: ' . $maintenanceHref);
+			//Caso nao funcione o header, tenta por javascript
+			?>
+	        <script language="javascript" type="text/javascript">
+			document.location.href = "<?php echo $maintenanceHref; ?>";
+			</script>
+	        <?php
+			exit;
+		}
 	}
 	error_log($msgErro . "\nURL: " . $_SERVER['REQUEST_URI']); // Usado para debug local
 	return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
