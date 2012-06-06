@@ -3034,3 +3034,23 @@ function preg_replacement_quote($str) {
 function array_full_diff($array_a, $array_b) {
     return array_diff(array_merge($array_a, $array_b), array_intersect($array_a, $array_b));
 }
+
+function jp7_normalize($string) {
+	$table = array(
+		'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a', 'ª' => 'a',
+		'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
+		'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', '&' => 'e',
+		'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
+		'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
+		'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
+		'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o', 'º' => 'o',
+		'Ó' => 'O', 'Ò' => 'O', 'Õ' => 'O', 'Ô' => 'O', 'Ö' => 'O',
+		'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
+		'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
+		'ç' => 'c',
+		'Ç' => 'C',
+		'ñ' => 'n',
+		'Ñ' => 'N'
+    );
+    return strtr($string, $table);
+}
