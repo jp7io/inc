@@ -3054,3 +3054,25 @@ function jp7_normalize($string) {
     );
     return strtr($string, $table);
 }
+/**
+ * Moves $key1 after $key2 if $pos = 1. Moves $key1 before $key2 if $pos = 0.
+ * 
+ * @param array $array
+ * @param string $key1
+ * @param string $key2
+ * @param int $pos [optional]
+ * @return array
+ */
+function array_move_key($array, $key1, $key2, $pos = 1) {
+	$value_key1 = $array[$key1];
+	unset($array[$key1]);
+	
+	$keys = array_keys($array);
+	$values = array_values($array);
+	
+	$pos_key2 = array_search($key2, $keys);
+	array_splice($keys, $pos_key2 + $pos, 0, array($key1));
+	array_splice($values, $pos_key2 + $pos, 0, array($value_key1));
+	
+	return array_combine($keys, $values);
+}
