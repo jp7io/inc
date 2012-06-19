@@ -443,9 +443,19 @@ function checkReferer($S, $protocol="http"){
 	while(strpos($S,"../")!==false){
 	}
 	*/
-	if(!dirname($S)||dirname($S)=="."){
-		$S_parent = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname(dirname($_SERVER['REQUEST_URI'])) . '/' . $S;
-		$S = $protocol . '://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $S;
+	if(!dirname($S) || dirname($S) == "."){
+		$parent_dirname = dirname(dirname($_SERVER['REQUEST_URI']));
+		if ($parent_dirname == '/') {
+			$parent_dirname = '';
+		}
+		
+		$dirname = dirname($_SERVER['REQUEST_URI']);
+		if ($dirname == '/') {
+			$dirname = '';
+		}
+		
+		$S_parent = $protocol . '://' . $_SERVER['HTTP_HOST'] . $parent_dirname . '/' . $S;
+		$S = $protocol . '://' . $_SERVER['HTTP_HOST'] . $dirname . '/' . $S;
 	}
 	return (strpos($_SERVER['HTTP_REFERER'], $S) === 0 || strpos($_SERVER['HTTP_REFERER'], $S_parent) === 0);
 }
