@@ -1311,7 +1311,6 @@ function interadmin_fields_values($param_0,$param_1="",$param_2="",$param_3=""){
 function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $field_name = '', $OOP = false) {
 	global $db;
 	global $s_session;
-	global $config;
 	// Force objects as strings (eg.: select_key, etc.)
 	if (is_object($table_or_id)) {
 		$table_or_id = strval($table_or_id);
@@ -1353,7 +1352,7 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
 		" WHERE ".$table_id_name."='".$table_id_value."'";
 		if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
 			$sql .= "" .
-			(($config->intermail->publish&&!$s_session['preview']) ? " AND publish <> ''" : "") .
+			(($GLOBALS['c_publish']&&!$s_session['preview']) ? " AND publish <> ''" : "") .
 			" AND (deleted = '' OR deleted IS NULL)" .
 			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
 		}
