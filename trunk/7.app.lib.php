@@ -8,21 +8,21 @@
 // jp7_app_checkPermission (2006/08/17)
 function jp7_app_checkPermission(){
 	global $jp7_app;
-	global $config;
+	global $c_cliente_domains;
 	global $s_interadmin_cliente;
 	$cliente = ($s_interadmin_cliente) ?  $s_interadmin_cliente : $GLOBALS['s_' . $jp7_app . '_cliente'];
 	$ok = FALSE;
-	for($i = 0;$i<count($config->intermail->cliente_domains);$i++){
+	for($i = 0;$i<count($c_cliente_domains);$i++){
 		switch($_SERVER['HTTP_HOST']){
-			case $config->intermail->cliente_domains[$i]:
-			case "www.".$config->intermail->cliente_domains[$i]:
-			case "www.".toId($config->intermail->cliente_domains[$i]):
-			case "www2.".$config->intermail->cliente_domains[$i]:
-			case "interadmin.".$config->intermail->cliente_domains[$i]:
-			case "intermail.".$config->intermail->cliente_domains[$i]:
-			case "qa.intermail.".$config->intermail->cliente_domains[$i]:
-			case "ri.".$config->intermail->cliente_domains[$i]:
-			case "ir.".$config->intermail->cliente_domains[$i]:
+			case $c_cliente_domains[$i]:
+			case "www.".$c_cliente_domains[$i]:
+			case "www.".toId($c_cliente_domains[$i]):
+			case "www2.".$c_cliente_domains[$i]:
+			case "interadmin.".$c_cliente_domains[$i]:
+			case "intermail.".$c_cliente_domains[$i]:
+			case "qa.intermail.".$c_cliente_domains[$i]:
+			case "ri.".$c_cliente_domains[$i]:
+			case "ir.".$c_cliente_domains[$i]:
 				$ok = TRUE;
 				break;
 		}
