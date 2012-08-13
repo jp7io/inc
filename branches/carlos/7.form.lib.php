@@ -692,3 +692,19 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 	}
 	return $vars_out;
 }
+
+function interadmin_arquivos_preview($S, $name = '', $presrc = false, $icon_small = false) {
+	global $c_arquivos_parametros;
+	$ext = jp7_extension($S);
+	$icon_size = ($icon_small) ? '16' : '32';
+	if ($ext) {
+		if (in_array($ext, array('gif', 'jpg', 'jpeg', 'png'))) {
+			$S = '<div class="image_preview_background"><img ' . (($presrc) ? 'pre' : '') . 'src="' . $S . (strpos($S, '?') ? '&' : '?') . 'size=40x40"' . $c_arquivos_parametros . (($name) ? ' alt="' . $name . '"' : '') . '></div>';
+		} elseif (in_array($ext, array('doc', 'pdf', 'ppt', 'swf', 'wmv', 'xsl', 'zip', 'docx', 'xlsx'))) { 
+			$S = "<div><img src=\"/_default/img/aplicacao/ico_file_".$ext."_" . $icon_size . ".gif\"".(($name)?" alt=\"".$name."\"":"")." style=\"width:" . $icon_size . "px;height:" . $icon_size . "px;background:transparent\"></div>";
+		} else {
+			$S = '<div class="bg_gray_1"><b class="font_0 font_white">.' . strtoupper($ext) . '</b></div>';
+		}
+	}
+	return $S;
+}
