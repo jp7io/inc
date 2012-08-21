@@ -1047,6 +1047,21 @@ function interadmin_tipos_campos($campos) {
 }
 
 /**
+ * Transforma array de campos em string separada por ; e {,} no formato do InterAdmin.
+ * 
+ * @param array $campos
+ * @return string
+ */
+function interadmin_tipos_campos_encode($campos) {
+	$s = '';
+	foreach ($campos as $key => $value) {
+		unset($value['ordem']);
+		$s .= implode('{,}', $value) . '{;}';
+	}
+	return $s;	
+}
+
+/**
  * Gets an array containing "nome" and "xtra" values of a field on Interadmin. 
  *
  * @param string $db_prefix Prefix of the table.
