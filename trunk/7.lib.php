@@ -126,9 +126,14 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 function __autoload($className){
 	global $debugger;
 	
+	if (strpos($className, '\\')) {
+
+	}
+
 	if ($className) {
 		$ext = ((strpos($className, 'Zend_') === 0) ? '' : '.class') . '.php';
 		$filename = str_replace('_', '/', $className) . $ext;
+		$filename = str_replace('\\', '/', $filename);
 		
 		$paths = explode(PATH_SEPARATOR, get_include_path());
 		
