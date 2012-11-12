@@ -2854,12 +2854,13 @@ function jp7_is_executable($executable) {
  * @param string $format Format of the output. Defaults to "Versão {release} (Build {build})".
  * @return string Formatted string.
  */
-function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {release} (Build {build})')
+function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {release} (Build {build})', $nocache_force = false)
 {
 	global $c_doc_root;
 	$cacheFile = $c_doc_root . $packageDir . '/.version';
 	
-	if (@is_file($cacheFile)) {
+	$version = false;
+	if (@is_file($cacheFile) && !$nocache_force) {
         // If .version was saved this day or SVN is not available, keep .version cache
 		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || JP7_IS_WINDOWS || !jp7_is_executable('svn')) {
             $version = unserialize(file_get_contents($cacheFile));
