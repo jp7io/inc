@@ -709,5 +709,3 @@ function getdnsattributes ($l,$ip){
   $str = substr( $str, 1, -1 );
   return $str;
 }
-
-?>

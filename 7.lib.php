@@ -70,7 +70,7 @@ function endsWith($needle, $haystack) {
 $c_jp7 = false;
 if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
 	$c_jp7 = true;
-} elseif (startsWith('186.', $_SERVER['REMOTE_ADDR']) || startsWith('187.', $_SERVER['REMOTE_ADDR']) || startsWith('189.', $_SERVER['REMOTE_ADDR'])) {
+} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('186.', '187.', '189.', '201.'))) {
 	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
@@ -2635,6 +2635,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	if (!$c_jp7) {
 		//Envia email e exibe tela de manutenção
 		if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
+			Jp7_View::logError();
 			$debugger->sendTraceByEmail($backtrace);
 			$backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para ' .
 				'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
@@ -3106,4 +3107,22 @@ function array_move_key($array, $key1, $key2, $pos = 1) {
 	array_splice($values, $pos_key2 + $pos, 0, array($value_key1));
 	
 	return array_combine($keys, $values);
+}
+
+/**
+ * Sends the given data to the FirePHP Firefox Extension.
+ * The data can be displayed in the Firebug Console or in the
+ * "Server" request tab.
+ *
+ * @see http://www.firephp.org/Wiki/Reference/Fb
+ * @param mixed $Object
+ * @return true
+ * @throws Exception
+ */
+function fb()
+{
+	$instance = FirePHP::getInstance(true);
+
+	$args = func_get_args();
+	return call_user_func_array(array($instance,'fb'),$args);
 }
