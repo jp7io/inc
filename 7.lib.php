@@ -116,6 +116,13 @@ define('JP7_IS_WINDOWS', jp7_is_windows());
  */
 define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 
+require 'Zend/Loader/Autoloader.php';
+$autoloader = Zend_Loader_Autoloader::getInstance();
+$autoloader->setDefaultAutoloader('__autoload');
+$autoloader->setFallbackAutoloader(true);
+$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Zend_');
+$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'ZendX_');
+
 /**
  * Includes a class in case it hasn't been defined yet.
  *
@@ -126,12 +133,8 @@ define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 function __autoload($className){
 	global $debugger;
 	
-	if (strpos($className, '\\')) {
-
-	}
-
 	if ($className) {
-		$ext = ((strpos($className, 'Zend_') === 0) ? '' : '.class') . '.php';
+		$ext = '.class.php';
 		$filename = str_replace('_', '/', $className) . $ext;
 		$filename = str_replace('\\', '/', $filename);
 		
