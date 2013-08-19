@@ -75,7 +75,9 @@ if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.
 }
 
 if ($c_jp7) {
-    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+	if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+		error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_STRICT);
+	} elseif (version_compare(PHP_VERSION, '5.3.0') >= 0) {
         error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
     } else {
         error_reporting(E_ALL ^ E_NOTICE);
@@ -372,8 +374,10 @@ function toXml($S) {
  * @version (2007/01/22)
  * @author JP
  */
-function hex2bin($S){
-	return pack("H".strlen($S),$S); 
+if (!function_exists('hex2bin')) {
+	function hex2bin($S){
+		return pack("H".strlen($S),$S); 
+	}
 }
 
 /**
