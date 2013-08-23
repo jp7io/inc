@@ -268,6 +268,7 @@ function interadmin_combo($current_id,$parent_id_tipo_2,$nivel=0,$prefix="",$sql
 		" WHERE id_tipo=".$parent_id_tipo_2.
 		$sql_where.
 		" AND (deleted='' OR deleted IS NULL) ".
+		" AND (publish<>'') ".
 		" ORDER BY int_key,varchar_key,select_key";
 	}
 	$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
