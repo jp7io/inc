@@ -1383,6 +1383,7 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
 			" AND (deleted = '' OR deleted IS NULL)" .
 			" AND date_publish <= '".date("Y/m/d H:i:s")."'";
 		}
+		$O = new stdClass();
 		if ($GLOBALS['db_type']) {
 			$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 			if ($row = $rs->FetchNextObj()) {
