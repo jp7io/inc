@@ -3116,6 +3116,25 @@ function array_move_key($array, $key1, $key2, $pos = 1) {
 	return array_combine($keys, $values);
 }
 
+function curl_get_contents($url, $options = array()) {
+	$ch = curl_init();
+	$timeout = 15;
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+	if ($options['header']) {
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $options['header']);	
+	}
+	$data = curl_exec($ch);
+	$info = curl_getinfo($ch);
+	curl_close($ch);
+	if ($info['http_code'] != 200) {
+		return false;
+	}
+	return $data;
+}
+
 /**
  * Sends the given data to the FirePHP Firefox Extension.
  * The data can be displayed in the Firebug Console or in the
