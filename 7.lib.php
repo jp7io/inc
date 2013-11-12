@@ -3122,6 +3122,9 @@ function curl_get_contents($url, $options = array()) {
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+	if (ini_get('open_basedir') != '') {
+		throw new Exception('CURL não segue redirects com open_basedir ligado. Desligue o open_basedir.');
+	}
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 	if ($options['header']) {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $options['header']);	
