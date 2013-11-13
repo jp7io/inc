@@ -3171,11 +3171,7 @@ function curl_get_contents($url, $options = array()) {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $options['header']);	
 	}
 	$data = curl_exec_follow($ch, 20);
-	$info = curl_getinfo($ch);
 	curl_close($ch);
-	if ($info['http_code'] != 200) {
-		return false;
-	}
 	return $data;
 }
 
