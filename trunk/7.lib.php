@@ -957,7 +957,7 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
  * @subpackage jp7_db_pages
  * @deprecated Kept as an alias to Pagination class.
  */
-class jp7_db_pages extends Pagination{
+class jp7_db_pages extends Pagination {
 	// Alterado o nome para Pagination
 }
 
@@ -3173,6 +3173,17 @@ function curl_get_contents($url, $options = array()) {
 	$data = curl_exec_follow($ch, 20);
 	curl_close($ch);
 	return $data;
+}
+
+function utf8_encode_recursive($array) {
+	foreach ($array as &$item) {
+		if (is_string($item)) {
+			$item = utf8_encode($item);
+		} elseif (is_object($item) || is_array($item)) {
+			$item = utf8_encode_recursive($item);
+		}
+	}
+	return $array;
 }
 
 /**
