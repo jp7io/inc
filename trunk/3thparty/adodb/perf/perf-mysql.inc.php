@@ -108,7 +108,7 @@ class perf_mysql extends adodb_perf{
 			$sql = $this->conn->GetOne("select sql1 from adodb_logsql where sql1 like $sqlq");
 		}
 		
-		$s = '<p><b>Explain</b>: '.htmlspecialchars($sql).'</p>';
+		$s = '<p><b>Explain</b>: '.htmlspecialchars($sql, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</p>';
 		$rs = $this->conn->Execute('EXPLAIN '.$sql);
 		$s .= rs2html($rs,false,false,false,false);
 		$this->conn->LogSQL($save);

@@ -47,6 +47,8 @@ function jp7_check_exception($e) {
 register_shutdown_function('jp7_check_shutdown');
 set_exception_handler('jp7_check_exception');
 
+
+
 /**
  * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
  */
@@ -105,7 +107,7 @@ set_include_path(realpath(ROOT_PATH . '/classes'). PATH_SEPARATOR .  get_include
  * @global Jp7_Debugger $debugger
  */
 $debugger = new Jp7_Debugger();
-//set_error_handler(array($debugger, 'errorHandler'));
+set_error_handler(array($debugger, 'errorHandler'));
 
 /**
  * @global Browser $is
@@ -2055,7 +2057,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 		$mail = mail($to, $subject, $message, $headers); // Safe Mode
 	}
 	if ($debug) {
-		echo 'jp7_mail(' . htmlentities($to) . ': ' . $mail . '<br>';
+		echo 'jp7_mail(' . isoentities($to) . ': ' . $mail . '<br>';
 	}
 	return $mail;
 }
@@ -3202,4 +3204,12 @@ function fb()
 
 	$args = func_get_args();
 	return call_user_func_array(array($instance,'fb'),$args);
+}
+
+function isoentities($string) {
+	return htmlentities($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+}
+
+function isospecialchars($string) {
+	return htmlspecialchars($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
 }

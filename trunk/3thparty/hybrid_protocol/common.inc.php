@@ -122,7 +122,7 @@ function xml_pp($xml, $html_output=false) {
     }
   }
   $xml = implode("\n", $pretty);
-  return ($html_output) ? htmlentities($xml) : $xml;
+  return ($html_output) ? htmlentities($xml, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') : $xml;
 }
 
 /**

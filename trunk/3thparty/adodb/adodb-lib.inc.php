@@ -271,20 +271,20 @@ function _adodb_getmenu(&$zthis, $name,$defstr='',$blank1stItem=true,$multiple=f
 		}
 */
 		if ($hasvalue) 
-			$value = " value='".htmlspecialchars($zval2)."'";
+			$value = " value='".htmlspecialchars($zval2, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1')."'";
 		
 		if (is_array($defstr))  {
 			
 			if (in_array($selected,$defstr)) 
-				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 			else 
-				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 		}
 		else {
 			if (strcasecmp($selected,$defstr)==0) 
-				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 			else
-				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 		}
 		$zthis->MoveNext();
 	} // while
@@ -349,28 +349,28 @@ function _adodb_getmenu_gp(&$zthis, $name,$defstr='',$blank1stItem=true,$multipl
             $optgroup = $group;
             if ($firstgroup) {
                 $firstgroup = false;
-                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+                $s .="\n<optgroup label='". htmlspecialchars($group, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') ."'>";
             } else {
                 $s .="\n</optgroup>";
-                $s .="\n<optgroup label='". htmlspecialchars($group) ."'>";
+                $s .="\n<optgroup label='". htmlspecialchars($group, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') ."'>";
             }
 		}
 	
 		if ($hasvalue) 
-			$value = " value='".htmlspecialchars($zval2)."'";
+			$value = " value='".htmlspecialchars($zval2, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1')."'";
 		
 		if (is_array($defstr))  {
 			
 			if (in_array($selected,$defstr)) 
-				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 			else 
-				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 		}
 		else {
 			if (strcasecmp($selected,$defstr)==0) 
-				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval).'</option>';
+				$s .= "\n<option selected='selected'$value>".htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 			else
-				$s .= "\n<option".$value.'>'.htmlspecialchars($zval).'</option>';
+				$s .= "\n<option".$value.'>'.htmlspecialchars($zval, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</option>';
 		}
 		$zthis->MoveNext();
 	} // while
@@ -1047,12 +1047,12 @@ function _adodb_debug_execute(&$zthis, $sql, $inputarr)
 	if (isset($zthis->dsnType)) $dbt .= '-'.$zthis->dsnType;
 	if ($inBrowser) {
 		if ($ss) {
-			$ss = '<code>'.htmlspecialchars($ss).'</code>';
+			$ss = '<code>'.htmlspecialchars($ss, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1').'</code>';
 		}
 		if ($zthis->debug === -1)
-			ADOConnection::outp( "<br />\n($dbt): ".htmlspecialchars($sqlTxt)." &nbsp; $ss\n<br />\n",false);
+			ADOConnection::outp( "<br />\n($dbt): ".htmlspecialchars($sqlTxt, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1')." &nbsp; $ss\n<br />\n",false);
 		else 
-			ADOConnection::outp( "<hr />\n($dbt): ".htmlspecialchars($sqlTxt)." &nbsp; $ss\n<hr />\n",false);
+			ADOConnection::outp( "<hr />\n($dbt): ".htmlspecialchars($sqlTxt, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1')." &nbsp; $ss\n<hr />\n",false);
 	} else {
 		ADOConnection::outp("-----\n($dbt): ".$sqlTxt."\n-----\n",false);
 	}
@@ -1112,7 +1112,7 @@ function _adodb_backtrace($printOrArr=true,$levels=9999,$skippy=0)
 			else if (is_bool($v)) $args[] = $v ? 'true' : 'false';
 			else {
 				$v = (string) @$v;
-				$str = htmlspecialchars(substr($v,0,$MAXSTRLEN));
+				$str = htmlspecialchars(substr($v,0,$MAXSTRLEN), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
 				if (strlen($v) > $MAXSTRLEN) $str .= '...';
 				$args[] = $str;
 			}

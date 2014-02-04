@@ -277,7 +277,7 @@ CREATE TABLE PLAN_TABLE (
 			}
 		}
 		
-		$s = "<p><b>Explain</b>: ".htmlspecialchars($sql)."</p>";	
+		$s = "<p><b>Explain</b>: ".htmlspecialchars($sql, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1')."</p>";	
 		
 		$this->conn->BeginTrans();
 		$id = "ADODB ".microtime();
