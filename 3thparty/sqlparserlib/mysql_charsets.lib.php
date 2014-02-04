@@ -101,8 +101,8 @@ function PMA_generateCharsetDropdownBox($type = PMA_CSDROPDOWN_COLLATION,
     }
 
     $return_str  = '<select xml:lang="en" dir="ltr" name="'
-        . htmlspecialchars($name) . '"'
-        . (empty($id) ? '' : ' id="' . htmlspecialchars($id) . '"')
+        . htmlspecialchars($name, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '"'
+        . (empty($id) ? '' : ' id="' . htmlspecialchars($id, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '"')
         . ($submitOnChange ? ' onchange="this.form.submit();"' : '') . '>' . "\n";
     if ($label) {
         $return_str .= '<option value="">'

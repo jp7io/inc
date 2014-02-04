@@ -18430,7 +18430,7 @@ function CloseTag($tag)
 				$objattr = array();
 				$objattr['type'] = 'toc';
 				$objattr['toclevel'] = $this->h2toc[$tag];
-				$objattr['CONTENT'] = htmlspecialchars($content);	// mPDF 5.6.37
+				$objattr['CONTENT'] = htmlspecialchars($content, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');	// mPDF 5.6.37
 				$e = "\xbb\xa4\xactype=toc,objattr=".serialize($objattr)."\xbb\xa4\xac";
 				array_unshift($this->textbuffer,array($e));
 			}

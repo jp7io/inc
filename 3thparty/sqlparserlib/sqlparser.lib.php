@@ -140,7 +140,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         $SQP_errorString = '<p>'.$GLOBALS['strSQLParserUserError'] . '</p>' . "\n"
             . '<pre>' . "\n"
             . 'ERROR: ' . $message . "\n"
-            . 'SQL: ' . htmlspecialchars($sql) .  "\n"
+            . 'SQL: ' . htmlspecialchars($sql, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') .  "\n"
             . '</pre>' . "\n";
 
     } // end of the "PMA_SQP_throwError()" function
@@ -164,7 +164,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         $debugstr .= 'PMA: ' . PMA_VERSION . "\n";
         $debugstr .= 'PHP VER,OS: ' . PMA_PHP_STR_VERSION . ' ' . PHP_OS . "\n";
         $debugstr .= 'LANG: ' . $GLOBALS['lang'] . "\n";
-        $debugstr .= 'SQL: ' . htmlspecialchars($sql);
+        $debugstr .= 'SQL: ' . htmlspecialchars($sql, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
 
         $encodedstr     = $debugstr;
         if (@function_exists('gzcompress')) {
@@ -343,7 +343,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
                     // ($pos === FALSE)
                     if ($pos < 0) {
                         $debugstr = $GLOBALS['strSQPBugUnclosedQuote'] . ' @ ' . $startquotepos. "\n"
-                                  . 'STR: ' . htmlspecialchars($quotetype);
+                                  . 'STR: ' . htmlspecialchars($quotetype, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
                         PMA_SQP_throwError($debugstr, $sql);
                         return $sql_array;
                     }
@@ -494,7 +494,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
                             continue;
                         } else {
                             $debugstr = $GLOBALS['strSQPBugInvalidIdentifer'] . ' @ ' . ($count1+1) . "\n"
-                                      . 'STR: ' . htmlspecialchars(PMA_substr($sql, $count1, $count2 - $count1));
+                                      . 'STR: ' . htmlspecialchars(PMA_substr($sql, $count1, $count2 - $count1), ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
                             PMA_SQP_throwError($debugstr, $sql);
                             return $sql_array;
                         }
@@ -611,7 +611,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
 
                     } elseif ($last != '~') {
                         $debugstr =  $GLOBALS['strSQPBugUnknownPunctuation'] . ' @ ' . ($count1+1) . "\n"
-                                  . 'STR: ' . htmlspecialchars($punct_data);
+                                  . 'STR: ' . htmlspecialchars($punct_data, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
                         PMA_SQP_throwError($debugstr, $sql);
                         return $sql_array;
                     }
@@ -2047,7 +2047,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
 
         $class     .= 'syntax_' . $arr['type'];
 
-        return '<span class="' . $class . '">' . htmlspecialchars($arr['data']) . '</span>';
+        return '<span class="' . $class . '">' . htmlspecialchars($arr['data'], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1') . '</span>';
     } // end of the "PMA_SQP_formatHtml_colorize()" function
 
 
@@ -2069,11 +2069,11 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         //DEBUG echo 'in Format<pre>'; print_r($arr); echo '</pre>';
         // then check for an array
         if (!is_array($arr)) {
-            return htmlspecialchars($arr);
+            return htmlspecialchars($arr, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
         }
         // first check for the SQL parser having hit an error
         if (PMA_SQP_isError()) {
-            return htmlspecialchars($arr['raw']);
+            return htmlspecialchars($arr['raw'], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
         }
         // else do it properly
         switch ($mode) {
@@ -2462,7 +2462,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
             if ($mode=='color') {
                 $str .= PMA_SQP_formatHTML_colorize($arr[$i]);
             } elseif ($mode == 'text') {
-                $str .= htmlspecialchars($arr[$i]['data']);
+                $str .= htmlspecialchars($arr[$i]['data'], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
             } else {
                 $str .= $arr[$i]['data'];
             }
@@ -2545,7 +2545,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
      */
     function PMA_SQP_formatNone($arr)
     {
-        $formatted_sql = htmlspecialchars($arr['raw']);
+        $formatted_sql = htmlspecialchars($arr['raw'], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
         $formatted_sql = preg_replace("@((\015\012)|(\015)|(\012)){3,}@", "\n\n", $formatted_sql);
 
         return $formatted_sql;
