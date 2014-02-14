@@ -2587,6 +2587,17 @@ function utf8_encode_recursive($array) {
 	return $array;
 }
 
+function utf8_decode_recursive($array) {
+	foreach ($array as &$item) {
+		if (is_string($item)) {
+			$item = utf8_decode($item);
+		} elseif (is_object($item) || is_array($item)) {
+			$item = utf8_decode_recursive($item);
+		}
+	}
+	return $array;
+}
+
 /**
  * Sends the given data to the FirePHP Firefox Extension.
  * The data can be displayed in the Firebug Console or in the
