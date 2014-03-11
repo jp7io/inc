@@ -702,7 +702,7 @@ if (!function_exists('interadmin_arquivos_preview')) {
 		if ($ext) {
 			if (in_array($ext, array('gif', 'jpg', 'jpeg', 'png'))) {
 				$S = '<div class="image_preview_background"><img ' . (($presrc) ? 'pre' : '') . 'src="' . $S . (strpos($S, '?') ? '&' : '?') . 'size=40x40"' . $c_arquivos_parametros . (($name) ? ' alt="' . $name . '"' : '') . '></div>';
-			} elseif (in_array($ext, array('doc', 'pdf', 'ppt', 'swf', 'wmv', 'xsl', 'zip', 'docx', 'xlsx'))) { 
+			} elseif (in_array($ext, array('doc', 'pdf', 'ppt', 'swf', 'wmv', 'xls', 'zip', 'docx', 'xlsx'))) { 
 				$S = "<div><img src=\"/_default/img/aplicacao/ico_file_".$ext."_" . $icon_size . ".gif\"".(($name)?" alt=\"".$name."\"":"")." style=\"width:" . $icon_size . "px;height:" . $icon_size . "px;background:transparent\"></div>";
 			} else {
 				$S = '<div class="bg_gray_1"><b class="font_0 font_white">.' . strtoupper($ext) . '</b></div>';
