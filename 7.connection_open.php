@@ -164,8 +164,8 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	$c_view->headScript()->appendFile('../../js/init.js');
 	
 	// CSS
-	$c_view->headLink()->appendStylesheet($c_path_css . '7_w3c.css');
-	$c_view->headLink()->appendStylesheet('../../css/' . $config->name_id . '.css');
+	$c_view->headLink()->appendStylesheet($c_path_css . '7_w3c.css', 'all');
+	$c_view->headLink()->appendStylesheet('../../css/' . $config->name_id . '.css', 'all');
 	if ($c_template) {
 		$c_view->headLink()->appendStylesheet('/_default/css/7_templates.css');
 		$c_view->headLink()->appendStylesheet('/_templates/' . $c_template . '/css/style.css');
