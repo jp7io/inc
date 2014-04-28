@@ -88,8 +88,8 @@ if ($c_jp7) {
     error_reporting(0);
 }
 
-setlocale(LC_CTYPE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
-setlocale(LC_COLLATE, array('pt_BR', 'pt_BR.ISO8859-1', 'Portuguese_Brazil'));
+setlocale(LC_CTYPE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
+setlocale(LC_COLLATE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
 
 date_default_timezone_set('America/Sao_Paulo');
 
