@@ -72,7 +72,7 @@ function endsWith($needle, $haystack) {
 $c_jp7 = false;
 if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
 	$c_jp7 = true;
-} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('177.', '186.', '187.', '189.', '201.'))) {
+} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('177.', '179.', '186.', '187.', '189.', '201.'))) {
 	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
