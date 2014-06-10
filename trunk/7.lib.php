@@ -127,6 +127,7 @@ $autoloader->setFallbackAutoloader(true);
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Zend_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'ZendX_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'PHPExcel_');
+$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Google_');
 
 /**
  * Includes a class in case it hasn't been defined yet.
