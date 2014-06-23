@@ -2518,6 +2518,21 @@ function array_move_key($array, $key1, $key2, $pos = 1) {
 	return array_combine($keys, $values);
 }
 
+/**
+ * Removes value from array.
+ * 
+ * @param array $array
+ * @param mixed $value
+ */
+if (!function_exists('array_delete')) {
+	function array_delete(&$array, $value) {
+		$key = array_search($value, $array);
+		if ($key !== false) {
+			unset($array[$key]);
+		}
+	}
+}
+
 function curl_exec_follow($ch, /*int*/ $maxredirect = null) {
 	$mr = $maxredirect === null ? 5 : intval($maxredirect);
 	if (ini_get('open_basedir') == '') {
