@@ -2418,9 +2418,13 @@ function jp7_formatDsn($db) {
  */
 function kd() {
 	$_ = func_get_args();
-    call_user_func_array(
-        array('Krumo', 'dump'), $_
-    );
+	if (php_sapi_name() == 'cli') {
+		call_user_func_array('var_dump', $_);
+	} else {		
+	    call_user_func_array(
+	        array('Krumo', 'dump'), $_
+	    );
+    }
 	die();
 }
 
