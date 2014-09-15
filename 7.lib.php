@@ -106,8 +106,8 @@ $debugger = new Jp7_Debugger();
 /**
  * @global Browser $is
  */
-$is = new Browser($_SERVER['HTTP_USER_AGENT']);
 define('JP7_IS_WINDOWS', jp7_is_windows());
+$is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 /**
  * Define o diretório com os arquivos do Krumo
