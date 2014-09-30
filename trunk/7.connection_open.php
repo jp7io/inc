@@ -23,18 +23,20 @@ if (!$c_path_default) {
 }
 
 // Check IDs
-foreach ($_REQUEST as $key => $value) {
-	if ($key == 'id' || substr($key, -3) === '_id') {
-		if (strpos($key, 'openid_') !== false) {
-			continue; // Conflito OpenID (openid_claimed_id)
-		}
-		if (is_string($value) && strpos($value, 'http://') !== false) {
-			global $debugger;
-			if ($debugger) {
-				$debugger->sendTraceByEmail(new Exception('ID com URL'));
+if ($_REQUEST) {
+	foreach ($_REQUEST as $key => $value) {
+		if ($key == 'id' || substr($key, -3) === '_id') {
+			if (strpos($key, 'openid_') !== false) {
+				continue; // Conflito OpenID (openid_claimed_id)
 			}
-			header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $GLOBALS['c_path']);
-			exit();
+			if (is_string($value) && strpos($value, 'http://') !== false) {
+				global $debugger;
+				if ($debugger) {
+					$debugger->sendTraceByEmail(new Exception('ID com URL'));
+				}
+				header('Location: http://' . $_SERVER['HTTP_HOST'] . '/' . $GLOBALS['c_path']);
+				exit();
+			}
 		}
 	}
 }
