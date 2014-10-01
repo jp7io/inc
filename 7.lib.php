@@ -2293,7 +2293,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
 	}
 	
 	if (!$version || !$version->build || !$version->release) {
-		$comando = 'svn info "' . $c_doc_root . $packageDir . '"';
+		$comando = 'svn info "' . $c_doc_root . $packageDir . '"' . (!JP7_IS_WINDOWS ? ' 2>&1' : '');
 		$svninfo = explode("\n", shell_exec($comando));
 		
 		$version = new stdClass();
