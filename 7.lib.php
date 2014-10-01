@@ -2292,7 +2292,7 @@ function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {r
         }
 	}
 	
-	if (!$version || !$version->build) {
+	if (!$version || !$version->build || !$version->release) {
 		$comando = 'svn info "' . $c_doc_root . $packageDir . '"';
 		$svninfo = explode("\n", shell_exec($comando));
 		
