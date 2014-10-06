@@ -65,9 +65,10 @@ function endsWith($needle, $haystack) {
  * @global bool $c_jp7
  */
 $c_jp7 = false;
-if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR'])) {
+$c_development = $_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
+if ($c_development) {
 	$c_jp7 = true;
-} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('177.', '179.', '186.', '187.', '189.', '201.'))) {
+} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.'))) {
 	$c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
@@ -124,7 +125,7 @@ $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'PHPExcel_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Google_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Whoops');
 
-if ($c_jp7) {
+if ($c_development) {
 	$whoops = new \Whoops\Run;
 	$whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
 	$whoops->register();
