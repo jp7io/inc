@@ -92,7 +92,7 @@ if(!function_exists('htmlspecialchars_decode')) {
 }
 
 function PreparePreText($text,$ff='//FF//') {
-	$text = htmlspecialchars($text, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+	$text = htmlspecialchars($text);
 	if ($ff) { $text = str_replace($ff,'</pre><formfeed /><pre>',$text); }
 	return ('<pre>'.$text.'</pre>');
 }
