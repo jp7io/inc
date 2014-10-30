@@ -218,6 +218,13 @@ function toSeo($string) {
 }
 
 /**
+ * Alias for toSeo(). 
+ */
+function toSlug($string) {
+	return toSeo($string);
+}
+
+/**
  * Generates a SQL WHERE statement with REGEXP for 'decoding' the toSeo() function.
  *
  * @param string $field Field where the data will be searched, e.g. varchar_key.
