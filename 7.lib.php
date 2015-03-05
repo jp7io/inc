@@ -966,6 +966,7 @@ function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key') {
 	global $db;
 	global $db_prefix;
 	global $lang;
+	
 	$table = $db_prefix . $lang->prefix;
 	$sql = "SELECT id FROM " . $table . " WHERE" .
 	" " . $field_name . "='" . $field_value . "'" .
@@ -2287,37 +2288,9 @@ function jp7_is_executable($executable) {
  * @param string $format Format of the output. Defaults to "Versão {release} (Build {build})".
  * @return string Formatted string.
  */
-function interadmin_get_version($packageDir = 'interadmin', $format = 'Versão {release} (Build {build})', $nocache_force = false)
-{
-	global $c_doc_root;
-	$cacheFile = $c_doc_root . $packageDir . '/.version';
-	
-	$version = false;
-	if (@is_file($cacheFile) && !$nocache_force) {
-        // If .version was saved this day or SVN is not available, keep .version cache
-		if (date('Y-m-d') === date('Y-m-d', @filemtime($cacheFile)) || JP7_IS_WINDOWS || !jp7_is_executable('svn')) {
-            $version = unserialize(file_get_contents($cacheFile));
-        }
-	}
-	
-	if (!$version || !$version->build || !$version->release) {
-		$comando = 'svn info "' . $c_doc_root . $packageDir . '"' . (!JP7_IS_WINDOWS ? ' 2>&1' : '');
-		$svninfo = explode("\n", shell_exec($comando));
-		
-		$version = new stdClass();
-		$version->release = reset(preg_grep('/^URL:(.*)/', $svninfo));
-		$version->release = preg_replace('~URL:(.*)' . $packageDir . '/~', '', $version->release);
-		if (strpos($version->release, 'tags') === 0) {
-			$version->release = preg_replace('~tags/release-([0-9.]*)(-crypt)?~', '$1', $version->release);			
-		}
-		$version->build = reset(preg_grep('/^Rev(.*)/', $svninfo));
-		$version->build = preg_replace('~Rev(.*): (.*)~', '$2', $version->build);
-		file_put_contents($cacheFile, serialize($version));
-	}
-	
-	$retorno = str_replace('{release}', $version->release, $format);
-	$retorno = str_replace('{build}', $version->build, $retorno);
-	return $retorno;
+function interadmin_get_version($packageDir = 'interadmin') {
+	$revisionFile = ROOT_PATH . '/' . $packageDir . '/.git/refs/heads/master';
+	return file_get_contents($revisionFile);
 }
 
 // Suporte para json_encode() em hospedagens que não possuem o pacote JSON
