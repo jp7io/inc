@@ -2290,7 +2290,7 @@ function jp7_is_executable($executable) {
  */
 function interadmin_get_version($packageDir = 'interadmin') {
 	$revisionFile = ROOT_PATH . '/' . $packageDir . '/.git/refs/heads/master';
-	return file_get_contents($revisionFile);
+	return trim(file_get_contents($revisionFile));
 }
 
 // Suporte para json_encode() em hospedagens que não possuem o pacote JSON
