@@ -2409,6 +2409,10 @@ function kd() {
 	die();
 }
 
+function km($object) {
+	kd(get_class_methods($object));
+}
+
 function jp7_get_object_vars($object) {
 	// Por estar fora de escopo do objeto enviará somente os valores visíveis
 	return get_object_vars($object); 
