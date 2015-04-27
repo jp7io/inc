@@ -124,6 +124,7 @@ $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'ZendX_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'PHPExcel_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Google_');
 $autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Whoops');
+$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Symfony');
 
 if ($c_development) {
 	$whoops = new \Whoops\Run;
