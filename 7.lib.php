@@ -2577,12 +2577,21 @@ function curl_get_contents($url, $options = array()) {
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+	curl_setopt($ch, CURLOPT_HEADER, 1);
 	if ($options['header']) {
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $options['header']);	
 	}
-	$data = curl_exec_follow($ch, 20);
+	$response = curl_exec_follow($ch, 20);
+	
+	$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+	$header = substr($response, 0, $header_size);
+	$body = substr($response, $header_size);
+	
+	if (strpos($header, 'HTTP/1.1 200 OK') === false) {
+		throw new Exception('Could not get "' .  $url . '" - '. explode("\n", $header)[0]);
+	}	
 	curl_close($ch);
-	return $data;
+	return $body;
 }
 
 function utf8_encode_recursive($array) {
