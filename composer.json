@@ -1,0 +1,26 @@
+{
+	"name": "jp7internet/inc",
+	"description": "Jp7 Includes",
+	"keywords": [],
+	"license": "proprietary",
+	"repositories" : [
+       
+    ],
+	"require": {
+		
+	},
+	"require-dev": {
+		
+	},
+	"autoload": {
+		
+	},
+	"scripts": {
+		
+	},
+	"config": {
+		"preferred-install": "dist",
+		"component-dir": "vendor/components-installed"
+	},
+	"minimum-stability": "dev"
+}
