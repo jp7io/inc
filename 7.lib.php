@@ -131,7 +131,13 @@ function interadmin_autoload($className){
 	return false;
 }
 
-require 'Zend/Loader/Autoloader.php';
+@include 'Zend/Loader/Autoloader.php';
+if (!class_exists('Zend_Loader_Autoloader')) {
+    echo '##### Download Zend Framework: #####<br>' . PHP_EOL;
+    echo 'svn checkout http://svn.jp7.com.br/zf/svn/framework/standard/tags/release-1.11.10/library/Zend classes/Zend<br>' . PHP_EOL;
+    exit;
+}
+
 $autoloader = Zend_Loader_Autoloader::getInstance();
 $autoloader->setDefaultAutoloader('interadmin_autoload');
 $autoloader->setFallbackAutoloader(true);
