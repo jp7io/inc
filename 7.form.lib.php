@@ -1,4 +1,4 @@
-<?
+<?php
 // JP7's PHP DynForm Functions
 // Copyright 2004-2007 JP7
 // http://jp7.com.br

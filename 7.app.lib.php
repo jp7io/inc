@@ -1,4 +1,4 @@
-<?
+<?php
 // JP7's PHP Application Functions
 // Copyright 2004-2006 JP7
 // http://jp7.com.br

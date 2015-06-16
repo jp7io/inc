@@ -1,4 +1,4 @@
-<?
+<?php
 // General Vars
 $interadmin_id=$id;
 $interadmin_id_tipo=$id_tipo;
