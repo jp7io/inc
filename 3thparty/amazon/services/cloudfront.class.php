@@ -289,7 +289,7 @@ class AmazonCloudFront extends CFRuntime
 
 	/**
 	 * When caching is enabled, this method fires the request to the server, and the response is cached.
-	 * Accepts identical parameters as <authenticate()>. You should never call this method directly—it is
+	 * Accepts identical parameters as <authenticate()>. You should never call this method directlyâit is
 	 * used internally by the caching system.
 	 *
 	 * @param string $method (Required) The HTTP method to use to connect. Accepts <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>, and <code>HEAD</code>.

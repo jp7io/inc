@@ -12,10 +12,10 @@ if ($seo_baseurl) {
 		// Home
 		$baseHref .= '/' . $c_path . 'site/home/index.php';		
 	} elseif ($lang->lang != $config->lang_default && $go_url) {
-		// Língua
+		// LÃ­ngua
 		$baseHref .= '/' . $c_path . $lang->path_url . $go_url;
 	} else {
-		// Base href ficava incorreto quando haviam duas barras no endereço
+		// Base href ficava incorreto quando haviam duas barras no endereÃ§o
 		$baseHref .= str_replace('//', '/', $uriSemQueryString);
 	}
 }

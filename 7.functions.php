@@ -19,22 +19,22 @@ function endsWith($needle, $haystack) {
 function toId($string, $tofile = false, $separador = '') {
 	// Check if there are diacritics before replacing them
 	if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
-		$string = preg_replace("([·‡„‚‰¡¿√¬ƒ™])", 'a', $string);
-		$string = preg_replace("([ÈËÍÎ…» À&])", 'e', $string);
-		$string = preg_replace("([ÌÏÓÔÕÃŒœ])", 'i', $string);
-		$string = preg_replace("([ÛÚıÙˆ”“’‘÷∫])", 'o', $string);
-		$string = preg_replace("([˙˘˚¸⁄Ÿ€‹])", 'u', $string);
-		$string = preg_replace("([Á«])", 'c', $string);
-		$string = preg_replace("([Ò—])", 'n', $string);
+		$string = mb_ereg_replace("([√°√†√£√¢√§√Å√Ä√É√Ç√Ñ¬™])", 'a', $string);
+		$string = mb_ereg_replace("([√©√®√™√´√â√à√ä√ã&])", 'e', $string);
+		$string = mb_ereg_replace("([√≠√¨√Æ√Ø√ç√å√é√è])", 'i', $string);
+		$string = mb_ereg_replace("([√≥√≤√µ√¥√∂√ì√í√ï√î√ñ¬∫])", 'o', $string);
+		$string = mb_ereg_replace("([√∫√π√ª√º√ö√ô√õ√ú])", 'u', $string);
+		$string = mb_ereg_replace("([√ß√á])", 'c', $string);
+		$string = mb_ereg_replace("([√±√ë])", 'n', $string);
 	}
 	if ($tofile) {
-		$string = preg_replace("([^(\d\w)])", '_', $string);
+		$string = mb_ereg_replace("([^(\d\w)])", '_', $string);
 	} else {
-		$string = preg_replace("([^\d\w]+)", $separador, $string);
+		$string = mb_ereg_replace("([^\d\w]+)", $separador, $string);
 		$string = trim(strtolower($string), $separador);
 	}
 	if ($separador != '-') {
-		$string = preg_replace("([/-])", '_', $string);
+		$string = mb_ereg_replace("([/-])", '_', $string);
 	}
 	return $string;
 }
@@ -72,13 +72,13 @@ function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*'){
 	$sql_where = $regexp;
 	for ($i = 0; $i < strlen($str); $i++){
 		$char = $str[$i];
-		$char = str_replace('a', '[a·‡„‚‰™]', $char);
-		$char =	str_replace('e', '[eÈËÍÎ&]', $char);
-		$char = str_replace('i', '[iÌÏÓÔ]', $char);
-		$char =	str_replace('o', '[oÛÚıÙˆ∫]', $char);
-		$char =	str_replace('u', '[u˙˘˚¸]', $char);
-		$char =	str_replace('c', '[cÁ]', $char);
-		$char =	str_replace('n', '[nÒ]', $char);
+		$char = str_replace('a', '[a√°√†√£√¢√§¬™]', $char);
+		$char =	str_replace('e', '[e√©√®√™√´&]', $char);
+		$char = str_replace('i', '[i√≠√¨√Æ√Ø]', $char);
+		$char =	str_replace('o', '[o√≥√≤√µ√¥√∂¬∫]', $char);
+		$char =	str_replace('u', '[u√∫√π√ª√º]', $char);
+		$char =	str_replace('c', '[c√ß]', $char);
+		$char =	str_replace('n', '[n√±]', $char);
 		$sql_where .= $char . $regexp;
 	}
 	return "REPLACE(".$field.",' ','') REGEXP '^" . $sql_where . "$'";
@@ -187,7 +187,7 @@ function toParam($S){
  * @author JP7
  */
 function toXml($S) {
-	return str_replace(array('&', '"', "'", '<', '>', 'í' ), array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'), $S);
+	return str_replace(array('&', '"', "'", '<', '>', '‚Äô' ), array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'), $S);
 }
 
 /**
@@ -521,8 +521,8 @@ function jp7_date_week($w, $sigla = FALSE) {
 	switch($lang->lang) {
 		case "en": $W = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"); break;
 		case "de": $W = array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"); break;
-		case "es": $W = array("Domingo", "Lunes", "Martes", "MiÈrcoles", "Jueves", "Viernes", "S·bado"); break;
-		default: $W = array("Domingo", "Segunda", "TerÁa", "Quarta", "Quinta", "Sexta", "S·bado"); break;
+		case "es": $W = array("Domingo", "Lunes", "Martes", "Mi√©rcoles", "Jueves", "Viernes", "S√°bado"); break;
+		default: $W = array("Domingo", "Segunda", "Ter√ßa", "Quarta", "Quinta", "Sexta", "S√°bado"); break;
 	}
 	if (!is_int($w)) $w = date("w", strtotime($w));
 	$return = $W[$w];
@@ -545,13 +545,13 @@ function jp7_date_month($m, $sigla = FALSE) {
 			$M = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 			break;
 		case 'de':
-			$M = array('Januar', 'Februar', 'M‰rz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
+			$M = array('Januar', 'Februar', 'M√§rz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
 			break;
 		case 'es':
 			$M = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 			break;
 		default:
-			$M = array('Janeiro', 'Fevereiro', 'MarÁo', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
+			$M = array('Janeiro', 'Fevereiro', 'Mar√ßo', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
 			break;
 	}
 	$return = $M[$m - 1];
@@ -615,7 +615,7 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
  * @param string $var Name of global variable containing the current value for the hidden field, the default value is "".
  * @param string $readonly Readonly parameter to be inserted on the checkbox. e.g. readonly="readonly"
  * @param string $xtra Additional HTML parameter to be inserted on the checkbox.
- * @return string If $GLOBALS["interadmin_visualizar"] is set it returns "Sim" or "N„o", otherwise it returns the created HTML for checkbox and hidden field.
+ * @return string If $GLOBALS["interadmin_visualizar"] is set it returns "Sim" or "N√£o", otherwise it returns the created HTML for checkbox and hidden field.
  * @todo Make $readonly a boolean, setting if the field is readonly or not. Check if its better to replace $GLOBALS["interadmin_visualizar"] by global $interadmin_visualizar.
  * @author JP
  * @version (2007/07/13)
@@ -628,7 +628,7 @@ function jp7_db_checkbox($name, $value = "S", $var = "", $readonly="", $xtra="",
 		$var_value = $GLOBALS[$var];
 	}
 	if ($GLOBALS["interadmin_visualizar"]) {
-		return (($var_value) ? "Sim" : "N„o");
+		return (($var_value) ? "Sim" : "N√£o");
 	} else {
 		return "".
 		"<input type=\"checkbox\" name=\"jp7_db_checkbox_".$name."\" id=\"jp7_db_checkbox_".$name."\" value=\"".$value."\"".(($var_value)?" checked=\"checked\"":"").$readonly." onclick=\"form['".$name."'].value=(checked)?value:''\"".(($xtra)?" ".$xtra:"")." />".
@@ -1202,11 +1202,11 @@ function jp7_path_find($file) {
 		if ($ok = @file_exists($path . $file)) {
 			break;	
 		} elseif (strpos($path . $file, $web_root) === 0) {
-			break; // j· na raiz, evita erros de open_base_dir()
+			break; // j√° na raiz, evita erros de open_base_dir()
 		}
 	}
 	if (!$ok) {
-		// Necess·rio para localizaÁ„o de includes em templates
+		// Necess√°rio para localiza√ß√£o de includes em templates
 		$path = jp7_path($GLOBALS['c_doc_root'], TRUE) . dirname($_SERVER['REQUEST_URI']) . '/';
 		$ok = @file_exists($path . $file);
 	}
@@ -1289,7 +1289,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
 			if (strpos($template, 'http://') !== 0) {
 				$template = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['REQUEST_URI']) . '/' . $template;
 			}
-			//valida usu·rio logado e caso o template inicie em http
+			//valida usu√°rio logado e caso o template inicie em http
 			if ($_SERVER['PHP_AUTH_USER']) {
 				$template = str_replace('http://', 'http://' . $_SERVER['PHP_AUTH_USER'] . ':' . $_SERVER['PHP_AUTH_PW'] . '@', $template);
 			}
@@ -1374,7 +1374,7 @@ function jp7_mail($to,$subject,$message,$headers="",$parameters="",$template="",
  * @param string $padding Padding for the text, using CSS-like format, the default value is "0 0 0 0".
  * @param array|bool $shadow Array containing "color" (RGB string separated by comma),  "x" and "y" (the coordinates of the shadow), the default value is <tt>FALSE</tt>.
  * @param string $antialiasing If it receives the char "-" (minus) the antialiasing is turned off, the default value is "".
- * @param bol $truecolor If <tt>TRUE</tt> Os PNGs ser„o tratados com alpha. The default value is <tt>FALSE</tt>.
+ * @param bol $truecolor If <tt>TRUE</tt> Os PNGs ser√£o tratados com alpha. The default value is <tt>FALSE</tt>.
  * @return NULL
  * @version (2006/04/07)
  */
@@ -1454,12 +1454,12 @@ function jp7_imageCreateFromBmp($filename) {
     	return false;
     }
     
-    //1 : Chargement des entÍtes FICHIER
+    //1 : Chargement des ent√™tes FICHIER
 	$file = unpack('vfile_type/Vfile_size/Vreserved/Vbitmap_offset', fread($f1, 14));
     if ($file['file_type'] != 19778) {
        return false;
 	}
-    //2 : Chargement des entÍtes BMP
+    //2 : Chargement des ent√™tes BMP
     $bmp = unpack(
 		'Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
 		'/Vcompression/Vsize_bitmap/Vhoriz_resolution' . 
@@ -1483,7 +1483,7 @@ function jp7_imageCreateFromBmp($filename) {
         $palette = unpack('V' . $bmp['colors'], fread($f1, $bmp['colors'] * 4));
     }
     
-    //4 : CrÈation de l'image
+    //4 : Cr√©ation de l'image
     $img = fread($f1, $bmp['size_bitmap']);
     $vide = chr(0);
     
@@ -1707,7 +1707,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
 					imagepng($im_dest, $dest, round(($quality / 10) - 1));
 				} else {
 					imagejpeg($im_dest, $dest, $quality);
-					$mime = 'image/jpeg'; // It¥s being saved as a JPEG file
+					$mime = 'image/jpeg'; // It¬¥s being saved as a JPEG file
 				}
 			}			
 			imagedestroy($im_dest);
@@ -1745,7 +1745,7 @@ function rgba2int($red, $green, $blue, $alpha = 0) {
 function jp7_imageRoundedCorner($im, $radius = 20, $color = '255,255,255') {
 	$image_file = $_GET['src'];
 	$corner_radius = ($radius) ? $radius : 20; // The default corner radius is set to 20px
-	$angle = isset($_GET['angle']) ? $_GET['angle'] : 0; // The default angle is set to 0∫
+	$angle = isset($_GET['angle']) ? $_GET['angle'] : 0; // The default angle is set to 0¬∫
 	$topleft = (isset($_GET['topleft']) and $_GET['topleft'] == "no") ? false : true; // Top-left rounded corner is shown by default
 	$bottomleft = (isset($_GET['bottomleft']) and $_GET['bottomleft'] == "no") ? false : true; // Bottom-left rounded corner is shown by default
 	$bottomright = (isset($_GET['bottomright']) and $_GET['bottomright'] == "no") ? false : true; // Bottom-right rounded corner is shown by default
@@ -1896,7 +1896,7 @@ function jp7_file_size($file){
 function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	global $debugger, $config, $c_jp7;
 	
-	// LanÁando exceÁ„o, utilizado no Web Services, por exemplo
+	// Lan√ßando exce√ß√£o, utilizado no Web Services, por exemplo
 	if ($debugger->isExceptionsEnabled()) {
 		$exception = new Jp7_InterAdmin_Exception($msgErro);
 		$exception->setSql($sql);
@@ -1908,11 +1908,11 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null) {
 	$backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
 	
 	if (!$c_jp7) {
-		//Envia email e exibe tela de manutenÁ„o
+		//Envia email e exibe tela de manuten√ß√£o
 		if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
 			Jp7_View::logError();
 			$debugger->sendTraceByEmail($backtrace);
-			$backtrace = 'Ocorreu um erro ao tentar acessar esta p·gina, se o erro persistir envie um email para ' .
+			$backtrace = 'Ocorreu um erro ao tentar acessar esta p√°gina, se o erro persistir envie um email para ' .
 				'<a href="' . Jp7_Debugger::EMAIL . '">' . Jp7_Debugger::EMAIL . '</a>';
 			
 			$maintenanceHref = $debugger->getMaintenancePage() . '?page=' . $_SERVER['REQUEST_URI'] . '&msg=' . jp7_encrypt($msgErro, 'cryptK31');
@@ -2060,9 +2060,9 @@ function interadmin_bootstrap() {
 		// CLIENTE/APP
 		$jp7_app = $_GET['jp7_app'] = $urlArr[2];
         $cliente = $_GET['cliente'] = $urlArr[1];
-        // n„o tem cliente
+        // n√£o tem cliente
 		if (!$jp7_app) { 
-			interadmin_bootstrap_open_url($cliente); // $cliente na verdade È a aplicacao
+			interadmin_bootstrap_open_url($cliente); // $cliente na verdade √© a aplicacao
 		}
 		$url = str_replace('/' . $cliente . '/' . $jp7_app . '/', '', $_SERVER['REQUEST_URI']);
 	}
@@ -2071,7 +2071,7 @@ function interadmin_bootstrap() {
 	$url = preg_replace('/([^?]*)(.*)/', '\1', $url);
 	
 	if (!$url) {
-		interadmin_bootstrap_open_url($cliente); // $cliente na verdade È a aplicacao
+		interadmin_bootstrap_open_url($cliente); // $cliente na verdade √© a aplicacao
 	}
 	
 	chdir(jp7_doc_root() . $jp7_app);
@@ -2107,7 +2107,7 @@ function jp7_is_executable($executable) {
  * The version is cached on a file called: $packageDir/.version
  * 
  * @param string $packageDir Name of the package on SVN repository, defaults to 'interadmin'.
- * @param string $format Format of the output. Defaults to "Vers„o {release} (Build {build})".
+ * @param string $format Format of the output. Defaults to "Vers√£o {release} (Build {build})".
  * @return string Formatted string.
  */
 function interadmin_get_version($packageDir = 'interadmin') {
@@ -2115,7 +2115,7 @@ function interadmin_get_version($packageDir = 'interadmin') {
 	return substr(trim(file_get_contents($revisionFile)), 0, 7);
 }
 
-// Suporte para json_encode() em hospedagens que n„o possuem o pacote JSON
+// Suporte para json_encode() em hospedagens que n√£o possuem o pacote JSON
 if (!function_exists('json_encode')) {
 	function json_encode($array) {
 		$json = new Services_JSON();
@@ -2236,7 +2236,7 @@ function km($object) {
 }
 
 function jp7_get_object_vars($object) {
-	// Por estar fora de escopo do objeto enviar· somente os valores visÌveis
+	// Por estar fora de escopo do objeto enviar√° somente os valores vis√≠veis
 	return get_object_vars($object); 
 }
 
@@ -2294,20 +2294,20 @@ function array_full_diff($array_a, $array_b) {
 
 function jp7_normalize($string) {
 	$table = array(
-		'·' => 'a', '‡' => 'a', '„' => 'a', '‚' => 'a', '‰' => 'a', '™' => 'a',
-		'¡' => 'A', '¿' => 'A', '√' => 'A', '¬' => 'A', 'ƒ' => 'A',
-		'È' => 'e', 'Ë' => 'e', 'Í' => 'e', 'Î' => 'e', '&' => 'e',
-		'…' => 'E', '»' => 'E', ' ' => 'E', 'À' => 'E',
-		'Ì' => 'i', 'Ï' => 'i', 'Ó' => 'i', 'Ô' => 'i',
-		'Õ' => 'I', 'Ã' => 'I', 'Œ' => 'I', 'œ' => 'I',
-		'Û' => 'o', 'Ú' => 'o', 'ı' => 'o', 'Ù' => 'o', 'ˆ' => 'o', '∫' => 'o',
-		'”' => 'O', '“' => 'O', '’' => 'O', '‘' => 'O', '÷' => 'O',
-		'˙' => 'u', '˘' => 'u', '˚' => 'u', '¸' => 'u',
-		'⁄' => 'U', 'Ÿ' => 'U', '€' => 'U', '‹' => 'U',
-		'Á' => 'c',
-		'«' => 'C',
-		'Ò' => 'n',
-		'—' => 'N'
+		'√°' => 'a', '√†' => 'a', '√£' => 'a', '√¢' => 'a', '√§' => 'a', '¬™' => 'a',
+		'√Å' => 'A', '√Ä' => 'A', '√É' => 'A', '√Ç' => 'A', '√Ñ' => 'A',
+		'√©' => 'e', '√®' => 'e', '√™' => 'e', '√´' => 'e', '&' => 'e',
+		'√â' => 'E', '√à' => 'E', '√ä' => 'E', '√ã' => 'E',
+		'√≠' => 'i', '√¨' => 'i', '√Æ' => 'i', '√Ø' => 'i',
+		'√ç' => 'I', '√å' => 'I', '√é' => 'I', '√è' => 'I',
+		'√≥' => 'o', '√≤' => 'o', '√µ' => 'o', '√¥' => 'o', '√∂' => 'o', '¬∫' => 'o',
+		'√ì' => 'O', '√í' => 'O', '√ï' => 'O', '√î' => 'O', '√ñ' => 'O',
+		'√∫' => 'u', '√π' => 'u', '√ª' => 'u', '√º' => 'u',
+		'√ö' => 'U', '√ô' => 'U', '√õ' => 'U', '√ú' => 'U',
+		'√ß' => 'c',
+		'√á' => 'C',
+		'√±' => 'n',
+		'√ë' => 'N'
     );
     return strtr($string, $table);
 }

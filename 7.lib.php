@@ -23,7 +23,7 @@ function jp7_check_shutdown() {
 		case E_RECOVERABLE_ERROR:
 			global $debugger;
 			if ($debugger) {
-				// Nesse ponto as exceções não podem mais ser tratadas
+				// Nesse ponto as exceÃ§Ãµes nÃ£o podem mais ser tratadas
 				$debugger->setExceptionsEnabled(false);
 			}
 			die(jp7_debug($lasterror['message'] . ' in <b>' . $lasterror['file'] . '</b> on line ' .  $lasterror['line']));
@@ -38,7 +38,7 @@ function jp7_check_shutdown() {
 function jp7_check_exception($e) {
 	global $debugger;
 	if ($debugger) {
-		// Nesse ponto as exceções não podem mais ser tratadas
+		// Nesse ponto as exceÃ§Ãµes nÃ£o podem mais ser tratadas
 		$debugger->setExceptionsEnabled(false);
 	}
 	die(jp7_debug('Uncaught <b>' . get_class($e) . '</b> with message <b>' . $e->getMessage() . '</b> in ' . $e->getFile() . ' on line ' . $e->getLine(), null, $e->getTrace()));
@@ -78,6 +78,7 @@ if ($c_jp7) {
     error_reporting(0);
 }
 
+mb_internal_encoding("UTF-8");
 setlocale(LC_CTYPE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
 setlocale(LC_COLLATE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
 
@@ -90,7 +91,7 @@ jp7_register_globals();
 
 defined('ROOT_PATH') || define('ROOT_PATH', dirname(dirname(__FILE__)));
 
-// Necessário antes de loadar as classes
+// NecessÃ¡rio antes de loadar as classes
 set_include_path(realpath(ROOT_PATH . '/classes'). PATH_SEPARATOR .  get_include_path());
 
 /**
@@ -112,7 +113,7 @@ function interadmin_autoload($className){
 		
 		foreach ($paths as $path) {
 			if (strpos($path, 'classes') === false) {
-				continue; // Evita verificação desnecessária
+				continue; // Evita verificaÃ§Ã£o desnecessÃ¡ria
 			}
 			$file = $path . '/' . $filename;
 			if (@file_exists($file)) {
@@ -123,7 +124,7 @@ function interadmin_autoload($className){
 				return $className;
 			}
 		}
-		// Arquivo não encontrado
+		// Arquivo nÃ£o encontrado
 		if ($debugger) {
 			$debugger->addLog('autoload() could not find the (' . $className . ') class.', 'error');
 		}
@@ -161,7 +162,7 @@ define('JP7_IS_WINDOWS', jp7_is_windows());
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 /**
- * Define o diretório com os arquivos do Krumo
+ * Define o diretÃ³rio com os arquivos do Krumo
  */
 define('KRUMO_DIR', dirname(__FILE__) . '/../_default/js/krumo/');
 

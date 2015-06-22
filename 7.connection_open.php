@@ -104,7 +104,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 	}
 	
 	$config->lang = $config->langs[$lang->lang];
-	// Compatibilidade temporária 
+	// Compatibilidade temporÃ¡ria 
 	if (!$c_site_title) {
 		$c_site_title = $config->lang->title;
 	}
@@ -116,7 +116,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 		include $c_doc_root . $config->name_id . '/inc/lang_' . $lang->lang . '.php';
 	}
 		
-	// Tipos (Navegação) (2007/05/16 by JP)
+	// Tipos (NavegaÃ§Ã£o) (2007/05/16 by JP)
 	if (!$wap) {
 		$tipos = new interadmin_tipos($id_tipo, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
 		$secao = toId($tipos->nome[0]);
