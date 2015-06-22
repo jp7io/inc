@@ -62,7 +62,7 @@ for($i = 0;$i<$quantidade;$i++){
 						if (!is_dir($path)) mkdir($path, 0777);
 						else @chmod($path, 0777);
 						$dst = $path . $id_arquivo_banco . '.' . $tipo;
-						copy($_FILES[$table_field_name]['tmp_name'][$i], $dst) or die("Erro na cÃ³pia do arquivo!");
+						copy($_FILES[$table_field_name]['tmp_name'][$i], $dst) or die("Erro na cópia do arquivo!");
 						$GLOBALS['interadmin_' . $table_field_name] = $dst;
 					}
 				}
@@ -87,14 +87,14 @@ for($i = 0;$i<$quantidade;$i++){
 					$data = $GLOBALS[$table_field_name."_Y"][$i]."-".$GLOBALS[$table_field_name."_m"][$i]."-".$GLOBALS[$table_field_name."_d"][$i];
 					$hora = " ".(($GLOBALS[$table_field_name."_H"][$i])?$GLOBALS[$table_field_name."_H"][$i]:"00").":".(($GLOBALS[$table_field_name."_i"][$i])?$GLOBALS[$table_field_name."_i"][$i]:"00").":00";
 				
-					//se a data for invÃ¡lida, apaga os dados para nao dar erros de sqls
+					//se a data for inválida, apaga os dados para nao dar erros de sqls
 					//tenta usar a data completa			
 					if (strtotime($data . $hora)) {
 						$dataCorreta = $data . $hora;
 					//se nao der, tenta usar ela sem hora
 					} elseif (strtotime($data)) {
 						$dataCorreta = $data." 00:00:00";
-					//se nao der nao salvar nada, pois Ã© invÃ¡lida
+					//se nao der nao salvar nada, pois é inválida
 					} else {
 						$dataCorreta = "";
 					}

@@ -2,7 +2,7 @@
 // JP7's PHP Application Functions
 // Copyright 2004-2006 JP7
 // http://jp7.com.br
-// VersÃ£o 0.05 - 2006/08/29
+// Versão 0.05 - 2006/08/29
 
 
 // jp7_app_checkPermission (2006/08/17)
@@ -138,7 +138,7 @@ function jp7_app_createSelect_date($var,$time_xtra="",$s=false,$i=false,$readonl
 }
 
 /**
- * Adiciona string ao arquivo de log, que Ã© gravado dentro da pasta $c_interadminConfigPath/_log.
+ * Adiciona string ao arquivo de log, que é gravado dentro da pasta $c_interadminConfigPath/_log.
  * 
  * @param string $log Prefixo do nome do arquivo de log. Por exemplo: sql
  * @param string $S String a ser adicionada ao arquivo de log.
@@ -187,7 +187,7 @@ function jp7_msg($S,$type){
 
 // jp7_phpmyadmin_path (2004/06/23)
 /**
- * @deprecated NÃ£o Ã© mais utilizado o phpmyadmin para backup
+ * @deprecated Não é mais utilizado o phpmyadmin para backup
  */
 function jp7_phpmyadmin_path($path="../_admin/phpmyadmin/",$i=0){
 	if(is_dir($path)||$i>3)return $path;
@@ -196,7 +196,7 @@ function jp7_phpmyadmin_path($path="../_admin/phpmyadmin/",$i=0){
 
 // jp7_phpmyadmin_aplicacao_path (2007/07/19)
 /**
- * @deprecated NÃ£o Ã© mais utilizado o phpmyadmin para backup
+ * @deprecated Não é mais utilizado o phpmyadmin para backup
  */
 function jp7_phpmyadmin_aplicacao_path($path="../_admin/phpmyadmin/",$path2="../../"){
 	if(is_dir($path)||$i>3){
