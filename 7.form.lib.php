@@ -2,7 +2,7 @@
 // JP7's PHP DynForm Functions
 // Copyright 2004-2007 JP7
 // http://jp7.com.br
-// Vers„o 0.30 - 2007/08/06
+// Vers√£o 0.30 - 2007/08/06
 
 function interadmin_returnCampo($campo){
 	global $xtra_disabledfields_arr_final;
@@ -127,7 +127,7 @@ function interadmin_returnCampo($campo){
 				case "id_email": // ID E-Mail
 					$onkeypress=" xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.',event)\"";
 					break;
-				case "num": // N˙mero
+				case "num": // N√∫mero
 					$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
 					break;
 				case "cpf": // CPF
@@ -168,7 +168,7 @@ function interadmin_returnCampo($campo){
 							"<td>".jp7_app_createSelect_date($campo,(($xtra=="S"||(strpos($xtra,"datetime")===false&&$xtra))?"style=\"visibility:hidden\"":"").(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"").$readonly,false,$j,$readonly.(($xtra=="calendar_datetime"||$xtra=="calendar_date")?" onchange=\"interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":""),$xtra,$obrigatorio)."</td>\r\n".
 							"<td width=\"99%\" align=\"right\">\r\n".
 								//"<input type=\"button\" value=\"Atualizar".((strpos($xtra,"calendar")===false)?" Data".(($xtra!="S")?" - Hora":""):"")."\"".$readonly." tabindex=\"-1\" onclick=\"refreshDate('".$campo."','".$j."','','".$xtra."')".(($xtra=="calendar_datetime"||$xtra=="calendar_date")?";interadmin_calendar_update_bycombo(this,'".$campo."','".$j."')\"":"")."\">\r\n".
-								((strpos($xtra,"calendar")!==false)?"<input type=\"button\" id=\"".$campo."_calendar_".$j."\" value=\"Calend·rio\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\" />":"").
+								((strpos($xtra,"calendar")!==false)?"<input type=\"button\" id=\"".$campo."_calendar_".$j."\" value=\"Calend√°rio\"".$readonly." tabindex=\"-1\" style=\"margin-left:10px\" />":"").
 							"</td>\r\n".
 						"</tr>\r\n".
 					"</table>\r\n".
@@ -204,7 +204,7 @@ function interadmin_returnCampo($campo){
 					echo "".
 					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">\r\n".
 						"<th".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">Confirm. de ".$campo_nome.":</th>\r\n".
-						"<td colspan=2><input type=\"password\" xtype=\"password\" id=\"".$campo."_confirm[]\" name=\"".$campo."[]\" label=\"ConfirmaÁ„o de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>\r\n".
+						"<td colspan=2><input type=\"password\" xtype=\"password\" id=\"".$campo."_confirm[]\" name=\"".$campo."[]\" label=\"Confirma√ß√£o de ".$campo_nome."\" value=\"".toForm($valor)."\" title=\"".$ajuda."\" maxlength=255".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\"".(($tamanho)?" style=\"width:".$tamanho."em\"":"").$onkeypress."></td>\r\n".
 						"<td>".$S_ajuda."</td>\r\n".
 					"</tr>\r\n";
 				}
@@ -461,7 +461,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 	);
 	// Check Data
 	if(!$DF_to||!$DF_subject){
-		echo 'Faltam par‚metros <b>$DF_to</b> ou <b>$DF_subject</b>. Linha:' . __LINE__ . ' Arquivo: ' . __FILE__;
+		echo 'Faltam par√¢metros <b>$DF_to</b> ou <b>$DF_subject</b>. Linha:' . __LINE__ . ' Arquivo: ' . __FILE__;
 		exit;
 	}
 	// Send Mail
@@ -535,7 +535,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 			else $headers.="From: ".$DF_client."\r\n";
 		}
 		if($DF_reply_message){
-			$reply_subject=($DF_reply_subject)?$DF_reply_subject:"Resposta Autom·tica";
+			$reply_subject=($DF_reply_subject)?$DF_reply_subject:"Resposta Autom√°tica";
 			$message=$DF_reply_message;
 			if($DF_from_name)$message=str_replace("%FROM_NAME%",$DF_from_name,$message);
 			if($DF_client_name)$message=str_replace("%CLIENT_NAME%",$DF_client_name,$message);
@@ -551,7 +551,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 				"<hr size=1 color=\"#666666\">\r\n".
 				"<font size=1 color=\"#333333\">Automatic message. Please do not respond.</font><br><br>\r\n";
 			}else{
-				$reply_subject="Resposta Autom·tica";
+				$reply_subject="Resposta Autom√°tica";
 				$message="".
 				(($DF_from_name)?"<b>".$DF_from_name.",</b><br><br>\r\n":"").
 				"Recebemos sua mensagem e agradecemos o interesse.<br>\r\n".
@@ -559,7 +559,7 @@ function jp7_DF_sendMail($post_vars,$from_info=false,$env_info=true,$attachments
 				(($DF_client_name)?"Atenciosamente,<br><br>\r\n":"").
 				(($DF_client_name)?"<b>".$DF_client_name.".</b><br><br>\r\n":"").
 				"<hr size=1 color=\"#666666\">\r\n".
-				"<font size=1 color=\"#333333\">Mensagem autom·tica. Favor n„o responder.</font><br><br>\r\n";
+				"<font size=1 color=\"#333333\">Mensagem autom√°tica. Favor n√£o responder.</font><br><br>\r\n";
 			}
 		}
 		if($DF_reply_to){
@@ -610,7 +610,7 @@ function jp7_DF_prepareVars($db_prefix,$id_tipo,$vars_in,$var_prefix="",$only_in
 					$value=$new_value;
 				}elseif(strpos($key,"char_")===0){
 					if($value=="S")$value="Sim";
-					elseif(!$value||$value=="N")$value="N„o";
+					elseif(!$value||$value=="N")$value="N√£o";
 				}elseif(strpos($key,"date_")===0){
 					$value=jp7_date_format($value,"d/m/Y H:i");
 				}elseif(strpos($key,"select_multi")===0){
