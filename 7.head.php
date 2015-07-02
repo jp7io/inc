@@ -31,7 +31,7 @@ if ($seo_baseurl) {
 } ?>
 <html xmlns="http://www.w3.org/1999/xhtml"<?php echo $config->facebook_namespace ? ' xmlns:fb="http://www.facebook.com/2008/fbml"' : ''; ?>>
 <head>
-<meta http-equiv="content-type" content="text/html;charset=iso-8859-1" />
+<meta http-equiv="content-type" content="text/html;charset=<?php echo $config->charset ?>" />
 <meta name="language" content="<?php echo $lang->lang; ?>" />
 <meta name="description" content="<?php echo $config->lang->description; ?>" />
 <meta name="keywords" content="<?php echo $config->lang->keywords; ?>" />

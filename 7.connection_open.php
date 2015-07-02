@@ -88,6 +88,10 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
         die(jp7_debug('Unable to connect to the database '.jp7_formatDsn($config->db)));
     }
 
+    if ($config->charset == 'UTF-8') {
+        $db->execute("set names 'utf8'");
+    }
+
     // Language
     $lang = null;
     if ($_GET['lang'] && is_string($_GET['lang'])) {
