@@ -24,22 +24,22 @@ function toId($string, $tofile = false, $separador = '')
 {
     // Check if there are diacritics before replacing them
     if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
-        $string = mb_ereg_replace('([áàãâäÁÀÃÂÄª])', 'a', $string);
-        $string = mb_ereg_replace('([éèêëÉÈÊË&])', 'e', $string);
-        $string = mb_ereg_replace('([íìîïÍÌÎÏ])', 'i', $string);
-        $string = mb_ereg_replace('([óòõôöÓÒÕÔÖº])', 'o', $string);
-        $string = mb_ereg_replace('([úùûüÚÙÛÜ])', 'u', $string);
-        $string = mb_ereg_replace('([çÇ])', 'c', $string);
-        $string = mb_ereg_replace('([ñÑ])', 'n', $string);
+        $string = mb_ereg_replace('[áàãâäÁÀÃÂÄª]', 'a', $string);
+        $string = mb_ereg_replace('[éèêëÉÈÊË&]', 'e', $string);
+        $string = mb_ereg_replace('[íìîïÍÌÎÏ]', 'i', $string);
+        $string = mb_ereg_replace('[óòõôöÓÒÕÔÖº]', 'o', $string);
+        $string = mb_ereg_replace('[úùûüÚÙÛÜ]', 'u', $string);
+        $string = mb_ereg_replace('[çÇ]', 'c', $string);
+        $string = mb_ereg_replace('[ñÑ]', 'n', $string);
     }
     if ($tofile) {
-        $string = mb_ereg_replace("([^(\d\w)])", '_', $string);
+        $string = mb_ereg_replace("[^(\d\w)]", '_', $string);
     } else {
-        $string = mb_ereg_replace("([^\d\w]+)", $separador, $string);
+        $string = mb_ereg_replace("[^\d\w]+", $separador, $string);
         $string = trim(strtolower($string), $separador);
     }
     if ($separador != '-') {
-        $string = mb_ereg_replace('([/-])', '_', $string);
+        $string = mb_ereg_replace('[/-]', '_', $string);
     }
 
     return $string;
@@ -1575,12 +1575,12 @@ function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $tem
             //"	boundary=\"".$mime_boundary_2."\"\r\n\r\n".
             // TEXT
             '--'.$mime_boundary_2."\r\n".
-            "Content-Type: text/plain; charset=\"iso-8859-1\"\r\n".
+            "Content-Type: text/plain; charset=\"UTF-8\"\r\n".
             "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
             $message_text."\r\n\r\n".
             // HTML
             '--'.$mime_boundary_2."\r\n".
-            "Content-Type: text/html; charset=\"iso-8859-1\"\r\n".
+            "Content-Type: text/html; charset=\"UTF-8\"\r\n".
             "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
             $message_html."\r\n\r\n".
             // Footer
@@ -1589,7 +1589,7 @@ function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $tem
         // Headers
         $headers .=
             "Return-Errors-To: sites@jp7.com.br\r\n".
-            'Content-Type: text/plain';// charset=\"iso-8859-1\"\r\n".
+            'Content-Type: text/plain';// charset=\"UTF-8\"\r\n".
         //"Content-Transfer-Encoding: quoted-printable";
         // Message
         $message = $message_text;
@@ -2115,7 +2115,7 @@ function jp7_imageRoundedCorner($im, $radius = 20, $color = '255,255,255')
  * Attempts to encode a given string by the MIME header encoding scheme.
  *
  * @param string $S The string to be encoded.
- * @param string $charset Specifies the name of the character set in which the string is represented in, the default value is "iso-8859-1".
+ * @param string $charset Specifies the name of the character set in which the string is represented in, the default value is "UTF-8".
  * @param string $transfer_encoding Specifies the scheme of MIME encoding. It should be either "B" (Base64) or "Q" (Quoted-Printable), the default value is "Q".
  *
  * @see http://www.php.net/manual/en/function.mb-encode-mimeheader.php
@@ -2124,7 +2124,7 @@ function jp7_imageRoundedCorner($im, $radius = 20, $color = '255,255,255')
  *
  * @version (2005/12/08)
  */
-function jp7_encode_mimeheader($S, $charset = 'iso-8859-1', $transfer_encoding = 'Q')
+function jp7_encode_mimeheader($S, $charset = 'UTF-8', $transfer_encoding = 'Q')
 {
     return (function_exists('mb_encode_mimeheader')) ? mb_encode_mimeheader($S, $charset, $transfer_encoding, (strpos($_ENV['OS'], 'Windows') === false || !$_ENV['OS']) ? "\n" : "\r\n") : $S;
 }
