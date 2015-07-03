@@ -5,9 +5,9 @@
     }
     if ($s_session['preview']) {
         if ($config->server->type == InterSite::QA) {
-            $S .= ' - '.strtoupper('Preview');
+            $S .= ' - '.mb_strtoupper('Preview');
         } else {
-            $S = strtoupper('Preview');
+            $S = mb_strtoupper('Preview');
         }
     }
     ?>

@@ -169,7 +169,7 @@ function interadmin_returnCampo($campo)
         if (strpos($campo, 'tit_') === 0) {
         } elseif (strpos($campo, 'file_') === 0) {
             if (strpos($valor, '../../') === 0) {
-                $url = substr($valor, 6);
+                $url = mb_substr($valor, 6);
             }
             echo ''.
             "<tr>\r\n".
@@ -359,7 +359,7 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
                 $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->id.'" label="'.$field_label.'" value="'.$row->id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</label></div>\n";
                 break;
             default:
-                $R .= '<option value="'.$row->id.'"'.(($selected) ? ' selected="selected" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').'>'./*substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</option>\n";
+                $R .= '<option value="'.$row->id.'"'.(($selected) ? ' selected="selected" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').'>'./*mb_substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</option>\n";
                 break;
                 //if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
         }
@@ -439,7 +439,7 @@ function interadmin_tipos_combo($current_id_tipo, $parent_id_tipo_2, $nivel = 0,
                 $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->id_tipo.'" label="'.$field_label.'" value="'.$row->id_tipo.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id_tipo.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->nome."</label></div>\n";
                 break;
             default:
-                echo '<option value="'.$row->id_tipo.'"'.$readonly.(($selected) ? ' SELECTED style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').(($classes) ? ' style="background:#DDD"' : '').'>'.substr($row->nome, 0, 1).')'.$S.$row->nome."</option>\n";
+                echo '<option value="'.$row->id_tipo.'"'.$readonly.(($selected) ? ' SELECTED style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').(($classes) ? ' style="background:#DDD"' : '').'>'.mb_substr($row->nome, 0, 1).')'.$S.$row->nome."</option>\n";
                 break;
         }
         if (!$opcoes && ($style != 'checkbox' || $nivel < 2)) {
@@ -547,14 +547,14 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
     foreach ($post_vars as $key => $value) {
         if (in_array($key, $vars_headers)) {
             if (!$debug/*&&!@ini_get("safe_mode")*/ && $value) {
-                $headers .= strtoupper(substr($key, 3)).': '.$value."\r\n";
+                $headers .= mb_strtoupper(mb_substr($key, 3)).': '.$value."\r\n";
             }
         } elseif (strpos($key, 'DF_spacer') === 0) {
             $message .= "<br>\r\n";
         } elseif (strpos($key, '_select_multi') !== false) {
             $value = str_replace(' ,', '<br>', $value); // PC to HTML
             $value = str_replace('<br>', "<br>\r\n", $value); // HTML to HTML with CRLF
-            $message .= '<font size=1><b>'.substr($key, 0, strlen($key) - 13).":</b></font>&nbsp;<br>\r\n".
+            $message .= '<font size=1><b>'.mb_substr($key, 0, mb_strlen($key) - 13).":</b></font>&nbsp;<br>\r\n".
             "<div style=\"background:#F2F2F2;margin-top:3px;padding:5px;border:1px solid #CCC\">\r\n".
             "<font face=\"verdana\" size=2 color=\"#000000\" style=\"font-size:13px\">\r\n".
             toHTML($value, true)."\r\n".
@@ -565,14 +565,14 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
             $value = str_replace("\r", '<br>', $value); // Mac to HTML
             $value = str_replace("\n", '<br>', $value); // Linux to HTML
             $value = str_replace('<br>', "<br>\r\n", $value); // HTML to HTML with CRLF
-            $message .= '<font size=1><b>'.substr($key, 0, strlen($key) - 9).":</b></font>&nbsp;<br>\r\n".
+            $message .= '<font size=1><b>'.mb_substr($key, 0, mb_strlen($key) - 9).":</b></font>&nbsp;<br>\r\n".
             "<div style=\"background:#F2F2F2;margin-top:3px;padding:5px;border:1px solid #CCC\">\r\n".
             "<font face=\"verdana\" size=2 color=\"#000000\" style=\"font-size:13px\">\r\n".
             toHTML($value, true)."\r\n".
             "</font>\r\n".
             "</div>\r\n";
         } elseif (strpos($key, '_link') !== false) {
-            $message .= '<font size=1><b>'.substr($key, 0, strlen($key) - 5).':</b></font> <a href="'.$value.'" target="_blank">'.$value."</a><br>\r\n";
+            $message .= '<font size=1><b>'.mb_substr($key, 0, mb_strlen($key) - 5).':</b></font> <a href="'.$value.'" target="_blank">'.$value."</a><br>\r\n";
         } elseif (strpos($key, 'file_') !== false || @is_link($value)) {
             $message .= '<font size=1><b>'.$key.':</b></font> <a href="'.$value.'" target="_blank">'.$value."</a><br>\r\n";
         } elseif (!in_array($key, $vars_special) && strpos($key, 'noDF_') === false) {
@@ -684,7 +684,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 || strpos($key, $var_prefix.'select_') !== false
                 || strpos($key, $var_prefix.'parent_id') !== false) {
                 if ($var_prefix) {
-                    $key = substr($key, strlen($var_prefix));
+                    $key = mb_substr($key, mb_strlen($var_prefix));
                 }
                 $campo = interadmin_tipos_campo($db_prefix, $id_tipo, $key);
                 $key_out = $campo[nome];
@@ -693,7 +693,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 }
                 if (strpos($key, 'password_') === 0) {
                     $new_value = '';
-                    for ($i = 0;$i < strlen($value);$i++) {
+                    for ($i = 0;$i < mb_strlen($value);$i++) {
                         $new_value .= '*';
                     }
                     $value = $new_value;
@@ -813,7 +813,7 @@ if (!function_exists('interadmin_arquivos_preview')) {
             } elseif (in_array($ext, array('doc', 'pdf', 'ppt', 'swf', 'wmv', 'xls', 'zip', 'docx', 'xlsx'))) {
                 $S = '<div><img src="/_default/img/aplicacao/ico_file_'.$ext.'_'.$icon_size.'.gif"'.(($name) ? ' alt="'.$name.'"' : '').' style="width:'.$icon_size.'px;height:'.$icon_size.'px;background:transparent"></div>';
             } else {
-                $S = '<div class="bg_gray_1"><b class="font_0 font_white">.'.strtoupper($ext).'</b></div>';
+                $S = '<div class="bg_gray_1"><b class="font_0 font_white">.'.mb_strtoupper($ext).'</b></div>';
             }
         }
 

@@ -5,8 +5,8 @@ function startsWith($needle, $haystack)
 }
 function endsWith($needle, $haystack)
 {
-    $start = strlen($needle) * -1; //negative
-    return (substr($haystack, $start) === $needle);
+    $start = mb_strlen($needle) * -1; //negative
+    return (mb_substr($haystack, $start) === $needle);
 }
 
 /**
@@ -36,7 +36,7 @@ function toId($string, $tofile = false, $separador = '')
         $string = mb_ereg_replace("[^(\d\w)]", '_', $string);
     } else {
         $string = mb_ereg_replace("[^\d\w]+", $separador, $string);
-        $string = trim(strtolower($string), $separador);
+        $string = trim(mb_strtolower($string), $separador);
     }
     if ($separador != '-') {
         $string = mb_ereg_replace('[/-]', '_', $string);
@@ -85,7 +85,7 @@ function toSlug($string)
 function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
 {
     $sql_where = $regexp;
-    for ($i = 0; $i < strlen($str); $i++) {
+    for ($i = 0; $i < mb_strlen($str); $i++) {
         $char = $str[$i];
         $char = str_replace('a', '[aáàãâäª]', $char);
         $char = str_replace('e', '[eéèêë&]', $char);
@@ -120,7 +120,7 @@ function wap_toHTML($S)
 function toBase($S, $force_magic_quotes_gpc = false)
 {
     global $db;
-    if (strlen($S)) {
+    if (mb_strlen($S)) {
         $S = $db->qstr($S, get_magic_quotes_gpc() && !$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
         $S = trim($S);
     } else {
@@ -164,16 +164,16 @@ function toHTML($S, $HTML = false, $busca_replace = false)
 {
     global $busca_varchar, $busca_text;
     $busca = ($busca_varchar) ? $busca_varchar : $busca_text;
-    if (strlen($S)) {
+    if (mb_strlen($S)) {
         if (!$HTML) {
             $S = str_replace(chr(13), ' <br /> ', $S);
         }
-        //elseif(strpos(strtolower($S),"<p>")===false)$S="<p>".$S."</p>";
+        //elseif(strpos(mb_strtolower($S),"<p>")===false)$S="<p>".$S."</p>";
         $S = str_replace("\'", "'", $S);// Bug LocaWeb
         $S = str_replace("''", "'", $S);// Bug LocaWeb
         $S = str_replace('\"', '"', $S);// Bug LocaWeb
         if ($busca_replace && $busca) {
-            $S = preg_replace("/[^@\.]".$busca."[^@\.]/i", ' <span class="font-search">'.strtoupper($busca).'</span> ', $S);
+            $S = preg_replace("/[^@\.]".$busca."[^@\.]/i", ' <span class="font-search">'.mb_strtoupper($busca).'</span> ', $S);
         }
 
         return stripslashes($S);
@@ -248,7 +248,7 @@ function toXml($S)
 if (!function_exists('hex2bin')) {
     function hex2bin($S)
     {
-        return pack('H'.strlen($S), $S);
+        return pack('H'.mb_strlen($S), $S);
     }
 }
 
@@ -363,7 +363,7 @@ function jp7_string_left($S, $length)
         }
     }
 
-    return (strlen($S) > $length) ? substr($S, 0, $length).'...' : $S;
+    return (mb_strlen($S) > $length) ? mb_substr($S, 0, $length).'...' : $S;
 }
 
 /**
@@ -384,12 +384,12 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
 {
     if ($considerHtml) {
         // if the plain text is shorter than the maximum length, return the whole text
-        if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
+        if (mb_strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
             return $text;
         }
         // splits all html-tags to scanable lines
         preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
-        $total_length = strlen($ending);
+        $total_length = mb_strlen($ending);
         $open_tags = array();
         $truncate = '';
         foreach ($lines as $line_matchings) {
@@ -408,13 +408,13 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
                 // if tag is an opening tag (f.e. <b>)
                 } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                     // add tag to the beginning of $open_tags list
-                    array_unshift($open_tags, strtolower($tag_matchings[1]));
+                    array_unshift($open_tags, mb_strtolower($tag_matchings[1]));
                 }
                 // add html-tag to $truncate'd text
                 $truncate .= $line_matchings[1];
             }
             // calculate the length of the plain text part of the line; handle entities as one character
-            $content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+            $content_length = mb_strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|&#x[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
             if ($total_length + $content_length > $length) {
                 // the number of characters which are left
                 $left = $length - $total_length;
@@ -425,14 +425,14 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
                     foreach ($entities[0] as $entity) {
                         if ($entity[1] + 1 - $entities_length <= $left) {
                             $left--;
-                            $entities_length += strlen($entity[0]);
+                            $entities_length += mb_strlen($entity[0]);
                         } else {
                             // no more characters left
                             break;
                         }
                     }
                 }
-                $truncate .= substr($line_matchings[2], 0, $left + $entities_length);
+                $truncate .= mb_substr($line_matchings[2], 0, $left + $entities_length);
                 // maximum lenght is reached, so get off the loop
                 break;
             } else {
@@ -445,10 +445,10 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
             }
         }
     } else {
-        if (strlen($text) <= $length) {
+        if (mb_strlen($text) <= $length) {
             return $text;
         } else {
-            $truncate = substr($text, 0, $length - strlen($ending));
+            $truncate = mb_substr($text, 0, $length - mb_strlen($ending));
         }
     }
     // if the words shouldn't be cut in the middle...
@@ -457,7 +457,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
         $spacepos = strrpos($truncate, ' ');
         if (isset($spacepos)) {
             // ...and cut the text in this position
-            $truncate = substr($truncate, 0, $spacepos);
+            $truncate = mb_substr($truncate, 0, $spacepos);
         }
     }
     // add the defined ending to the text
@@ -529,7 +529,7 @@ function jp7_password($length = 6)
     $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
     $S = '';
     for ($i = 0; $i < $length; $i++) {
-        $S .= substr($chars, rand(0, strlen($chars) - 1), 1);
+        $S .= mb_substr($chars, rand(0, mb_strlen($chars) - 1), 1);
     }
 
     return $S;
@@ -580,7 +580,7 @@ function jp7_date_split($date)
         H => $date[3],
         i => $date[4],
         s => $date[5],
-        y => substr($date[0], 2),
+        y => mb_substr($date[0], 2),
     );
 }
 
@@ -616,8 +616,8 @@ function jp7_date_format($date, $format = 'd/m/Y')
         }
         $date = jp7_date_split($date);
         $S = '';
-        for ($i = 0;$i < strlen($format);$i++) {
-            $x = substr($format, $i, 1);
+        for ($i = 0;$i < mb_strlen($format);$i++) {
+            $x = mb_substr($format, $i, 1);
             $S .= ($date[$x]) ? $date[$x] : $x;
         }
 
@@ -651,7 +651,7 @@ function jp7_date_week($w, $sigla = false)
     }
     $return = $W[$w];
 
-    return ($sigla) ? substr($return, 0, 3) : $return;
+    return ($sigla) ? mb_substr($return, 0, 3) : $return;
 }
 
 /**
@@ -685,7 +685,7 @@ function jp7_date_month($m, $sigla = false)
     }
     $return = $M[$m - 1];
 
-    return ($sigla) ? substr($return, 0, 3) : $return;
+    return ($sigla) ? mb_substr($return, 0, 3) : $return;
 }
 
 /**
@@ -1017,7 +1017,7 @@ class jp7_lang
             if ($_SERVER['QUERY_STRING']) {
                 $pos1 = strpos($this->lang, $_SERVER['QUERY_STRING']);
                 if ($pos1 !== false) {
-                    $this->lang = substr($this->lang, 0, $pos1);
+                    $this->lang = mb_substr($this->lang, 0, $pos1);
                 }
             }
             $this->lang = explode('/', $this->lang);
@@ -1342,9 +1342,9 @@ function jp7_flash($src, $w, $h, $alt = '', $id = '', $xtra = '', $parameters = 
 function jp7_path($S, $reverse = false)
 {
     if ($reverse) {
-        return (substr($S, strlen($S) - 1) == '/') ? substr($S, 0, strlen($S) - 1) : $S;
+        return (mb_substr($S, mb_strlen($S) - 1) == '/') ? mb_substr($S, 0, mb_strlen($S) - 1) : $S;
     } else {
-        return (substr($S, -1) == '/' || !$S) ? $S : $S.'/';
+        return (mb_substr($S, -1) == '/' || !$S) ? $S : $S.'/';
     }
 }
 
@@ -1371,12 +1371,12 @@ function jp7_doc_root()
         if ($c_jp7) {
             $S = str_replace('\\', '/', $S);
             $S = str_replace('//', '/', $S);
-            $S = substr($S, 0, strpos($S, dirname($PATH_INFO)));
+            $S = mb_substr($S, 0, strpos($S, dirname($PATH_INFO)));
         }
     }
     if (!$S) {
         $S = realpath('./');
-        $S = substr($c_root, 0, ($c_path) ? strpos($S, $c_path) : strpos($S, 'site'));
+        $S = mb_substr($c_root, 0, ($c_path) ? strpos($S, $c_path) : strpos($S, 'site'));
     }
     $S = jp7_path($S);
 
@@ -1539,7 +1539,7 @@ function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $tem
                 $template = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']).'/'.$template;
             }
             if ($pos1 = strpos($template, '?')) {
-                //$template=substr($template,0,$pos1+1).urlencode(substr($template,$pos1+1));
+                //$template=mb_substr($template,0,$pos1+1).urlencode(mb_substr($template,$pos1+1));
                 $template = str_replace(' ', '%20', $template);
             }
             if (strpos($template, 'http://') !== 0) {
@@ -1610,7 +1610,7 @@ function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $tem
         $mail = mail($to, $subject, $message, $headers); // Safe Mode
     }
     if ($debug) {
-        echo 'jp7_mail('.isoentities($to).': '.$mail.'<br>';
+        echo 'jp7_mail('.htmlentities($to).': '.$mail.'<br>';
     }
 
     return $mail;
@@ -1770,15 +1770,15 @@ function jp7_imageCreateFromBmp($filename)
         $x = 0;
         while ($x < $bmp['width']) {
             if ($bmp['bits_per_pixel'] == 24) {
-                $color = unpack('V', substr($img, $p, 3).$vide);
+                $color = unpack('V', mb_substr($img, $p, 3).$vide);
             } elseif ($bmp['bits_per_pixel'] == 16) {
-                $color = unpack('n', substr($img, $p, 2));
+                $color = unpack('n', mb_substr($img, $p, 2));
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 8) {
-                $color = unpack('n', $vide.substr($img, $p, 1));
+                $color = unpack('n', $vide.mb_substr($img, $p, 1));
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 4) {
-                $color = unpack('n', $vide.substr($img, floor($p), 1));
+                $color = unpack('n', $vide.mb_substr($img, floor($p), 1));
                 if (($p * 2) % 2 == 0) {
                     $color[1] = ($color[1] >> 4);
                 } else {
@@ -1786,7 +1786,7 @@ function jp7_imageCreateFromBmp($filename)
                 }
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 1) {
-                $color = unpack('n', $vide.substr($img, floor($p), 1));
+                $color = unpack('n', $vide.mb_substr($img, floor($p), 1));
                 if (($p * 8) % 8 == 0) {
                     $color[1] = $color[1] >> 7;
                 } elseif (($p * 8) % 8 == 1) {
@@ -1879,7 +1879,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
         // Magick Get Size
         $command = $command_path.'identify -verbose '.$source;
         exec($command, $output, $return_var);
-        $source_geometry = explode('x', substr($output[2], strpos($output[2], ':') + 2));
+        $source_geometry = explode('x', mb_substr($output[2], strpos($output[2], ':') + 2));
         $source_w = $source_geometry[0];
         $source_h = $source_geometry[1];
     }
@@ -2247,8 +2247,8 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
  */
 function XOREncryption($InputString, $KeyPhrase)
 {
-    $KeyPhraseLength = strlen($KeyPhrase);
-    for ($i = 0; $i < strlen($InputString); $i++) {   // Loop trough input string
+    $KeyPhraseLength = mb_strlen($KeyPhrase);
+    for ($i = 0; $i < mb_strlen($InputString); $i++) {   // Loop trough input string
         $rPos = $i % $KeyPhraseLength; // Get key phrase character position
         $r = ord($InputString[$i]) ^ ord($KeyPhrase[$rPos]); // Magic happens here:
         $InputString[$i] = chr($r); // Replace characters
@@ -2414,7 +2414,7 @@ function interadmin_bootstrap()
 
 function jp7_is_windows()
 {
-    return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    return mb_strtoupper(mb_substr(PHP_OS, 0, 3)) === 'WIN';
 }
 
 /**
@@ -2449,7 +2449,7 @@ function interadmin_get_version($packageDir = 'interadmin')
 {
     $revisionFile = ROOT_PATH.'/'.$packageDir.'/.git/refs/heads/master';
 
-    return substr(trim(file_get_contents($revisionFile)), 0, 7);
+    return mb_substr(trim(file_get_contents($revisionFile)), 0, 7);
 }
 
 // Suporte para json_encode() em hospedagens que não possuem o pacote JSON
@@ -2544,7 +2544,7 @@ function jp7_absolute_path($path)
 function jp7_replace_beginning($search, $replace, $subject)
 {
     if (strpos($subject, $search) === 0) {
-        return $replace.substr($subject, strlen($search));
+        return $replace.mb_substr($subject, mb_strlen($search));
     } else {
         return $subject;
     }
@@ -2613,7 +2613,7 @@ function jp7_is_serialized($data)
     if ('N;' == $data) {
         return true;
     }
-    $length = strlen($data);
+    $length = mb_strlen($data);
     if ($length < 4) {
         return false;
     }
@@ -2774,8 +2774,8 @@ function curl_get_contents($url, $options = array())
     $response = curl_exec_follow($ch, 20);
 
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    $header = substr($response, 0, $header_size);
-    $body = substr($response, $header_size);
+    $header = mb_substr($response, 0, $header_size);
+    $body = mb_substr($response, $header_size);
 
     if (strpos($header, 'HTTP/1.1 200 OK') === false) {
         throw new Exception('Could not get "'.$url.'" - '.explode("\n", $header)[0]);
@@ -2784,7 +2784,7 @@ function curl_get_contents($url, $options = array())
 
     return $body;
 }
-
+/*
 function utf8_encode_recursive($array)
 {
     foreach ($array as &$item) {
@@ -2810,7 +2810,7 @@ function utf8_decode_recursive($array)
 
     return $array;
 }
-
+*/
 /**
  * Sends the given data to the FirePHP Firefox Extension.
  * The data can be displayed in the Firebug Console or in the
@@ -2832,7 +2832,7 @@ function fb()
 
     return call_user_func_array(array($instance, 'fb'), $args);
 }
-
+/*
 function isoentities($string)
 {
     return htmlentities($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
@@ -2842,3 +2842,4 @@ function isospecialchars($string)
 {
     return htmlspecialchars($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
 }
+*/

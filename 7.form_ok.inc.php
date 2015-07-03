@@ -51,7 +51,7 @@ for ($i = 0;$i < $quantidade;$i++) {
                     // Insert/Update
                     $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
                     $keywords = basename($_FILES[$table_field_name]['name'][$i], '.'.$tipo['extension']);
-                    $tipo = strtolower($tipo['extension']);
+                    $tipo = mb_strtolower($tipo['extension']);
                     $invalid_extensions = array('php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js');
                     if (!in_array($tipo, $invalid_extensions)) {
                         $lang_temp = $lang;
@@ -61,7 +61,7 @@ for ($i = 0;$i < $quantidade;$i++) {
                         $id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
                         $path = '../../upload/'.(($id_tipo) ? toId(interadmin_tipos_nome($id_tipo, true)).'/' : '');
                         $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
-                        $tipo = strtolower($tipo['extension']);
+                        $tipo = mb_strtolower($tipo['extension']);
                         if (!is_dir($path)) {
                             mkdir($path, 0777);
                         } else {
@@ -116,31 +116,31 @@ for ($i = 0;$i < $quantidade;$i++) {
 
         // Password
         if ($interadmin_password_key && $interadmin_password_key_xtra) {
-            $interadmin_password_key = md5(strtolower($interadmin_password_key));
+            $interadmin_password_key = md5(mb_strtolower($interadmin_password_key));
         }
         // Text/HTML
-        if (strtolower($interadmin_text_1) == '<p>&nbsp;</p>') {
+        if (mb_strtolower($interadmin_text_1) == '<p>&nbsp;</p>') {
             $interadmin_text_1 = '';
         }
         if ($interadmin_text_1) {
             $interadmin_text_1 = toXHTML($interadmin_text_1);
             $pos1 = strrpos($interadmin_text_1, '.') + 1;
-            $interadmin_text_1_start = substr($interadmin_text_1, 0, $pos1);
-            $interadmin_text_1_end = substr($interadmin_text_1, $pos1);
+            $interadmin_text_1_start = mb_substr($interadmin_text_1, 0, $pos1);
+            $interadmin_text_1_end = mb_substr($interadmin_text_1, $pos1);
             //$interadmin_text_1_end=str_replace("<br/>","",$interadmin_text_1_end);
             $interadmin_text_1_end = str_replace('<p>&nbsp;</p>', '', $interadmin_text_1_end);
             $interadmin_text_1 = $interadmin_text_1_start.$interadmin_text_1_end;
             $interadmin_text_1 = str_replace(' </p>', '</p>', $interadmin_text_1);
             //$interadmin_text_1=$db->qstr($interadmin_text_1,get_magic_quotes_gpc());
         }
-        if (strtolower($interadmin_text_2) == '<p>&nbsp;</p>') {
+        if (mb_strtolower($interadmin_text_2) == '<p>&nbsp;</p>') {
             $interadmin_text_2 = '';
         }
         if ($interadmin_text_2) {
             $interadmin_text_2 = toXHTML($interadmin_text_2);
             $pos1 = strrpos($interadmin_text_2, '.') + 1;
-            $interadmin_text_2_start = substr($interadmin_text_2, 0, $pos1);
-            $interadmin_text_2_end = substr($interadmin_text_2, $pos1);
+            $interadmin_text_2_start = mb_substr($interadmin_text_2, 0, $pos1);
+            $interadmin_text_2_end = mb_substr($interadmin_text_2, $pos1);
             //$interadmin_text_2_end=str_replace("<br/>","",$interadmin_text_2_end);
             $interadmin_text_2_end = str_replace('<p>&nbsp;</p>', '', $interadmin_text_2_end);
             $interadmin_text_2 = $interadmin_text_2_start.$interadmin_text_2_end;

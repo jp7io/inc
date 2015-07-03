@@ -26,7 +26,7 @@ if (!$c_path_default) {
 // Check IDs
 if ($_REQUEST) {
     foreach ($_REQUEST as $key => $value) {
-        if ($key == 'id' || substr($key, -3) === '_id') {
+        if ($key == 'id' || mb_substr($key, -3) === '_id') {
             if (strpos($key, 'openid_') !== false) {
                 continue; // Conflito OpenID (openid_claimed_id)
             }
@@ -99,7 +99,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
             $lang = new jp7_lang($_GET['lang'], $_GET['lang']);
         } else {
             $columns = $db->MetaColumns($db_prefix.'_tipos');
-            if ($columns['NOME_'.strtoupper($_GET['lang'])]) {
+            if ($columns['NOME_'.mb_strtoupper($_GET['lang'])]) {
                 $lang = new jp7_lang($_GET['lang'], $_GET['lang']);
             }
         }

@@ -67,7 +67,7 @@ $c_jp7 = false;
 $c_development = $_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
 if ($c_development) {
     $c_jp7 = true;
-} elseif (in_array(substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.', '177.', '178.'))) {
+} elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.', '177.', '178.'))) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
