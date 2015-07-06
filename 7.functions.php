@@ -2738,7 +2738,6 @@ function curl_exec_follow($ch, /*int*/ $maxredirect = null)
                 if ($code == 301 || $code == 302) {
                     preg_match('/Location:(.*?)\n/', $header, $matches);
                     $newurl = trim(array_pop($matches));
-                    $newurl = Jp7_Utf8::decode($newurl);
                 } else {
                     $code = 0;
                 }
