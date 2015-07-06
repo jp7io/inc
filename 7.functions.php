@@ -2784,7 +2784,7 @@ function curl_get_contents($url, $options = array())
 
     return $body;
 }
-/*
+
 function utf8_encode_recursive($array)
 {
     foreach ($array as &$item) {
@@ -2810,7 +2810,7 @@ function utf8_decode_recursive($array)
 
     return $array;
 }
-*/
+
 /**
  * Sends the given data to the FirePHP Firefox Extension.
  * The data can be displayed in the Firebug Console or in the
