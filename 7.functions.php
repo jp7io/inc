@@ -2715,6 +2715,17 @@ if (!function_exists('array_delete')) {
     }
 }
 
+function safe_urlencode($txt)
+{
+    // Skip all URL reserved characters plus dot, dash, underscore and tilde..
+    $pattern = "/[^-\._~:\/\?#\\[\\]@!\$&'\(\)\*\+,;=]+/";
+    $result = preg_replace_callback($pattern, function ($match) {
+        // ..and encode the rest!
+        return rawurlencode($match[0]);
+    }, $txt);
+    return $result;
+}
+
 function curl_exec_follow($ch, /*int*/ $maxredirect = null)
 {
     $mr = $maxredirect === null ? 5 : intval($maxredirect);
@@ -2737,7 +2748,7 @@ function curl_exec_follow($ch, /*int*/ $maxredirect = null)
                 $code = curl_getinfo($rch, CURLINFO_HTTP_CODE);
                 if ($code == 301 || $code == 302) {
                     preg_match('/Location:(.*?)\n/', $header, $matches);
-                    $newurl = trim(array_pop($matches));
+                    $newurl = safe_urlencode(trim(array_pop($matches)));
                 } else {
                     $code = 0;
                 }
@@ -2773,8 +2784,8 @@ function curl_get_contents($url, $options = array())
     $response = curl_exec_follow($ch, 20);
 
     $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    $header = mb_substr($response, 0, $header_size);
-    $body = mb_substr($response, $header_size);
+    $header = substr($response, 0, $header_size);
+    $body = substr($response, $header_size);
 
     if (strpos($header, 'HTTP/1.1 200 OK') === false) {
         throw new Exception('Could not get "'.$url.'" - '.explode("\n", $header)[0]);
