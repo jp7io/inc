@@ -183,6 +183,9 @@ if ($c_development) {
     set_exception_handler('jp7_check_exception');
 }
 
+// Fix permissions for created files
+// umask(0002);
+
 /**
  * class jp7_db_pages.
  *
