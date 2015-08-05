@@ -33,9 +33,9 @@ function toId($string, $tofile = false, $separador = '')
         $string = mb_ereg_replace('[ñÑ]', 'n', $string);
     }
     if ($tofile) {
-        $string = mb_ereg_replace("[^(\d\w)]", '_', $string);
+        $string = mb_ereg_replace('[^a-zA-Z0-9]', '_', $string);
     } else {
-        $string = mb_ereg_replace("[^\d\w]+", $separador, $string);
+        $string = mb_ereg_replace('[^a-zA-Z0-9]+', $separador, $string);
         $string = trim(mb_strtolower($string), $separador);
     }
     if ($separador != '-') {

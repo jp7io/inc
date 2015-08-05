@@ -25,5 +25,9 @@ class ToIdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('foo-bar', toSlug('Foo/Bar'));
         $this->assertEquals('foo-bar', toSlug('Foo-----Bar'));
         $this->assertEquals('foo-bar', toSlug('Foo-/--/--Bar     '));
+        $this->assertEquals('anu-ncio', toSlug('Anu´ncio'));
+        $this->assertEquals('anuncio', toSlug('Anúncio'));
+        // Looks like an accute, but its not
+        $this->assertEquals('anu-ncio', toSlug('Anúncio'));
     }
 }
