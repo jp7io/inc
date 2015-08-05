@@ -33,15 +33,16 @@ function toId($string, $tofile = false, $separador = '')
         $string = mb_ereg_replace('[ñÑ]', 'n', $string);
     }
     if ($tofile) {
-        $string = mb_ereg_replace('[^a-zA-Z0-9]', '_', $string);
+        $string = mb_ereg_replace('[^a-zA-Z0-9_]', '_', $string);
     } else {
-        $string = mb_ereg_replace('[^a-zA-Z0-9]+', $separador, $string);
+        $string = mb_ereg_replace('[^a-zA-Z0-9_]+', $separador, $string);
         $string = trim(mb_strtolower($string), $separador);
     }
-    if ($separador != '-') {
+    if ($separador) {
+        $string = str_replace('_', $separador, $string);
+    } else {
         $string = mb_ereg_replace('[/-]', '_', $string);
     }
-
     return $string;
 }
 

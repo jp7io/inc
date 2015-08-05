@@ -10,6 +10,7 @@ class ToIdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('sandyejunior', toId('Sandy&Junior'));
         $this->assertEquals('sandyejunior', toId('Sandy & Junior'));
         $this->assertEquals('teste', toId('♥teste'));
+        $this->assertEquals('quemequem_busca', toId('Quem é Quem_Busca'));
     }
     
     public function testToSlug()
@@ -29,5 +30,6 @@ class ToIdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('anuncio', toSlug('Anúncio'));
         // Looks like an accute, but its not
         $this->assertEquals('anu-ncio', toSlug('Anúncio'));
+        $this->assertEquals('quem-e-quem-busca', toSlug('Quem é Quem_Busca'));
     }
 }
