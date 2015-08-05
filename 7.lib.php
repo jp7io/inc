@@ -84,6 +84,7 @@ if ($c_jp7) {
 }
 
 mb_internal_encoding('UTF-8');
+mb_regex_encoding('UTF-8');
 setlocale(LC_CTYPE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
 setlocale(LC_COLLATE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
 
