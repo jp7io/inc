@@ -63,8 +63,13 @@ require __DIR__.'/7.functions.php';
 /**
  * @global bool $c_jp7
  */
+global $c_jp7;
 $c_jp7 = false;
-$c_development = $_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
+global $c_development;
+$c_development = $_SERVER['HTTP_HOST'] == 'localhost' || 
+    $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
+    $_SERVER['SERVER_ADDR'] == '::1' || 
+    startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
 if ($c_development) {
     $c_jp7 = true;
 } elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.', '177.', '178.'))) {
@@ -95,77 +100,19 @@ if (!@ini_get('allow_url_fopen')) {
 }
 jp7_register_globals();
 
+// TODO - Remove ROOT_PATH
 defined('ROOT_PATH') || define('ROOT_PATH', dirname(dirname(__FILE__)));
-
-// Necessário antes de loadar as classes
-set_include_path(realpath(ROOT_PATH.'/classes').PATH_SEPARATOR.get_include_path());
-
-/**
- * Includes a class in case it hasn't been defined yet.
- *
- * @param string $className Name of the class
- *
- * @global Jp7_Debugger
- */
-function interadmin_autoload($className)
-{
-    global $debugger;
-
-    if ($className) {
-        $ext = '.class.php';
-        $filename = str_replace('_', '/', $className).$ext;
-        $filename = str_replace('\\', '/', $filename);
-
-        $paths = explode(PATH_SEPARATOR, get_include_path());
-
-        foreach ($paths as $path) {
-            if (strpos($path, 'classes') === false) {
-                continue; // Evita verificação desnecessária
-            }
-            $file = $path.'/'.$filename;
-            if (@file_exists($file)) {
-                require_once $file;
-                if (JP7_IS_WINDOWS && !in_array($className, get_declared_classes()) && !in_array($className, get_declared_interfaces())) {
-                    die(jp7_debug('Class not found (case sensitive): '.$className));
-                }
-
-                return $className;
-            }
-        }
-        // Arquivo não encontrado
-        if ($debugger) {
-            $debugger->addLog('autoload() could not find the ('.$className.') class.', 'error');
-        }
-    }
-
-    return false;
-}
-
-@include 'Zend/Loader/Autoloader.php';
-if (!class_exists('Zend_Loader_Autoloader')) {
-    echo '##### Download Zend Framework: #####<br>'.PHP_EOL;
-    echo 'svn checkout http://svn.jp7.com.br/zf/svn/framework/standard/tags/release-1.11.10/library/Zend classes/Zend<br>'.PHP_EOL;
-    exit;
-}
-
-$autoloader = Zend_Loader_Autoloader::getInstance();
-$autoloader->setDefaultAutoloader('interadmin_autoload');
-$autoloader->setFallbackAutoloader(true);
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Zend_');
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'ZendX_');
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'PHPExcel_');
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Google_');
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Whoops');
-$autoloader->pushAutoloader(array('Zend_Loader', 'loadClass'), 'Symfony');
 
 /**
  * @global Jp7_Debugger $debugger
  */
+global $debugger;
 $debugger = new Jp7_Debugger();
 
 /*
  * @global Browser $is
  */
+global $is;
 define('JP7_IS_WINDOWS', jp7_is_windows());
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
@@ -197,4 +144,9 @@ if ($c_development) {
 class jp7_db_pages extends Pagination
 {
     // Alterado o nome para Pagination
+}
+
+function jp7_package_path($package) 
+{
+    return __DIR__ . '/../' . $package;
 }
