@@ -69,7 +69,6 @@ if (method_exists('Jp7_Bootstrap', 'initAdminBar')) {
 
 // PHPMyAdmin
 if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
-    require_once jp7_path_find('../inc/3thparty/adodb/adodb.inc.php');
     $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
     $ADODB_LANG = 'pt-br';
 
