@@ -2354,22 +2354,6 @@ function jp7_file_exists($filename)
 }
 
 /**
- * Alias of {@link Krumo::dump()}.
- *
- * @param mixed $data,...
- *
- * @see Krumo::dump()
- */
-function krumo()
-{
-    $_ = func_get_args();
-
-    return call_user_func_array(
-        array('Krumo', 'dump'), $_
-    );
-}
-
-/**
  * Works as a bootstrap for custom pages inside /_config/CLIENT/APP or /CLIENT/APP.
  * Parses the URI and sets the include_path.
  *
@@ -2566,22 +2550,6 @@ function jp7_formatDsn($db)
     }
 
     return $dsn;
-}
-
-/**
- * Alias to krumo();die;.
- */
-function kd()
-{
-    $_ = func_get_args();
-    if (php_sapi_name() == 'cli') {
-        call_user_func_array('var_dump', $_);
-    } else {
-        call_user_func_array(
-            array('Krumo', 'dump'), $_
-        );
-    }
-    die();
 }
 
 function km($object)
