@@ -2437,16 +2437,6 @@ function interadmin_get_version($packageDir = 'interadmin')
     return mb_substr(trim(file_get_contents($revisionFile)), 0, 7);
 }
 
-// Suporte para json_encode() em hospedagens que não possuem o pacote JSON
-if (!function_exists('json_encode')) {
-    function json_encode($array)
-    {
-        $json = new Services_JSON();
-
-        return $json->encode($array);
-    }
-}
-
 /**
  * DEPRECATED: Encodes an array as XML. Similar to json_encode().
  *
