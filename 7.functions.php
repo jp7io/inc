@@ -2432,9 +2432,7 @@ function jp7_is_executable($executable)
  */
 function interadmin_get_version($packageDir = 'interadmin')
 {
-    $revisionFile = ROOT_PATH.'/'.$packageDir.'/.git/refs/heads/master';
-
-    return mb_substr(trim(file_get_contents($revisionFile)), 0, 7);
+    return filemtime(ROOT_PATH.'/'.$packageDir.'/.git');
 }
 
 /**
