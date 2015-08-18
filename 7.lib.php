@@ -48,13 +48,13 @@ function jp7_check_exception($e)
 /**
  * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
  */
-if (!$_SERVER['SERVER_ADDR']) {
+if (empty($_SERVER['SERVER_ADDR']) && isset($_SERVER['LOCAL_ADDR'])) {
     $_SERVER['SERVER_ADDR'] = $_SERVER['LOCAL_ADDR'];
 }
 /**
  * In case $_SERVER['REMOTE_ADDR'] is not set, it gets the value from $_SERVER['REMOTE_HOST'], needed on some Windows servers.
  */
-if (!$_SERVER['REMOTE_ADDR']) {
+if (empty($_SERVER['REMOTE_ADDR']) && isset($_SERVER['REMOTE_HOST'])) {
     $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 }
 
@@ -146,7 +146,11 @@ class jp7_db_pages extends Pagination
     // Alterado o nome para Pagination
 }
 
-function jp7_package_path($package) 
+function jp7_package_path($package)
 {
+    $pattern = '/^inc/';
+    if (!preg_match($pattern, $package)) {
+        throw new InvalidArgumentException('Package does no match '.$pattern);
+    }
     return __DIR__ . '/../' . $package;
 }
