@@ -1,3 +1,3 @@
 <?php
 
-require __DIR__ . '/../7.lib.php';
+require __DIR__ . '/../7.functions.php';
