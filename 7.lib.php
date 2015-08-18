@@ -148,7 +148,7 @@ class jp7_db_pages extends Pagination
 
 function jp7_package_path($package)
 {
-    $pattern = '/^inc/';
+    $pattern = '/^(inc|classes)/';
     if (!preg_match($pattern, $package)) {
         throw new InvalidArgumentException('Package does no match '.$pattern);
     }
