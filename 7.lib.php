@@ -132,7 +132,7 @@ if ($c_development) {
 }
 
 // Fix permissions for created files
-// umask(0002);
+umask(0002);
 
 /**
  * class jp7_db_pages.
