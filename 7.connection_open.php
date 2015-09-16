@@ -13,14 +13,14 @@ if (!$config->db || !$config->db->type) {
 // Paths
 $c_root = $c_doc_root.$config->name_id.'/';
 
+if (!$c_path_default) {
+    $c_path_default = '/'.$config->name_id. '/vendor/jp7internet/_default/';
+}
 if (!$c_path_js) {
-    $c_path_js = '/_default/js/';
+    $c_path_js = $c_path_default.'js/';
 }
 if (!$c_path_css) {
-    $c_path_css = '/_default/css/';
-}
-if (!$c_path_default) {
-    $c_path_default = '/_default/';
+    $c_path_css = $c_path_default.'css/';
 }
 
 // Check IDs
@@ -113,8 +113,8 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
         $c_site_title = $config->lang->title;
     }
     // Arquivos de idioma
-    if (is_file($c_doc_root.'_default/inc/lang_'.$lang->lang.'.php')) {
-        include $c_doc_root.'_default/inc/lang_'.$lang->lang.'.php';
+    if (is_file($c_path_default.'inc/lang_'.$lang->lang.'.php')) {
+        include $c_path_default.'inc/lang_'.$lang->lang.'.php';
     }
     if (is_file($c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php')) {
         include $c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php';
@@ -149,7 +149,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
     $c_view->addHelperPath(jp7_package_path('classes/Jp7/View/Helper'), 'Jp7_View_Helper');
 
     Zend_Registry::set('config', $config);
-    // JavaScript
+    // JavaScript 
     $c_view->headScript()->appendFile($c_path_js.'jquery/jquery-1.3.2.min.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn_checkflash.js');
@@ -176,7 +176,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
     $c_view->headLink()->appendStylesheet($c_path_css.'7_w3c.css', 'all');
     $c_view->headLink()->appendStylesheet('../../css/'.$config->name_id.'.css', 'all');
     if ($c_template) {
-        $c_view->headLink()->appendStylesheet('/_default/css/7_templates.css');
+        $c_view->headLink()->appendStylesheet($c_path_default.'css/7_templates.css');
         $c_view->headLink()->appendStylesheet('/_templates/'.$c_template.'/css/style.css');
     }
 }
