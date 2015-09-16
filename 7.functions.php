@@ -1842,6 +1842,9 @@ function jp7_imageCreateFromBmp($filename)
  */
 function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 90, $maxsize = 10000000, $crop = false, $imagemagick = false, $enlarge = false)
 {
+    // Declare vars
+    $dif_w = 0;
+    $dif_h = 0;
     // Params can also be passed as an array of options
     if (is_array($quality)) {
         $options = $quality;
