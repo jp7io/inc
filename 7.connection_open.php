@@ -113,8 +113,8 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
         $c_site_title = $config->lang->title;
     }
     // Arquivos de idioma
-    if (is_file($c_path_default.'inc/lang_'.$lang->lang.'.php')) {
-        include $c_path_default.'inc/lang_'.$lang->lang.'.php';
+    if (is_file($c_doc_root.$config->name_id.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php')) {
+        include $c_doc_root.$config->name_id.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php';
     }
     if (is_file($c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php')) {
         include $c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php';
