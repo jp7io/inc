@@ -1845,6 +1845,8 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
     // Declare vars
     $dif_w = 0;
     $dif_h = 0;
+    $new_width = 0;
+    $new_height = 0;
     // Params can also be passed as an array of options
     if (is_array($quality)) {
         $options = $quality;
