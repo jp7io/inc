@@ -486,27 +486,27 @@ function jp7_register_globals()
 {
     global $HTTP_HOST;
     if (!@ini_get('register_globals') || !$HTTP_HOST) {
-        if ($_SERVER) {
+        if (!empty($_SERVER)) {
             foreach ($_SERVER as $key => $value) {
                 $GLOBALS[$key] = $_SERVER[$key];
             }
         }
-        if ($_GET) {
+        if (!empty($_GET)) {
             foreach ($_GET as $key => $value) {
                 $GLOBALS[$key] = $_GET[$key];
             }
         }
-        if ($_POST) {
+        if (!empty($_POST)) {
             foreach ($_POST as $key => $value) {
                 $GLOBALS[$key] = $_POST[$key];
             }
         }
-        if ($_COOKIE) {
+        if (!empty($_COOKIE)) {
             foreach ($_COOKIE as $key => $value) {
                 $GLOBALS[$key] = $_COOKIE[$key];
             }
         }
-        if ($_SESSION) {
+        if (!empty($_SESSION)) {
             foreach ($_SESSION as $key => $value) {
                 $GLOBALS[$key] = $_SESSION[$key];
             }
