@@ -76,16 +76,12 @@ if ($c_development) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
-if ($c_jp7) {
-    if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-        error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_STRICT);
-    } elseif (version_compare(PHP_VERSION, '5.3.0') >= 0) {
-        error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
-    } else {
-        error_reporting(E_ALL ^ E_NOTICE);
-    }
+if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+    error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_STRICT);
+} elseif (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+    error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
 } else {
-    error_reporting(0);
+    error_reporting(E_ALL ^ E_NOTICE);
 }
 
 mb_internal_encoding('UTF-8');

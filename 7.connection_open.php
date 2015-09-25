@@ -13,13 +13,13 @@ if (!$config->db || !$config->db->type) {
 // Paths
 $c_root = $c_doc_root.$config->name_id.'/';
 
-if (!$c_path_default) {
+if (empty($c_path_default)) {
     $c_path_default = '/'.$config->name_id. '/vendor/jp7internet/_default/';
 }
-if (!$c_path_js) {
+if (empty($c_path_js)) {
     $c_path_js = $c_path_default.'js/';
 }
-if (!$c_path_css) {
+if (empty($c_path_css)) {
     $c_path_css = $c_path_default.'css/';
 }
 
@@ -43,7 +43,7 @@ if ($_REQUEST) {
 }
 
 // Templates
-if ($c_template) {
+if (!empty($c_template)) {
     include $c_doc_root.'_templates/'.$c_template.'/config.php';
 }
 
@@ -51,7 +51,7 @@ if ($c_template) {
 if (!session_id()) {
     session_start();
 }
-if (is_null($s_session)) {
+if (!isset($s_session) || is_null($s_session)) {
     // Anti register-globals
     if (@ini_get('register_globals')) {
         unset($GLOBALS[$config->name_id]);
@@ -68,11 +68,11 @@ if (method_exists('Jp7_Bootstrap', 'initAdminBar')) {
 }
 
 // PHPMyAdmin
-if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) {
+if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_info)) {
     $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
     $ADODB_LANG = 'pt-br';
 
-    if (!$db instanceof ADOConnection) {
+    if (empty($db) || !$db instanceof ADOConnection) {
         $dsn = jp7_formatDsn($config->db);
         /**
          * @global ADOConnection $db
@@ -93,7 +93,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 
     // Language
     $lang = null;
-    if ($_GET['lang'] && is_string($_GET['lang'])) {
+    if (isset($_GET['lang']) && is_string($_GET['lang'])) {
         if ($_GET['lang'] == $config->lang_default) {
             $lang = new jp7_lang($_GET['lang'], $_GET['lang']);
         } else {
@@ -109,7 +109,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
 
     $config->lang = $config->langs[$lang->lang];
     // Compatibilidade temporária
-    if (!$c_site_title) {
+    if (empty($c_site_title)) {
         $c_site_title = $config->lang->title;
     }
     // Arquivos de idioma
@@ -139,7 +139,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
     }
 
     // Login Check
-    if ($tipos->restrito[1] || $tipos->restrito[$tipos->i - 1]) {
+    if (isset($tipos) && ($tipos->restrito[1] || $tipos->restrito[$tipos->i - 1])) {
         include '../../inc/login_check.php';
     }
 
@@ -155,7 +155,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
     $c_view->headScript()->appendFile($c_path_js.'interdyn_checkflash.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn_form.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn_form_lang_'.$lang->lang.'.js');
-    $c_view->headScript()->appendFile($c_path_js.'swfobject'.($c_swfobject ? '_'.$c_swfobject : '').'.js');
+    $c_view->headScript()->appendFile($c_path_js.'swfobject'.(empty($c_swfobject) ? '' : '_'.$c_swfobject).'.js');
     if ($config->menu != 'none') {
         if (strpos($config->menu, '../') !== false) {
             $c_view->headScript()->appendFile($config->menu);
@@ -175,7 +175,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && !$only_info) 
     // CSS
     $c_view->headLink()->appendStylesheet($c_path_css.'7_w3c.css', 'all');
     $c_view->headLink()->appendStylesheet('../../css/'.$config->name_id.'.css', 'all');
-    if ($c_template) {
+    if (!empty($c_template)) {
         $c_view->headLink()->appendStylesheet($c_path_default.'css/7_templates.css');
         $c_view->headLink()->appendStylesheet('/_templates/'.$c_template.'/css/style.css');
     }
