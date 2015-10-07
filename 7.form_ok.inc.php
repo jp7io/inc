@@ -180,7 +180,7 @@ for ($i = 0;$i < $quantidade;$i++) {
 }
 
 // InterAdmin Log File
-$file = fopen($c_doc_root.$config->name_id.'/interadmin/interadmin.log', 'w');
+$file = fopen(BASE_PATH.'/interadmin/interadmin.log', 'w');
 fwrite($file, $s_user['login']);
 fclose($file);
 //copy("interadmin.log",$c_cliente_physical_path."interadmin.log");

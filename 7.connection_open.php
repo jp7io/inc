@@ -111,11 +111,11 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
         $c_site_title = $config->lang->title;
     }
     // Arquivos de idioma
-    if (is_file($c_doc_root.$config->name_id.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php')) {
-        include $c_doc_root.$config->name_id.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php';
+    if (is_file(BASE_PATH.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php')) {
+        include BASE_PATH.'/vendor/jp7internet/_default/inc/lang_'.$lang->lang.'.php';
     }
-    if (is_file($c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php')) {
-        include $c_doc_root.$config->name_id.'/inc/lang_'.$lang->lang.'.php';
+    if (is_file(BASE_PATH.'/inc/lang_'.$lang->lang.'.php')) {
+        include BASE_PATH.'/inc/lang_'.$lang->lang.'.php';
     }
 
     // Tipos (Navegação) (2007/05/16 by JP)
