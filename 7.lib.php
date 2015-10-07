@@ -14,38 +14,6 @@
  */
 
 /**
- * Checks for Fatal Error preventing White Screen of Death.
- */
-function jp7_check_shutdown()
-{
-    $lasterror = error_get_last();
-    switch ($lasterror['type']) {  // Is it a Fatal Error?
-        case E_ERROR:
-        case E_USER_ERROR:
-        case E_RECOVERABLE_ERROR:
-            global $debugger;
-            if ($debugger) {
-                // Nesse ponto as exceções não podem mais ser tratadas
-                $debugger->setExceptionsEnabled(false);
-            }
-            die(jp7_debug($lasterror['message'].' in <b>'.$lasterror['file'].'</b> on line '.$lasterror['line']));
-            break;
-    }
-}
-/**
- * Checks for uncaught exceptions, preventing White Screen of Death.
- */
-function jp7_check_exception($e)
-{
-    global $debugger;
-    if ($debugger) {
-        // Nesse ponto as exceções não podem mais ser tratadas
-        $debugger->setExceptionsEnabled(false);
-    }
-    die(jp7_debug('Uncaught <b>'.get_class($e).'</b> with message <b>'.$e->getMessage().'</b> in '.$e->getFile().' on line '.$e->getLine(), null, $e->getTrace()));
-}
-
-/**
  * In case $_SERVER['SERVER_ADDR'] is not set, it gets the value from $_SERVER['LOCAL_ADDR'], needed on some Windows servers.
  */
 if (empty($_SERVER['SERVER_ADDR']) && isset($_SERVER['LOCAL_ADDR'])) {
@@ -96,9 +64,6 @@ if (!@ini_get('allow_url_fopen')) {
 }
 jp7_register_globals();
 
-// TODO - Remove ROOT_PATH
-defined('ROOT_PATH') || define('ROOT_PATH', dirname(dirname(__FILE__)));
-
 /**
  * @global Jp7_Debugger $debugger
  */
@@ -111,11 +76,6 @@ $debugger = new Jp7_Debugger();
 global $is;
 define('JP7_IS_WINDOWS', jp7_is_windows());
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
-
-/*
- * Define o diretório com os arquivos do Krumo
- */
-define('KRUMO_DIR', dirname(__FILE__).'/../_default/js/krumo/');
 
 if ($c_development) {
     $whoops = new \Whoops\Run();
@@ -140,13 +100,4 @@ umask(0002);
 class jp7_db_pages extends Pagination
 {
     // Alterado o nome para Pagination
-}
-
-function jp7_package_path($package)
-{
-    $pattern = '/^(inc|classes)/';
-    if (!preg_match($pattern, $package)) {
-        throw new InvalidArgumentException('Package does no match '.$pattern);
-    }
-    return __DIR__ . '/../' . $package;
 }
