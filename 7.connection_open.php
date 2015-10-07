@@ -11,10 +11,8 @@ if (!$config->db || !$config->db->type) {
 }
 
 // Paths
-$c_root = $c_doc_root.$config->name_id.'/';
-
 if (empty($c_path_default)) {
-    $c_path_default = '/'.$config->name_id. '/vendor/jp7internet/_default/';
+    $c_path_default = '/vendor/jp7internet/_default/';
 }
 if (empty($c_path_js)) {
     $c_path_js = $c_path_default.'js/';

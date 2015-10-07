@@ -1362,26 +1362,9 @@ function jp7_path($S, $reverse = false)
  */
 function jp7_doc_root()
 {
-    global $PATH_INFO, $c_jp7, $c_path;
-    $S = $_SERVER['DOCUMENT_ROOT'];
-    if (!$S) {
-        $S = @ini_get('doc_root');
-    }
-    if (!$S) {
-        $S = dirname($_SERVER['PATH_TRANSLATED']);
-        if ($c_jp7) {
-            $S = str_replace('\\', '/', $S);
-            $S = str_replace('//', '/', $S);
-            $S = mb_substr($S, 0, strpos($S, dirname($PATH_INFO)));
-        }
-    }
-    if (!$S) {
-        $S = realpath('./');
-        $S = mb_substr($c_root, 0, ($c_path) ? strpos($S, $c_path) : strpos($S, 'site'));
-    }
-    $S = jp7_path($S);
+    $docRoot = $_SERVER['DOCUMENT_ROOT'] ?: @ini_get('doc_root');
 
-    return $S;
+    return jp7_path($docRoot);
 }
 
 /**
