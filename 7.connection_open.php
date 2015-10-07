@@ -143,7 +143,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
         include '../../inc/login_check.php';
     }
 
-    $config->build = interadmin_get_version($config->name_id, '{build}');
+    $config->build = interadmin_get_version();
     $c_view = new Jp7_View();
     // Permite o uso de Helpers customizados da Jp7
     $c_view->addHelperPath(jp7_package_path('classes/Jp7/View/Helper'), 'Jp7_View_Helper');
