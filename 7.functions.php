@@ -2187,10 +2187,15 @@ function getFileName($filename)
  */
 function jp7_file_size($file)
 {
-    $file = ceil(@filesize($file) / 1024);
-    $file = ($file < 1024) ? ceil($file).'KB' : round($file / 1024, 1).'MB';
+    return jp7_human_size(@filesize($file));
+}
 
-    return $file;
+function jp7_human_size($size)
+{
+    $size = ceil($size / 1024);
+    $size = ($size < 1024) ? ceil($size).'KB' : round($size / 1024, 1).'MB';
+
+    return $size;
 }
 
 /**
