@@ -42,7 +42,7 @@ if ($seo_baseurl) {
     ?><?php 
 } ?>" />
 <meta name="generator" content="JP7 InterAdmin" />
-<meta name="version" content="<?php echo @interadmin_get_version($config->name_id); ?>" />
+<meta name="version" content="<?php echo interadmin_get_version(); ?>" />
 <?php if ($config->ie8compatible) {
     ?>
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />

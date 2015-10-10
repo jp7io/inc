@@ -1362,26 +1362,9 @@ function jp7_path($S, $reverse = false)
  */
 function jp7_doc_root()
 {
-    global $PATH_INFO, $c_jp7, $c_path;
-    $S = $_SERVER['DOCUMENT_ROOT'];
-    if (!$S) {
-        $S = @ini_get('doc_root');
-    }
-    if (!$S) {
-        $S = dirname($_SERVER['PATH_TRANSLATED']);
-        if ($c_jp7) {
-            $S = str_replace('\\', '/', $S);
-            $S = str_replace('//', '/', $S);
-            $S = mb_substr($S, 0, strpos($S, dirname($PATH_INFO)));
-        }
-    }
-    if (!$S) {
-        $S = realpath('./');
-        $S = mb_substr($c_root, 0, ($c_path) ? strpos($S, $c_path) : strpos($S, 'site'));
-    }
-    $S = jp7_path($S);
+    $docRoot = $_SERVER['DOCUMENT_ROOT'] ?: @ini_get('doc_root');
 
-    return $S;
+    return jp7_path($docRoot);
 }
 
 /**
@@ -2440,9 +2423,9 @@ function jp7_is_executable($executable)
  *
  * @return string Formatted string.
  */
-function interadmin_get_version($packageDir = 'interadmin')
+function interadmin_get_version()
 {
-    return filemtime(ROOT_PATH.'/'.$packageDir.'/.git');
+    return file_get_contents(BASE_PATH.'/.version');
 }
 
 /**
@@ -2851,4 +2834,46 @@ if (!function_exists('http_parse_headers')) {
 
         return $headers;
     }
+}
+
+function jp7_package_path($package)
+{
+    $pattern = '/^(inc|classes)/';
+    if (!preg_match($pattern, $package)) {
+        throw new InvalidArgumentException('Package does no match '.$pattern);
+    }
+    return __DIR__ . '/../' . $package;
+}
+
+/**
+ * Checks for Fatal Error preventing White Screen of Death.
+ */
+function jp7_check_shutdown()
+{
+    $lasterror = error_get_last();
+    switch ($lasterror['type']) {  // Is it a Fatal Error?
+        case E_ERROR:
+        case E_USER_ERROR:
+        case E_RECOVERABLE_ERROR:
+            global $debugger;
+            if ($debugger) {
+                // Nesse ponto as exceções não podem mais ser tratadas
+                $debugger->setExceptionsEnabled(false);
+            }
+            die(jp7_debug($lasterror['message'].' in <b>'.$lasterror['file'].'</b> on line '.$lasterror['line']));
+            break;
+    }
+}
+
+/**
+ * Checks for uncaught exceptions, preventing White Screen of Death.
+ */
+function jp7_check_exception($e)
+{
+    global $debugger;
+    if ($debugger) {
+        // Nesse ponto as exceções não podem mais ser tratadas
+        $debugger->setExceptionsEnabled(false);
+    }
+    die(jp7_debug('Uncaught <b>'.get_class($e).'</b> with message <b>'.$e->getMessage().'</b> in '.$e->getFile().' on line '.$e->getLine(), null, $e->getTrace()));
 }
