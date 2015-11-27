@@ -2533,9 +2533,17 @@ function jp7_formatDsn($db)
     return $dsn;
 }
 
-function km($object)
+function dm($object, $search = '.*')
 {
-    kd(get_class_methods($object));
+    $methods = [];
+    if (is_object($object)) {
+        $methods = get_class_methods($object);
+        $methods = array_filter($methods, function ($a) use ($search) {
+            return preg_match('/'.$search.'/i', $a);
+        });
+    }
+    
+    dd(compact('methods', 'object'));
 }
 
 function jp7_get_object_vars($object)
