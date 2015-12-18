@@ -2425,7 +2425,7 @@ function jp7_is_executable($executable)
  */
 function interadmin_get_version()
 {
-    return file_get_contents(BASE_PATH.'/.version');
+    return trim(file_get_contents(BASE_PATH.'/.version'));
 }
 
 /**
@@ -2525,7 +2525,8 @@ function jp7_replace_beginning($search, $replace, $subject)
  */
 function jp7_formatDsn($db)
 {
-    $dsn = $db->type.'://'.$db->user.':'.$db->pass.'@'.$db->host.'/'.$db->name;
+    $driver = ($db->type === 'mysql') ? 'mysqli' : $db->type;
+    $dsn = $driver.'://'.$db->user.':'.$db->pass.'@'.$db->host.'/'.$db->name;
     if ($db->flags) {
         $dsn .= $db->flags;
     }
