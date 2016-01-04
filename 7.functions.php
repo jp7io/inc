@@ -1461,7 +1461,8 @@ function jp7_extension($S)
 {
     if (strpos($S, '?') !== false) {
         // Tirando a Query String
-        $S = reset(explode('?', $S));
+        $arr = explode('?', $S);
+        $S = reset($arr);
     }
     $path_parts = pathinfo($S);
     $ext = trim($path_parts['extension'].' ');
