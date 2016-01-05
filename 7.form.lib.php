@@ -581,14 +581,13 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
     }
     if ($env_info) {
         global $lang;
-        global $REMOTE_ADDR;
         $message .= ''.
         "<br>\r\n".
         "<hr size=1 color=\"#666666\">\r\n".
         "<font size=1 color=\"#333333\">\r\n".
         (($lang) ? '<b>Idioma:</b> '.$lang->lang."<br>\r\n" : '').
         '<b>Data - Hora de Envio:</b> '.date('d/m/Y - H:i:s')."<br>\r\n".
-        '<b>IP:</b> '.$REMOTE_ADDR."<br><br>\r\n".
+        '<b>IP:</b> '.$_SERVER['REMOTE_ADDR']."<br><br>\r\n".
         "</font>\r\n";
     }
     if ($debug) {

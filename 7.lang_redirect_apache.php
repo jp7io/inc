@@ -1,8 +1,8 @@
 <?php
 
-$path = $SCRIPT_NAME;
+$path = $_SERVER['SCRIPT_NAME'];
 if (!$path) {
-    $path = $REQUEST_URI;
+    $path = $_SERVER['REQUEST_URI'];
 }
 $dirname = dirname($path);
 $dirname = mb_substr($dirname, strrpos($dirname, '/'));

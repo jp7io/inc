@@ -14,7 +14,7 @@ $interadmin_date_modify = date('Y-m-d H:i:s');
 $interadmin_date_publish = date('Y-m-d H:i:s');
 
 // Log
-$interadmin_log = date('d/m/Y H:i').' - '.(($user_log) ? $user_log : $s_user['login']).' - '.(($id) ? 'modify' : 'insert').' - '.$REMOTE_ADDR.chr(13);
+$interadmin_log = date('d/m/Y H:i').' - '.(($user_log) ? $user_log : $s_user['login']).' - '.(($id) ? 'modify' : 'insert').' - '.$_SERVER['REMOTE_ADDR'].chr(13);
 if ($id) {
     $sql = 'SELECT log FROM '.$db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : '').' WHERE id='.$id;
     $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
