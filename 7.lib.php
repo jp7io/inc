@@ -25,6 +25,10 @@ if (empty($_SERVER['SERVER_ADDR']) && isset($_SERVER['LOCAL_ADDR'])) {
 if (empty($_SERVER['REMOTE_ADDR']) && isset($_SERVER['REMOTE_HOST'])) {
     $_SERVER['REMOTE_ADDR'] = $_SERVER['REMOTE_HOST'];
 }
+// PHP FPM - use FastCgiExternalServer ... --pass-header Authorization
+if (empty($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['Authorization'])) {
+    list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['Authorization'], 6)));
+}
 
 require __DIR__.'/7.functions.php';
 
