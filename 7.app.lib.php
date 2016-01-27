@@ -5,51 +5,6 @@
 // http://jp7.com.br
 // Versão 0.05 - 2006/08/29
 
-
-// jp7_app_checkPermission (2006/08/17)
-function jp7_app_checkPermission()
-{
-    global $jp7_app;
-    global $c_cliente_domains;
-    global $s_interadmin_cliente;
-    $cliente = ($s_interadmin_cliente) ?  $s_interadmin_cliente : $GLOBALS['s_'.$jp7_app.'_cliente'];
-    $ok = false;
-    for ($i = 0;$i < count($c_cliente_domains);$i++) {
-        switch ($_SERVER['HTTP_HOST']) {
-            case $c_cliente_domains[$i]:
-            case 'www.'.$c_cliente_domains[$i]:
-            case 'www.'.toId($c_cliente_domains[$i]):
-            case 'www2.'.$c_cliente_domains[$i]:
-            case 'interadmin.'.$c_cliente_domains[$i]:
-            case 'intermail.'.$c_cliente_domains[$i]:
-            case 'qa.intermail.'.$c_cliente_domains[$i]:
-            case 'ri.'.$c_cliente_domains[$i]:
-            case 'ir.'.$c_cliente_domains[$i]:
-                $ok = true;
-                break;
-        }
-    }
-    switch ($_SERVER['HTTP_HOST']) {
-        case '192.168.0.2':
-        case 'localhost':
-        case 'jp':
-        case 'jp7':
-        case 'jp7.com.br':
-        case 'www.jp7.com.br':
-        case 'interadmin.jp7.com.br':
-        case 'intermail.jp7.com.br':
-        case 'jpsete.com.br':
-        case 'www.jpsete.com.br':
-        case 'jp7.dnsalias.com':
-            $ok = true;
-            break;
-    }
-    if (!$ok) {
-        header('Location:http://jp7.com.br/'.$jp7_app.'/site/home/ixed.php?cliente='.$cliente);
-        exit();
-    }
-}
-
 // jp7_app_createSelect() (2004/04/29)
 function jp7_app_createSelect($name, $label, $div, $start, $finish, $value, $xtra = '')
 {
