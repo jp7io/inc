@@ -1005,7 +1005,7 @@ class jp7_lang
      *
      * @version (2006/09/12)
      */
-    public function jp7_lang($lang = '', $force = false)
+    public function __construct($lang = '', $force = false)
     {
         global $config;
         if (!$lang) {
@@ -1280,7 +1280,7 @@ class interadmin_cabecalho
      *
      * @version (2006/11/29)
      */
-    public function interadmin_cabecalho($i = 0, $model_id_tipo = 5, $check = 'file_1,file_2', $rand = false)
+    public function __construct($i = 0, $model_id_tipo = 5, $check = 'file_1,file_2', $rand = false)
     {
         global $db;
         global $db_prefix;
@@ -1407,6 +1407,7 @@ function jp7_include($file)
  * @author JP, Carlos
  *
  * @version (2009/02/25)
+ * @deprecated
  */
 function jp7_path_find($file)
 {
