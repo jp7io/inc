@@ -530,7 +530,7 @@ function jp7_password($length = 6)
     $chars = 'abcdefghijkmnopqrstuvwxyz023456789';
     $S = '';
     for ($i = 0; $i < $length; $i++) {
-        $S .= mb_substr($chars, rand(0, mb_strlen($chars) - 1), 1);
+        $S .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
     }
 
     return $S;
