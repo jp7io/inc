@@ -38,8 +38,7 @@ require __DIR__.'/7.functions.php';
 global $c_jp7;
 $c_jp7 = false;
 global $c_development;
-$c_development = $_SERVER['HTTP_HOST'] == 'localhost' || 
-    $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
+$c_development = $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
     $_SERVER['SERVER_ADDR'] == '::1' || 
     startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
 if ($c_development) {
