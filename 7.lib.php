@@ -85,7 +85,6 @@ if ($c_development) {
     $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
     $whoops->register();
 } else {
-    set_error_handler(array($debugger, 'errorHandler'));
     register_shutdown_function('jp7_check_shutdown');
     set_exception_handler('jp7_check_exception');
 }
