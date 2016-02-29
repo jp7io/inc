@@ -40,7 +40,7 @@ $c_jp7 = false;
 global $c_development;
 $c_development = $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
     $_SERVER['SERVER_ADDR'] == '::1' || 
-    startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
+    starts_with($_SERVER['REMOTE_ADDR'], '192.168.0.');
 if ($c_development) {
     $c_jp7 = true;
 } elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.', '177.', '178.'))) {
