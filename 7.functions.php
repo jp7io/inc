@@ -2200,7 +2200,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
 
     // Lançando exceção, utilizado no Web Services, por exemplo
     if ($debugger->isExceptionsEnabled()) {
-        $exception = new Jp7_InterAdmin_Exception($msgErro);
+        $exception = new Jp7_Interadmin_Exception($msgErro);
         $exception->setSql($sql);
         throw $exception;
     }
