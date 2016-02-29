@@ -1,13 +1,4 @@
 <?php
-function startsWith($needle, $haystack)
-{
-    return strpos($haystack, $needle) === 0;
-}
-function endsWith($needle, $haystack)
-{
-    $start = mb_strlen($needle) * -1; //negative
-    return (mb_substr($haystack, $start) === $needle);
-}
 
 /**
  * Takes off diacritics and empty spaces from a string, if $tofile is <tt>FALSE</tt> (default) the case is changed to lowercase.
@@ -82,6 +73,7 @@ function toSlug($string)
  * @author Carlos Rodrigues
  *
  * @version (2008/06/12)
+ * @deprecated
  */
 function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
 {
@@ -101,6 +93,9 @@ function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
     return 'REPLACE('.$field.",' ','') REGEXP '^".$sql_where."$'";
 }
 
+/**
+ * @deprecated
+ */
 function wap_toHTML($S)
 {
     return Jp7_Deprecated::wap_toHTML($S);
@@ -117,6 +112,7 @@ function wap_toHTML($S)
  * @return string Quoted string.
  *
  * @version (2003/08/25)
+ * @deprecated
  */
 function toBase($S, $force_magic_quotes_gpc = false)
 {
@@ -139,6 +135,7 @@ function toBase($S, $force_magic_quotes_gpc = false)
  * @return string Formatted string.
  *
  * @version (2004/06/14)
+ * @deprecated
  */
 function toForm($S)
 {
@@ -160,6 +157,7 @@ function toForm($S)
  * @return string Formatted string.
  *
  * @version (2004/06/14)
+ * @deprecated
  */
 function toHTML($S, $HTML = false, $busca_replace = false)
 {
@@ -189,6 +187,7 @@ function toHTML($S, $HTML = false, $busca_replace = false)
  * @return string Formatted string.
  *
  * @version (2004/05/31)
+ * @deprecated
  */
 function toScript($S)
 {
@@ -266,6 +265,7 @@ if (!function_exists('hex2bin')) {
  * @version (2007/04/19)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
 {
@@ -290,6 +290,7 @@ function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYP
  * @version (2007/04/19)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_decrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
 {
@@ -481,6 +482,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
  * @todo Check if this function could be flagged as "deprecated".
  *
  * @version (2007/03/03)
+ * @deprecated
  */
 function jp7_register_globals()
 {
@@ -524,6 +526,7 @@ function jp7_register_globals()
  * @version (2008/09/25)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_password($length = 6)
 {
@@ -2305,7 +2308,7 @@ function jp7_explode($separator, $string, $useTrim = true)
     if ($useTrim) {
         return array_filter($array, 'trim');
     } else {
-        return array_filter($array, create_function('$a', 'return (bool) $a;'));
+        return array_filter($array, 'boolval');
     }
 }
 
@@ -2323,7 +2326,7 @@ function jp7_implode($separator, $array, $useTrim = true)
     if ($useTrim) {
         $array = array_filter($array, 'trim');
     } else {
-        $array = array_filter($array, create_function('$a', 'return (bool) $a;'));
+        return array_filter($array, 'boolval');
     }
 
     return implode($separator, $array);
@@ -2346,50 +2349,6 @@ function jp7_file_exists($filename)
     }
 
     return false;
-}
-
-/**
- * Works as a bootstrap for custom pages inside /_config/CLIENT/APP or /CLIENT/APP.
- * Parses the URI and sets the include_path.
- *
- * @return string Filename to be included.
- */
-function interadmin_bootstrap()
-{
-    global $config;
-
-    $urlArr = explode('/', $_SERVER['REQUEST_URI']);
-
-    if ($urlArr[1] == '_config') {
-        // _config/CLIENTE
-        $jp7_app = $_GET['jp7_app'] = $urlArr[3];
-        $cliente = $_GET['cliente'] = $urlArr[2];
-        $url = str_replace('/_config/'.$cliente.'/'.$jp7_app.'/', '', $_SERVER['REQUEST_URI']);
-    } else {
-        // CLIENTE/APP
-        $jp7_app = $_GET['jp7_app'] = $urlArr[2];
-        $cliente = $_GET['cliente'] = $urlArr[1];
-        // não tem cliente
-        if (!$jp7_app) {
-            interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
-        }
-        $url = str_replace('/'.$cliente.'/'.$jp7_app.'/', '', $_SERVER['REQUEST_URI']);
-    }
-
-    // Retira a query string
-    $url = preg_replace('/([^?]*)(.*)/', '\1', $url);
-
-    if (!$url) {
-        interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
-    }
-
-    chdir(jp7_doc_root().$jp7_app);
-    set_include_path(get_include_path().PATH_SEPARATOR.jp7_doc_root().$jp7_app);
-    if ($jp7_app != 'interadmin') {
-        set_include_path(get_include_path().PATH_SEPARATOR.jp7_doc_root().'interadmin');
-    }
-
-    return $url;
 }
 
 function jp7_is_windows()
@@ -2501,24 +2460,6 @@ function jp7_absolute_path($path)
 }
 
 /**
- * Same as str_replace but only if the string starts with $search.
- *
- * @param string $search
- * @param string $replace
- * @param string $subject
- *
- * @return string
- */
-function jp7_replace_beginning($search, $replace, $subject)
-{
-    if (strpos($subject, $search) === 0) {
-        return $replace.mb_substr($subject, mb_strlen($search));
-    } else {
-        return $subject;
-    }
-}
-
-/**
  * Formats a DSN from an object with 'type', 'host', 'user', 'pass' and 'name'.
  *
  * @param object $db	Object with the database information.
@@ -2536,18 +2477,6 @@ function jp7_formatDsn($db)
     return $dsn;
 }
 
-function dm($object, $search = '.*')
-{
-    $methods = [];
-    if (is_object($object)) {
-        $methods = get_class_methods($object);
-        $methods = array_filter($methods, function ($a) use ($search) {
-            return preg_match('/'.$search.'/i', $a);
-        });
-    }
-    
-    dd(compact('methods', 'object'));
-}
 
 function jp7_get_object_vars($object)
 {
@@ -2588,11 +2517,11 @@ function jp7_is_serialized($data)
     $token = $data[0];
     switch ($token) {
         case 's':
-        case 'a' :
-        case 'O' :
-        case 'b' :
-        case 'i' :
-        case 'd' :
+        case 'a':
+        case 'O':
+        case 'b':
+        case 'i':
+        case 'd':
             return true;
     }
 
@@ -2781,39 +2710,6 @@ function utf8_decode_recursive($array)
 
     return $array;
 }
-
-/**
- * Sends the given data to the FirePHP Firefox Extension.
- * The data can be displayed in the Firebug Console or in the
- * "Server" request tab.
- *
- * @see http://www.firephp.org/Wiki/Reference/Fb
- *
- * @param mixed $Object
- *
- * @return true
- *
- * @throws Exception
- */
-function fb()
-{
-    $instance = FirePHP::getInstance(true);
-
-    $args = func_get_args();
-
-    return call_user_func_array(array($instance, 'fb'), $args);
-}
-/*
-function isoentities($string)
-{
-    return htmlentities($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-}
-
-function isospecialchars($string)
-{
-    return htmlspecialchars($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-}
-*/
 
 if (!function_exists('http_parse_headers')) {
     function http_parse_headers($raw_headers)
