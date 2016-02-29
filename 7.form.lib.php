@@ -377,7 +377,7 @@ function interadmin_tipos_combo($current_id_tipo, $parent_id_tipo_2, $nivel = 0,
     global $db_prefix;
 
     if (is_null($opcoes)) {
-        $rows = array();
+        $rows = [];
         $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
             ' WHERE 1=1'.
             ((is_numeric($parent_id_tipo_2)) ? ' AND parent_id_tipo='.$parent_id_tipo_2 : ' AND parent_id_tipo=0').
@@ -487,15 +487,15 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
     }
     $DF_template .= ((strpos($DF_template, '?') === false) ? '?' : '&').'DF_client_name='.$post_vars['DF_client_name'].'&DF_template_title='.$post_vars['DF_template_title'];
     $html = ($DF_format == 'text') ? false : true;
-    $vars_required = array(
+    $vars_required = [
         'DF_to',
         'DF_subject',
-    );
-    $vars_headers = array(
+    ];
+    $vars_headers = [
         'DF_cc',
         'DF_bcc',
-    );
-    $vars_special = array(
+    ];
+    $vars_special = [
         'DF_client',
         'DF_client_name',
         'DF_from',
@@ -519,7 +519,7 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
         'DF_reply_to',
         'DF_reply_to_name',
         'debug',
-    );
+    ];
     // Check Data
     if (!$DF_to || !$DF_subject) {
         echo 'Faltam parâmetros <b>$DF_to</b> ou <b>$DF_subject</b>. Linha:'.__LINE__.' Arquivo: '.__FILE__;
@@ -668,7 +668,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
 {
     global $db;
     global $db_name;
-    $vars_out = array();
+    $vars_out = [];
     foreach ($vars_in as $key => $value) {
         if (strpos($key, 'noDF_') === false) {
             // InterAdmin Vars
@@ -807,9 +807,9 @@ if (!function_exists('interadmin_arquivos_preview')) {
         $ext = jp7_extension($S);
         $icon_size = ($icon_small) ? '16' : '32';
         if ($ext) {
-            if (in_array($ext, array('gif', 'jpg', 'jpeg', 'png'))) {
+            if (in_array($ext, ['gif', 'jpg', 'jpeg', 'png'])) {
                 $S = '<div class="image_preview_background"><img '.(($presrc) ? 'pre' : '').'src="'.$S.(strpos($S, '?') ? '&' : '?').'size=40x40"'.$c_arquivos_parametros.(($name) ? ' alt="'.$name.'"' : '').'></div>';
-            } elseif (in_array($ext, array('doc', 'pdf', 'ppt', 'swf', 'wmv', 'xls', 'zip', 'docx', 'xlsx'))) {
+            } elseif (in_array($ext, ['doc', 'pdf', 'ppt', 'swf', 'wmv', 'xls', 'zip', 'docx', 'xlsx'])) {
                 $S = '<div><img src="/_default/img/aplicacao/ico_file_'.$ext.'_'.$icon_size.'.gif"'.(($name) ? ' alt="'.$name.'"' : '').' style="width:'.$icon_size.'px;height:'.$icon_size.'px;background:transparent"></div>';
             } else {
                 $S = '<div class="bg_gray_1"><b class="font_0 font_white">.'.mb_strtoupper($ext).'</b></div>';

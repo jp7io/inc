@@ -25,7 +25,7 @@ if ($id) {
 }
 
 // Table Fields
-$table_fields_notallowed = array('id','id_tipo','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish');
+$table_fields_notallowed = ['id','id_tipo','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish'];
 $table_columns = $db->MetaColumnNames($db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : ''));
 array_shift($table_columns);
 foreach ($table_columns as $table_field_name) {
@@ -52,7 +52,7 @@ for ($i = 0;$i < $quantidade;$i++) {
                     $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
                     $keywords = basename($_FILES[$table_field_name]['name'][$i], '.'.$tipo['extension']);
                     $tipo = mb_strtolower($tipo['extension']);
-                    $invalid_extensions = array('php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js');
+                    $invalid_extensions = ['php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js'];
                     if (!in_array($tipo, $invalid_extensions)) {
                         $lang_temp = $lang;
                         $lang = $lang->lang;

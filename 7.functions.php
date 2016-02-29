@@ -234,7 +234,7 @@ function toParam($S)
  */
 function toXml($S)
 {
-    return str_replace(array('&', '"', "'", '<', '>', '’'), array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'), $S);
+    return str_replace(['&', '"', "'", '<', '>', '’'], ['&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'], $S);
 }
 
 /*
@@ -392,7 +392,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
         // splits all html-tags to scanable lines
         preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
         $total_length = mb_strlen($ending);
-        $open_tags = array();
+        $open_tags = [];
         $truncate = '';
         foreach ($lines as $line_matchings) {
             // if there is any html-tag in this line, handle it and add it (uncounted) to the output
@@ -575,7 +575,7 @@ function jp7_date_split($date)
     $date = str_replace(':', ',', $date);
     $date = explode(',', $date);
 
-    return array(
+    return [
         Y => $date[0],
         m => $date[1],
         M => jp7_date_month($date[1], true),
@@ -585,7 +585,7 @@ function jp7_date_split($date)
         i => $date[4],
         s => $date[5],
         y => mb_substr($date[0], 2),
-    );
+    ];
 }
 
 /**
@@ -645,10 +645,10 @@ function jp7_date_week($w, $sigla = false)
 {
     global $lang;
     switch ($lang->lang) {
-        case 'en': $W = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'); break;
-        case 'de': $W = array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'); break;
-        case 'es': $W = array('Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'); break;
-        default: $W = array('Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'); break;
+        case 'en': $W = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; break;
+        case 'de': $W = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']; break;
+        case 'es': $W = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; break;
+        default: $W = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']; break;
     }
     if (!is_int($w)) {
         $w = date('w', strtotime($w));
@@ -675,16 +675,16 @@ function jp7_date_month($m, $sigla = false)
     global $lang;
     switch ($lang->lang) {
         case 'en':
-            $M = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+            $M = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             break;
         case 'de':
-            $M = array('Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
+            $M = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
             break;
         case 'es':
-            $M = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+            $M = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             break;
         default:
-            $M = array('Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
+            $M = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             break;
     }
     $return = $M[$m - 1];
@@ -737,11 +737,11 @@ function jp7_tel_split($tel)
     $tel = str_replace(' - Ramal: ', ',', $tel);
     $tel = explode(',', $tel);
 
-    return array(
+    return [
         ddd => trim($tel[0]),
         numero => trim($tel[1]),
         ramal => trim($tel[2]),
-    );
+    ];
 }
 
 function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '')
@@ -806,7 +806,7 @@ function jp7_db_update($table, $table_id_name, $table_id_value, $fields)
  */
 function interadmin_tipos_campos($campos)
 {
-    $campos_parameters = array('tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id');
+    $campos_parameters = ['tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id'];
     $campos = explode('{;}', $campos);
     for ($i = 0; $i < count($campos); $i++) {
         $parameters = explode('{,}', $campos[$i]);
@@ -865,10 +865,10 @@ function interadmin_tipos_campo($db_prefix, $id_tipo, $var_key)
     foreach ($tipo_campos as $campo) {
         $campo = explode('{,}', $campo);
         if ($campo[0] == $var_key) {
-            return array(
+            return [
                 'nome' => $campo[1],
                 'xtra' => $campo[6],
-            );
+            ];
             break;
         }
     }
@@ -1033,7 +1033,7 @@ class jp7_lang
             //}else $this->lang=$this->lang[1]; // Old Way
             $this->lang = str_replace('_', '', $this->lang); // Apache Redirect
         }
-        $langs = array('de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br');
+        $langs = ['de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'];
         //if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$config->name_id||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
         if (!in_array($this->lang, $langs) || $this->lang == $config->lang_default) {
             $this->lang = $lang;
@@ -1210,7 +1210,7 @@ class interadmin_tipos
             }
         }
         $path_seo = '';
-        $path_seo_arr = array();
+        $path_seo_arr = [];
         foreach ((array) $this->nome as $key => $nome) {
             if (!in_array($nome, (array) $implicit_parents_names)) {
                 $path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
@@ -1743,7 +1743,7 @@ function jp7_imageCreateFromBmp($filename)
     }
 
     //3 : Chargement des couleurs de la palette
-    $palette = array();
+    $palette = [];
     if ($bmp['colors'] < 16777216) {
         $palette = unpack('V'.$bmp['colors'], fread($f1, $bmp['colors'] * 4));
     }
@@ -2399,13 +2399,13 @@ function interadmin_get_version()
  *
  * @deprecated Use json_encode whenever possible
  */
-function jp7_xml_encode($data, $options = array())
+function jp7_xml_encode($data, $options = [])
 {
-    $default = array(
+    $default = [
         'send_headers' => true,
         'encoding' => 'UTF-8',
         'xml_tag' => true,
-    );
+    ];
 
     $options += $default;
     if ($options['send_headers']) {
@@ -2418,7 +2418,7 @@ function jp7_xml_encode($data, $options = array())
     foreach ($data as $key => $value) {
         $xml .= '<'.$key.'>';
         if (is_array($value)) {
-            $xml .= jp7_xml_encode($value, array('xml_tag' => false, 'send_headers' => false));
+            $xml .= jp7_xml_encode($value, ['xml_tag' => false, 'send_headers' => false]);
         } else {
             $xml .= $value;
         }
@@ -2441,9 +2441,9 @@ function jp7_xml_encode($data, $options = array())
  */
 function jp7_absolute_path($path)
 {
-    $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
+    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
     $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
-    $absolutes = array();
+    $absolutes = [];
     foreach ($parts as $part) {
         if ('.' == $part) {
             continue;
@@ -2545,7 +2545,7 @@ function array_full_diff($array_a, $array_b)
 
 function jp7_normalize($string)
 {
-    $table = array(
+    $table = [
         'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a', 'ª' => 'a',
         'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
         'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', '&' => 'e',
@@ -2560,7 +2560,7 @@ function jp7_normalize($string)
         'Ç' => 'C',
         'ñ' => 'n',
         'Ñ' => 'N',
-    );
+    ];
 
     return strtr($string, $table);
 }
@@ -2583,8 +2583,8 @@ function array_move_key($array, $key1, $key2, $pos = 1)
     $values = array_values($array);
 
     $pos_key2 = array_search($key2, $keys);
-    array_splice($keys, $pos_key2 + $pos, 0, array($key1));
-    array_splice($values, $pos_key2 + $pos, 0, array($value_key1));
+    array_splice($keys, $pos_key2 + $pos, 0, [$key1]);
+    array_splice($values, $pos_key2 + $pos, 0, [$value_key1]);
 
     return array_combine($keys, $values);
 }
@@ -2660,7 +2660,7 @@ function curl_exec_follow($ch, /*int*/ $maxredirect = null)
     return curl_exec($ch);
 }
 
-function curl_get_contents($url, $options = array())
+function curl_get_contents($url, $options = [])
 {
     $ch = curl_init();
     $timeout = 15;
@@ -2714,7 +2714,7 @@ function utf8_decode_recursive($array)
 if (!function_exists('http_parse_headers')) {
     function http_parse_headers($raw_headers)
     {
-        $headers = array();
+        $headers = [];
         $key = '';
 
         foreach (explode("\n", $raw_headers) as $i => $h) {
@@ -2724,9 +2724,9 @@ if (!function_exists('http_parse_headers')) {
                 if (!isset($headers[$h[0]])) {
                     $headers[$h[0]] = trim($h[1]);
                 } elseif (is_array($headers[$h[0]])) {
-                    $headers[$h[0]] = array_merge($headers[$h[0]], array(trim($h[1])));
+                    $headers[$h[0]] = array_merge($headers[$h[0]], [trim($h[1])]);
                 } else {
-                    $headers[$h[0]] = array_merge(array($headers[$h[0]]), array(trim($h[1])));
+                    $headers[$h[0]] = array_merge([$headers[$h[0]]], [trim($h[1])]);
                 }
 
                 $key = $h[0];
