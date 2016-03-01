@@ -744,9 +744,9 @@ function jp7_tel_split($tel)
     ];
 }
 
-function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '')
+function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '', $returnValues = false)
 {
-    return Jp7_Deprecated::jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix);
+    return Jp7_Deprecated::jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix, $returnValues);
 }
 
 function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = '', $var_check = true, $force_magic_quotes_gpc = false)
