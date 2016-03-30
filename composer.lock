@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f35a96c094d33a3ccf8c4f29d20ae4e1",
-    "content-hash": "d37690dea2f5637376b37f387a4d760b",
+    "hash": "89c81f18d1cc8ec5025520d5680e08ba",
+    "content-hash": "ea1041ffa0c4af890f4228d11f09fc38",
     "packages": [
         {
             "name": "adodb/adodb-php",
@@ -63,16 +63,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "dev-master",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "bad82de557eaea7c7dcf6d4b775b91461dcde16e"
+                "reference": "a327942c50cbd62b25c6fbe08f173031ce25fbff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/bad82de557eaea7c7dcf6d4b775b91461dcde16e",
-                "reference": "bad82de557eaea7c7dcf6d4b775b91461dcde16e",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/a327942c50cbd62b25c6fbe08f173031ce25fbff",
+                "reference": "a327942c50cbd62b25c6fbe08f173031ce25fbff",
                 "shasum": ""
             },
             "require": {
@@ -118,14 +118,14 @@
                 "whoops",
                 "zf2"
             ],
-            "time": "2016-02-05 19:33:27"
+            "time": "2016-01-06 17:51:21"
         }
     ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": [],
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []
