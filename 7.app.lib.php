@@ -140,7 +140,7 @@ function jp7_app_log($log, $S)
     @chmod($log_file, 0777);
     @chmod($file_path.$log_file_day, 0777);
     if ($c_remote) {
-        interadmin_update_remote_files(array('_log/'.$log.'.log', '_log/'.$log_file_day));
+        interadmin_update_remote_files(['_log/'.$log.'.log', '_log/'.$log_file_day]);
     }
 }
 

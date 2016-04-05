@@ -1,13 +1,4 @@
 <?php
-function startsWith($needle, $haystack)
-{
-    return strpos($haystack, $needle) === 0;
-}
-function endsWith($needle, $haystack)
-{
-    $start = mb_strlen($needle) * -1; //negative
-    return (mb_substr($haystack, $start) === $needle);
-}
 
 /**
  * Takes off diacritics and empty spaces from a string, if $tofile is <tt>FALSE</tt> (default) the case is changed to lowercase.
@@ -24,24 +15,24 @@ function toId($string, $tofile = false, $separador = '')
 {
     // Check if there are diacritics before replacing them
     if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
-        $string = mb_ereg_replace('[áàãâäÁÀÃÂÄª]', 'a', $string);
-        $string = mb_ereg_replace('[éèêëÉÈÊË&]', 'e', $string);
-        $string = mb_ereg_replace('[íìîïÍÌÎÏ]', 'i', $string);
-        $string = mb_ereg_replace('[óòõôöÓÒÕÔÖº]', 'o', $string);
-        $string = mb_ereg_replace('[úùûüÚÙÛÜ]', 'u', $string);
-        $string = mb_ereg_replace('[çÇ]', 'c', $string);
-        $string = mb_ereg_replace('[ñÑ]', 'n', $string);
+        $string = preg_replace('/[áàãâäÁÀÃÂÄª]/u', 'a', $string);
+        $string = preg_replace('/[éèêëÉÈÊË&]/u', 'e', $string);
+        $string = preg_replace('/[íìîïÍÌÎÏ]/u', 'i', $string);
+        $string = preg_replace('/[óòõôöÓÒÕÔÖº]/u', 'o', $string);
+        $string = preg_replace('/[úùûüÚÙÛÜ]/u', 'u', $string);
+        $string = preg_replace('/[çÇ]/u', 'c', $string);
+        $string = preg_replace('/[ñÑ]/u', 'n', $string);
     }
     if ($tofile) {
-        $string = mb_ereg_replace('[^a-zA-Z0-9_]', '_', $string);
+        $string = preg_replace('/[^a-zA-Z0-9_]/u', '_', $string);
     } else {
-        $string = mb_ereg_replace('[^a-zA-Z0-9_]+', $separador, $string);
+        $string = preg_replace('/[^a-zA-Z0-9_]+/u', $separador, $string);
         $string = trim(mb_strtolower($string), $separador);
     }
     if ($separador) {
         $string = str_replace('_', $separador, $string);
     } else {
-        $string = mb_ereg_replace('[/-]', '_', $string);
+        $string = preg_replace('/[\/-]/u', '_', $string);
     }
     return $string;
 }
@@ -82,6 +73,7 @@ function toSlug($string)
  * @author Carlos Rodrigues
  *
  * @version (2008/06/12)
+ * @deprecated
  */
 function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
 {
@@ -101,6 +93,9 @@ function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
     return 'REPLACE('.$field.",' ','') REGEXP '^".$sql_where."$'";
 }
 
+/**
+ * @deprecated
+ */
 function wap_toHTML($S)
 {
     return Jp7_Deprecated::wap_toHTML($S);
@@ -117,6 +112,7 @@ function wap_toHTML($S)
  * @return string Quoted string.
  *
  * @version (2003/08/25)
+ * @deprecated
  */
 function toBase($S, $force_magic_quotes_gpc = false)
 {
@@ -139,6 +135,7 @@ function toBase($S, $force_magic_quotes_gpc = false)
  * @return string Formatted string.
  *
  * @version (2004/06/14)
+ * @deprecated
  */
 function toForm($S)
 {
@@ -160,6 +157,7 @@ function toForm($S)
  * @return string Formatted string.
  *
  * @version (2004/06/14)
+ * @deprecated
  */
 function toHTML($S, $HTML = false, $busca_replace = false)
 {
@@ -189,6 +187,7 @@ function toHTML($S, $HTML = false, $busca_replace = false)
  * @return string Formatted string.
  *
  * @version (2004/05/31)
+ * @deprecated
  */
 function toScript($S)
 {
@@ -235,7 +234,7 @@ function toParam($S)
  */
 function toXml($S)
 {
-    return str_replace(array('&', '"', "'", '<', '>', '’'), array('&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'), $S);
+    return str_replace(['&', '"', "'", '<', '>', '’'], ['&amp;', '&quot;', '&apos;', '&lt;', '&gt;', '&apos;'], $S);
 }
 
 /*
@@ -266,6 +265,7 @@ if (!function_exists('hex2bin')) {
  * @version (2007/04/19)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
 {
@@ -290,6 +290,7 @@ function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYP
  * @version (2007/04/19)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_decrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
 {
@@ -391,7 +392,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
         // splits all html-tags to scanable lines
         preg_match_all('/(<.+?>)?([^<>]*)/s', $text, $lines, PREG_SET_ORDER);
         $total_length = mb_strlen($ending);
-        $open_tags = array();
+        $open_tags = [];
         $truncate = '';
         foreach ($lines as $line_matchings) {
             // if there is any html-tag in this line, handle it and add it (uncounted) to the output
@@ -481,6 +482,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
  * @todo Check if this function could be flagged as "deprecated".
  *
  * @version (2007/03/03)
+ * @deprecated
  */
 function jp7_register_globals()
 {
@@ -524,6 +526,7 @@ function jp7_register_globals()
  * @version (2008/09/25)
  *
  * @author JP
+ * @deprecated
  */
 function jp7_password($length = 6)
 {
@@ -572,7 +575,7 @@ function jp7_date_split($date)
     $date = str_replace(':', ',', $date);
     $date = explode(',', $date);
 
-    return array(
+    return [
         Y => $date[0],
         m => $date[1],
         M => jp7_date_month($date[1], true),
@@ -582,7 +585,7 @@ function jp7_date_split($date)
         i => $date[4],
         s => $date[5],
         y => mb_substr($date[0], 2),
-    );
+    ];
 }
 
 /**
@@ -642,10 +645,10 @@ function jp7_date_week($w, $sigla = false)
 {
     global $lang;
     switch ($lang->lang) {
-        case 'en': $W = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'); break;
-        case 'de': $W = array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'); break;
-        case 'es': $W = array('Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'); break;
-        default: $W = array('Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'); break;
+        case 'en': $W = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; break;
+        case 'de': $W = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']; break;
+        case 'es': $W = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; break;
+        default: $W = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']; break;
     }
     if (!is_int($w)) {
         $w = date('w', strtotime($w));
@@ -672,16 +675,16 @@ function jp7_date_month($m, $sigla = false)
     global $lang;
     switch ($lang->lang) {
         case 'en':
-            $M = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+            $M = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             break;
         case 'de':
-            $M = array('Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
+            $M = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
             break;
         case 'es':
-            $M = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+            $M = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             break;
         default:
-            $M = array('Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro');
+            $M = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             break;
     }
     $return = $M[$m - 1];
@@ -734,16 +737,16 @@ function jp7_tel_split($tel)
     $tel = str_replace(' - Ramal: ', ',', $tel);
     $tel = explode(',', $tel);
 
-    return array(
+    return [
         ddd => trim($tel[0]),
         numero => trim($tel[1]),
         ramal => trim($tel[2]),
-    );
+    ];
 }
 
-function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '')
+function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '', $returnValues = false)
 {
-    return Jp7_Deprecated::jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix);
+    return Jp7_Deprecated::jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix, $returnValues);
 }
 
 function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = '', $var_check = true, $force_magic_quotes_gpc = false)
@@ -803,7 +806,7 @@ function jp7_db_update($table, $table_id_name, $table_id_value, $fields)
  */
 function interadmin_tipos_campos($campos)
 {
-    $campos_parameters = array('tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id');
+    $campos_parameters = ['tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id'];
     $campos = explode('{;}', $campos);
     for ($i = 0; $i < count($campos); $i++) {
         $parameters = explode('{,}', $campos[$i]);
@@ -862,10 +865,10 @@ function interadmin_tipos_campo($db_prefix, $id_tipo, $var_key)
     foreach ($tipo_campos as $campo) {
         $campo = explode('{,}', $campo);
         if ($campo[0] == $var_key) {
-            return array(
+            return [
                 'nome' => $campo[1],
                 'xtra' => $campo[6],
-            );
+            ];
             break;
         }
     }
@@ -1030,7 +1033,7 @@ class jp7_lang
             //}else $this->lang=$this->lang[1]; // Old Way
             $this->lang = str_replace('_', '', $this->lang); // Apache Redirect
         }
-        $langs = array('de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br');
+        $langs = ['de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'];
         //if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$config->name_id||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
         if (!in_array($this->lang, $langs) || $this->lang == $config->lang_default) {
             $this->lang = $lang;
@@ -1207,7 +1210,7 @@ class interadmin_tipos
             }
         }
         $path_seo = '';
-        $path_seo_arr = array();
+        $path_seo_arr = [];
         foreach ((array) $this->nome as $key => $nome) {
             if (!in_array($nome, (array) $implicit_parents_names)) {
                 $path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
@@ -1740,7 +1743,7 @@ function jp7_imageCreateFromBmp($filename)
     }
 
     //3 : Chargement des couleurs de la palette
-    $palette = array();
+    $palette = [];
     if ($bmp['colors'] < 16777216) {
         $palette = unpack('V'.$bmp['colors'], fread($f1, $bmp['colors'] * 4));
     }
@@ -2200,7 +2203,7 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
 
     // Lançando exceção, utilizado no Web Services, por exemplo
     if ($debugger->isExceptionsEnabled()) {
-        $exception = new Jp7_InterAdmin_Exception($msgErro);
+        $exception = new Jp7_Interadmin_Exception($msgErro);
         $exception->setSql($sql);
         throw $exception;
     }
@@ -2305,7 +2308,7 @@ function jp7_explode($separator, $string, $useTrim = true)
     if ($useTrim) {
         return array_filter($array, 'trim');
     } else {
-        return array_filter($array, create_function('$a', 'return (bool) $a;'));
+        return array_filter($array, 'boolval');
     }
 }
 
@@ -2323,7 +2326,7 @@ function jp7_implode($separator, $array, $useTrim = true)
     if ($useTrim) {
         $array = array_filter($array, 'trim');
     } else {
-        $array = array_filter($array, create_function('$a', 'return (bool) $a;'));
+        return array_filter($array, 'boolval');
     }
 
     return implode($separator, $array);
@@ -2346,50 +2349,6 @@ function jp7_file_exists($filename)
     }
 
     return false;
-}
-
-/**
- * Works as a bootstrap for custom pages inside /_config/CLIENT/APP or /CLIENT/APP.
- * Parses the URI and sets the include_path.
- *
- * @return string Filename to be included.
- */
-function interadmin_bootstrap()
-{
-    global $config;
-
-    $urlArr = explode('/', $_SERVER['REQUEST_URI']);
-
-    if ($urlArr[1] == '_config') {
-        // _config/CLIENTE
-        $jp7_app = $_GET['jp7_app'] = $urlArr[3];
-        $cliente = $_GET['cliente'] = $urlArr[2];
-        $url = str_replace('/_config/'.$cliente.'/'.$jp7_app.'/', '', $_SERVER['REQUEST_URI']);
-    } else {
-        // CLIENTE/APP
-        $jp7_app = $_GET['jp7_app'] = $urlArr[2];
-        $cliente = $_GET['cliente'] = $urlArr[1];
-        // não tem cliente
-        if (!$jp7_app) {
-            interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
-        }
-        $url = str_replace('/'.$cliente.'/'.$jp7_app.'/', '', $_SERVER['REQUEST_URI']);
-    }
-
-    // Retira a query string
-    $url = preg_replace('/([^?]*)(.*)/', '\1', $url);
-
-    if (!$url) {
-        interadmin_bootstrap_open_url($cliente); // $cliente na verdade é a aplicacao
-    }
-
-    chdir(jp7_doc_root().$jp7_app);
-    set_include_path(get_include_path().PATH_SEPARATOR.jp7_doc_root().$jp7_app);
-    if ($jp7_app != 'interadmin') {
-        set_include_path(get_include_path().PATH_SEPARATOR.jp7_doc_root().'interadmin');
-    }
-
-    return $url;
 }
 
 function jp7_is_windows()
@@ -2440,13 +2399,13 @@ function interadmin_get_version()
  *
  * @deprecated Use json_encode whenever possible
  */
-function jp7_xml_encode($data, $options = array())
+function jp7_xml_encode($data, $options = [])
 {
-    $default = array(
+    $default = [
         'send_headers' => true,
         'encoding' => 'UTF-8',
         'xml_tag' => true,
-    );
+    ];
 
     $options += $default;
     if ($options['send_headers']) {
@@ -2459,7 +2418,7 @@ function jp7_xml_encode($data, $options = array())
     foreach ($data as $key => $value) {
         $xml .= '<'.$key.'>';
         if (is_array($value)) {
-            $xml .= jp7_xml_encode($value, array('xml_tag' => false, 'send_headers' => false));
+            $xml .= jp7_xml_encode($value, ['xml_tag' => false, 'send_headers' => false]);
         } else {
             $xml .= $value;
         }
@@ -2482,9 +2441,9 @@ function jp7_xml_encode($data, $options = array())
  */
 function jp7_absolute_path($path)
 {
-    $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
+    $path = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
     $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
-    $absolutes = array();
+    $absolutes = [];
     foreach ($parts as $part) {
         if ('.' == $part) {
             continue;
@@ -2498,24 +2457,6 @@ function jp7_absolute_path($path)
     $path = implode(DIRECTORY_SEPARATOR, $absolutes);
 
     return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '').$path;
-}
-
-/**
- * Same as str_replace but only if the string starts with $search.
- *
- * @param string $search
- * @param string $replace
- * @param string $subject
- *
- * @return string
- */
-function jp7_replace_beginning($search, $replace, $subject)
-{
-    if (strpos($subject, $search) === 0) {
-        return $replace.mb_substr($subject, mb_strlen($search));
-    } else {
-        return $subject;
-    }
 }
 
 /**
@@ -2536,18 +2477,6 @@ function jp7_formatDsn($db)
     return $dsn;
 }
 
-function dm($object, $search = '.*')
-{
-    $methods = [];
-    if (is_object($object)) {
-        $methods = get_class_methods($object);
-        $methods = array_filter($methods, function ($a) use ($search) {
-            return preg_match('/'.$search.'/i', $a);
-        });
-    }
-    
-    dd(compact('methods', 'object'));
-}
 
 function jp7_get_object_vars($object)
 {
@@ -2588,11 +2517,11 @@ function jp7_is_serialized($data)
     $token = $data[0];
     switch ($token) {
         case 's':
-        case 'a' :
-        case 'O' :
-        case 'b' :
-        case 'i' :
-        case 'd' :
+        case 'a':
+        case 'O':
+        case 'b':
+        case 'i':
+        case 'd':
             return true;
     }
 
@@ -2616,7 +2545,7 @@ function array_full_diff($array_a, $array_b)
 
 function jp7_normalize($string)
 {
-    $table = array(
+    $table = [
         'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a', 'ª' => 'a',
         'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
         'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', '&' => 'e',
@@ -2631,7 +2560,7 @@ function jp7_normalize($string)
         'Ç' => 'C',
         'ñ' => 'n',
         'Ñ' => 'N',
-    );
+    ];
 
     return strtr($string, $table);
 }
@@ -2654,8 +2583,8 @@ function array_move_key($array, $key1, $key2, $pos = 1)
     $values = array_values($array);
 
     $pos_key2 = array_search($key2, $keys);
-    array_splice($keys, $pos_key2 + $pos, 0, array($key1));
-    array_splice($values, $pos_key2 + $pos, 0, array($value_key1));
+    array_splice($keys, $pos_key2 + $pos, 0, [$key1]);
+    array_splice($values, $pos_key2 + $pos, 0, [$value_key1]);
 
     return array_combine($keys, $values);
 }
@@ -2731,7 +2660,7 @@ function curl_exec_follow($ch, /*int*/ $maxredirect = null)
     return curl_exec($ch);
 }
 
-function curl_get_contents($url, $options = array())
+function curl_get_contents($url, $options = [])
 {
     $ch = curl_init();
     $timeout = 15;
@@ -2782,43 +2711,10 @@ function utf8_decode_recursive($array)
     return $array;
 }
 
-/**
- * Sends the given data to the FirePHP Firefox Extension.
- * The data can be displayed in the Firebug Console or in the
- * "Server" request tab.
- *
- * @see http://www.firephp.org/Wiki/Reference/Fb
- *
- * @param mixed $Object
- *
- * @return true
- *
- * @throws Exception
- */
-function fb()
-{
-    $instance = FirePHP::getInstance(true);
-
-    $args = func_get_args();
-
-    return call_user_func_array(array($instance, 'fb'), $args);
-}
-/*
-function isoentities($string)
-{
-    return htmlentities($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-}
-
-function isospecialchars($string)
-{
-    return htmlspecialchars($string, ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
-}
-*/
-
 if (!function_exists('http_parse_headers')) {
     function http_parse_headers($raw_headers)
     {
-        $headers = array();
+        $headers = [];
         $key = '';
 
         foreach (explode("\n", $raw_headers) as $i => $h) {
@@ -2828,9 +2724,9 @@ if (!function_exists('http_parse_headers')) {
                 if (!isset($headers[$h[0]])) {
                     $headers[$h[0]] = trim($h[1]);
                 } elseif (is_array($headers[$h[0]])) {
-                    $headers[$h[0]] = array_merge($headers[$h[0]], array(trim($h[1])));
+                    $headers[$h[0]] = array_merge($headers[$h[0]], [trim($h[1])]);
                 } else {
-                    $headers[$h[0]] = array_merge(array($headers[$h[0]]), array(trim($h[1])));
+                    $headers[$h[0]] = array_merge([$headers[$h[0]]], [trim($h[1])]);
                 }
 
                 $key = $h[0];

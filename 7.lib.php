@@ -40,10 +40,10 @@ $c_jp7 = false;
 global $c_development;
 $c_development = $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
     $_SERVER['SERVER_ADDR'] == '::1' || 
-    startsWith('192.168.0.', $_SERVER['REMOTE_ADDR']);
+    starts_with($_SERVER['REMOTE_ADDR'], '192.168.0.');
 if ($c_development) {
     $c_jp7 = true;
-} elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), array('179.', '177.', '178.'))) {
+} elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), ['179.', '177.', '178.'])) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
@@ -51,8 +51,8 @@ error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_STRICT);
 
 mb_internal_encoding('UTF-8');
 mb_regex_encoding('UTF-8');
-setlocale(LC_CTYPE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
-setlocale(LC_COLLATE, array('pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil'));
+setlocale(LC_CTYPE, ['pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil']);
+setlocale(LC_COLLATE, ['pt_BR.ISO8859-1', 'pt_BR', 'Portuguese_Brazil']);
 
 date_default_timezone_set('America/Sao_Paulo');
 

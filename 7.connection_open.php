@@ -55,7 +55,7 @@ if (!isset($s_session) || is_null($s_session)) {
         unset($GLOBALS[$config->name_id]);
     }
     if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
-        $_SESSION[$config->name_id]['interadmin'] = array();
+        $_SESSION[$config->name_id]['interadmin'] = [];
     }
     $s_session = &$_SESSION[$config->name_id]['interadmin'];
     $s_user = &$s_session['user'];
