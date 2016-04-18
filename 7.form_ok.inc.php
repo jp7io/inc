@@ -17,7 +17,10 @@ $interadmin_date_publish = date('Y-m-d H:i:s');
 $interadmin_log = date('d/m/Y H:i').' - '.(($user_log) ? $user_log : $s_user['login']).' - '.(($id) ? 'modify' : 'insert').' - '.$_SERVER['REMOTE_ADDR'].chr(13);
 if ($id) {
     $sql = 'SELECT log FROM '.$db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : '').' WHERE id='.$id;
-    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+    $rs = $db->Execute($sql);
+    if ($rs === false) {
+        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+    }
     while ($row = $rs->FetchNextObj()) {
         $interadmin_log .= $row->log;
     }
@@ -68,7 +71,9 @@ for ($i = 0;$i < $quantidade;$i++) {
                             @chmod($path, 0777);
                         }
                         $dst = $path.$id_arquivo_banco.'.'.$tipo;
-                        copy($_FILES[$table_field_name]['tmp_name'][$i], $dst) or die('Erro na cópia do arquivo!');
+                        if (!copy($_FILES[$table_field_name]['tmp_name'][$i], $dst)) {
+                            throw new Exception('Erro na cópia do arquivo!');
+                        }
                         $GLOBALS['interadmin_'.$table_field_name] = $dst;
                     }
                 }

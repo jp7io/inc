@@ -99,7 +99,10 @@ function interadmin_returnCampo($campo)
             $sql = 'SELECT id,'.$nomevarchar.' FROM '.$db_prefix.
                 ' WHERE id_tipo='.$campo_nome.
                 ' ORDER BY int_key, char_key,varchar_key';
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             $form = '';
             while ($row = $rs->FetchNextObj()) {
                 $form .= '<input '.(($obrigatorio) ? ' obligatory="yes"' : '').' label="'.$campo_nome_2.'" type="radio" name="'.$campo.'['.$j.']" id="'.$campo.'_'.$j.'_'.$row->id.'" value="'.$row->id.'"'.(($row->id == $valor) ? ' checked' : '').' /> <label for="'.$campo.'_'.$j.'_'.$row->id.'">'.toHTML($row->$nomevarchar).'</label>';
@@ -115,7 +118,10 @@ function interadmin_returnCampo($campo)
                 $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
                 ' WHERE parent_id_tipo='.$campo_nome.
                 ' ORDER BY ordem,nome';
-                $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
                 while ($row = $rs->FetchNextObj()) {
                     $form .= '<option value="'.$row->id_tipo.'"'.(($row->id_tipo == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
                 }
@@ -258,7 +264,10 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
     global $lang;
     $sql = 'SELECT tabela,campos,language FROM '.$db_prefix.'_tipos'.
     ' WHERE id_tipo='.$parent_id_tipo_2;
-    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+    $rs = $db->Execute($sql);
+    if ($rs === false) {
+        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+    }
     while ($row = $rs->FetchNextObj()) {
         $campos = interadmin_tipos_campos($row->campos);
         $select_lang = $row->language;
@@ -298,7 +307,10 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
         " AND (publish<>'') ".
         ' ORDER BY int_key,varchar_key,select_key';
     }
-    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+    $rs = $db->Execute($sql);
+    if ($rs === false) {
+        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+    }
     $S = '';
     for ($i = 0;$i < $nivel * 5;$i++) {
         if ($i < $nivel * 5 - 1) {
@@ -383,7 +395,10 @@ function interadmin_tipos_combo($current_id_tipo, $parent_id_tipo_2, $nivel = 0,
             ((is_numeric($parent_id_tipo_2)) ? ' AND parent_id_tipo='.$parent_id_tipo_2 : ' AND parent_id_tipo=0').
             $sql_where.
             ' ORDER BY ordem,nome';
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         while ($row = $rs->FetchNextObj()) {
             $rows[] = $row;
         }
@@ -708,7 +723,10 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     // Selects Multi
                     if ($key_out && is_int(intval($key_out))) {
                         $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($key_out);
-                        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                        $rs = $db->Execute($sql);
+                        if ($rs === false) {
+                            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                        }
                         if ($row = $rs->FetchNextObj()) {
                             $key_out = $row->nome.'_select_multi';
                         }
@@ -717,14 +735,20 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     if ($value/*&&is_int(intval($value))*/) {
                         if ($campo[xtra]) {
                             $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo IN ('.$value.')';
-                            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                            $rs = $db->Execute($sql);
+                            if ($rs === false) {
+                                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                            }
                             while ($row = $rs->FetchNextObj()) {
                                 $value_arr[] = $row->nome;
                             }
                             $rs->Close();
                         } else {
                             $sql = 'SELECT varchar_key FROM '.$db_prefix.' WHERE id IN ('.$value.')';
-                            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                            $rs = $db->Execute($sql);
+                            if ($rs === false) {
+                                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                            }
                             while ($row = $rs->FetchNextObj()) {
                                 $value_arr[] = $row->varchar_key;
                             }
@@ -736,7 +760,10 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     // Selects
                     if ($key_out && is_int(intval($key_out))) {
                         $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($key_out);
-                        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                        $rs = $db->Execute($sql);
+                        if ($rs === false) {
+                            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                        }
                         if ($row = $rs->FetchNextObj()) {
                             $key_out = $row->nome;
                         }
@@ -745,14 +772,20 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     if ($value && is_int(intval($value))) {
                         if ($campo[xtra]) {
                             $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($value);
-                            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                            $rs = $db->Execute($sql);
+                            if ($rs === false) {
+                                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                            }
                             if ($row = $rs->FetchNextObj()) {
                                 $value = $row->nome;
                             }
                             $rs->Close();
                         } else {
                             $sql = 'SELECT varchar_key FROM '.$db_prefix.' WHERE id='.intval($value);
-                            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                            $rs = $db->Execute($sql);
+                            if ($rs === false) {
+                                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                            }
                             if ($row = $rs->FetchNextObj()) {
                                 $value = $row->varchar_key;
                             }
@@ -763,7 +796,10 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     // Parent ID
                     if ($value) {
                         $sql = 'SELECT id_tipo,varchar_key FROM '.$db_prefix.' WHERE id='.$value;
-                        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                        $rs = $db->Execute($sql);
+                        if ($rs === false) {
+                            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                        }
                         $row = $rs->FetchNextObj();
                         $key_out = $row->id_tipo;
                         $value = $row->varchar_key;
@@ -771,7 +807,10 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     }
                     if ($key_out) {
                         $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.$key_out;
-                        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+                        $rs = $db->Execute($sql);
+                        if ($rs === false) {
+                            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                        }
                         $row = $rs->FetchNextObj();
                         $key_out = $row->nome;
                         $rs->Close();

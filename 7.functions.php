@@ -915,7 +915,10 @@ function interadmin_tipos_nome($id_tipo, $nolang = false)
         global $db_prefix;
         global $lang;
         $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
-        $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
         $row = $rs->FetchNextObj();
         $nome = ($row->nome_lang && !$nolang) ? $row->nome_lang : $row->nome;
         $rs->Close();
@@ -973,9 +976,12 @@ function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key')
 
     $table = $db_prefix.$lang->prefix;
     $sql = 'SELECT id FROM '.$table.' WHERE'.
-    ' '.$field_name."='".$field_value."'".
-    (($id_tipo) ? ' AND id_tipo='.$id_tipo : '');
-    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+        ' '.$field_name."='".$field_value."'".
+        (($id_tipo) ? ' AND id_tipo='.$id_tipo : '');
+    $rs = $db->Execute($sql);
+    if ($rs === false) {
+        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+    }
     if ($row = $rs->FetchNextObj()) {
         $I = $row->id;
     }
@@ -1160,7 +1166,10 @@ class interadmin_tipos
         // Id
         if ($id && is_numeric($id)) {
             $sql = 'SELECT id_tipo,parent_id,varchar_key FROM '.$db_prefix.$lang->prefix.' WHERE id='.$id;
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             while ($row = $rs->FetchNextObj()) {
                 $id_tipo = $row->id_tipo;
                 $parent_id = $row->parent_id;
@@ -1171,7 +1180,10 @@ class interadmin_tipos
         // Parent Id
         if ($parent_id && is_numeric($parent_id)) {
             $sql = 'SELECT id_tipo,parent_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$parent_id;
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             while ($row = $rs->FetchNextObj()) {
                 $id_tipo = $row->id_tipo;
                 $grand_parent_id = $row->parent_id;
@@ -1181,7 +1193,10 @@ class interadmin_tipos
         // Grand Parent Id
         if ($grand_parent_id && is_numeric($grand_parent_id)) {
             $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.' WHERE id='.$grand_parent_id;
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             while ($row = $rs->FetchNextObj()) {
                 $id_tipo = $row->id_tipo;
             }
@@ -1253,7 +1268,10 @@ function interadmin_id_tipo($id = '', $parent_id_tipo = 0, $model_id_tipo = 0)
         ' ORDER BY ordem,nome';
     }
     $sql .= ' LIMIT 1';
-    $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+    $rs = $db->Execute($sql);
+    if ($rs === false) {
+        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+    }
     if ($row = $rs->FetchNextObj()) {
         return $row->id_tipo;
     }
@@ -1295,7 +1313,10 @@ class interadmin_cabecalho
             " AND publish<>''".
             " AND deleted=''".
             ' ORDER BY int_key,date_publish DESC';
-            $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
             if ($rand) {
                 $rand = rand(1, $rs->RecordCount());
             }
