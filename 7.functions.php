@@ -272,6 +272,7 @@ function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYP
     if (!$key) {
         $key = md5($_SERVER['HTTP_HOST']);
     }
+    $key = str_pad($key, 16);
     $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher, $mode), MCRYPT_RAND);
 
     return bin2hex(mcrypt_encrypt($cipher, $key, $S, $mode, $iv));
@@ -297,6 +298,7 @@ function jp7_decrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYP
     if (!$key) {
         $key = md5($_SERVER['HTTP_HOST']);
     }
+    $key = str_pad($key, 16);
     $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher, $mode), MCRYPT_RAND);
 
     return trim(mcrypt_decrypt($cipher, $key, hex2bin($S), $mode, $iv), "\0");
