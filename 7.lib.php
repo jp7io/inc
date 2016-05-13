@@ -47,7 +47,7 @@ if ($c_development) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
 
-error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_STRICT);
+error_reporting(E_ALL ^ E_NOTICE);
 
 mb_internal_encoding('UTF-8');
 mb_regex_encoding('UTF-8');
