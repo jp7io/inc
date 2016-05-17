@@ -37,11 +37,7 @@ require __DIR__.'/7.functions.php';
  */
 global $c_jp7;
 $c_jp7 = false;
-global $c_development;
-$c_development = $_SERVER['SERVER_ADDR'] == '127.0.0.1' || 
-    $_SERVER['SERVER_ADDR'] == '::1' || 
-    starts_with($_SERVER['REMOTE_ADDR'], '192.168.0.');
-if ($c_development) {
+if ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1') {
     $c_jp7 = true;
 } elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), ['179.', '177.', '178.'])) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
@@ -74,14 +70,7 @@ global $is;
 define('JP7_IS_WINDOWS', jp7_is_windows());
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
-if ($c_development) {
-    $whoops = new \Whoops\Run();
-    $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
-    $whoops->register();
-} else {
-    register_shutdown_function('jp7_check_shutdown');
-    set_exception_handler('jp7_check_exception');
-}
+register_shutdown_function('jp7_check_shutdown');
 
 // Fix permissions for created files
 umask(0002);

@@ -2219,6 +2219,7 @@ function jp7_human_size($size)
  * @global Jp7_Debugger
  *
  * @return string 	HTML formatted backtrace.
+ * @deprecated
  */
 function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
 {
@@ -2780,17 +2781,13 @@ function jp7_package_path($package)
  */
 function jp7_check_shutdown()
 {
-    $lasterror = error_get_last();
-    switch ($lasterror['type']) {  // Is it a Fatal Error?
+    $error = error_get_last();
+    switch ($error['type']) {  // Is it a Fatal Error?
         case E_ERROR:
-        case E_USER_ERROR:
-        case E_RECOVERABLE_ERROR:
-            global $debugger;
-            if ($debugger) {
-                // Nesse ponto as exceções não podem mais ser tratadas
-                $debugger->setExceptionsEnabled(false);
-            }
-            die(jp7_debug($lasterror['message'].' in <b>'.$lasterror['file'].'</b> on line '.$lasterror['line']));
+        case E_CORE_ERROR:
+        case E_COMPILE_ERROR:
+        case E_PARSE:
+            throw new RuntimeException($error['message'], $error['type'], 0, $error['file'], $error['line']);
             break;
     }
 }
@@ -2800,10 +2797,8 @@ function jp7_check_shutdown()
  */
 function jp7_check_exception($e)
 {
-    global $debugger;
-    if ($debugger) {
-        // Nesse ponto as exceções não podem mais ser tratadas
-        $debugger->setExceptionsEnabled(false);
-    }
-    die(jp7_debug('Uncaught <b>'.get_class($e).'</b> with message <b>'.$e->getMessage().'</b> in '.$e->getFile().' on line '.$e->getLine(), null, $e->getTrace()));
+    $whoops = new \Whoops\Run;
+    $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
+    $whoops->handleException($e);
+    return;
 }
