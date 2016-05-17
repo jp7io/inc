@@ -2787,7 +2787,7 @@ function jp7_check_shutdown()
         case E_CORE_ERROR:
         case E_COMPILE_ERROR:
         case E_PARSE:
-            throw new RuntimeException($error['message'], $error['type'], 0, $error['file'], $error['line']);
+            throw new RuntimeException($error['message'].' at '.$error['file'].':'.$error['line']);
             break;
     }
 }
