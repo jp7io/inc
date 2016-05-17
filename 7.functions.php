@@ -2794,11 +2794,9 @@ function jp7_check_shutdown()
 
 /**
  * Checks for uncaught exceptions, preventing White Screen of Death.
+ * @deprecated
  */
 function jp7_check_exception($e)
 {
-    $whoops = new \Whoops\Run;
-    $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
-    $whoops->handleException($e);
-    return;
+    echo $e->getMessage();
 }
