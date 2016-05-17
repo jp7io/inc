@@ -42,6 +42,10 @@ if ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || $_SERVER['SERVER_ADDR'] == '::1') 
 } elseif (in_array(mb_substr($_SERVER['REMOTE_ADDR'], 0, 4), ['179.', '177.', '178.'])) {
     $c_jp7 = ($_SERVER['REMOTE_ADDR'] == gethostbyname('office.jp7.com.br'));
 }
+// Security: don't leak debug variables
+if (getenv('APP_DEBUG') && !$c_jp7) {
+    putenv('APP_DEBUG=');
+}
 
 error_reporting(E_ALL ^ E_NOTICE);
 
