@@ -73,6 +73,12 @@ define('JP7_IS_WINDOWS', jp7_is_windows());
 $is = new Browser($_SERVER['HTTP_USER_AGENT']);
 
 register_shutdown_function('jp7_check_shutdown');
+// Convert errors to Exceptions - Code taken from Laravel
+set_error_handler(function ($level, $message, $file = '', $line = 0, $context = []) {
+    if (error_reporting() & $level) {
+        throw new ErrorException($message, 0, $level, $file, $line);
+    }
+});
 
 // Fix permissions for created files
 umask(0002);
