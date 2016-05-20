@@ -94,3 +94,8 @@ class jp7_db_pages extends Pagination
 {
     // Alterado o nome para Pagination
 }
+// Facades
+class Storage extends InterAdminStorage
+{
+    // Temporary to use Laravel facades
+}
