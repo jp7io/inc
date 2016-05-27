@@ -8,7 +8,12 @@
     ],
     "require": {
         "filp/whoops": "~2.0.0",
-        "adodb/adodb-php": "~5.0"
+        "adodb/adodb-php": "~5.0",
+        "symfony/var-dumper": "~2.7.3|~3.0.4",
+        "illuminate/support": "~5.1",
+        "illuminate/filesystem": "~5.1",
+        "illuminate/config": "~5.1",
+        "illuminate/log": "~5.1"
     },
     "require-dev": {
         
