@@ -606,9 +606,9 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
         "</font>\r\n";
     }
     if ($debug) {
-        $DF_send = jp7_mail(($DF_to_name && $server != 'Windows' && !@ini_get('safe_mode')) ? $DF_to_name.' <'.$DF_to.'>' : $DF_to, $DF_subject, $message, $headers, $parameters, $DF_template, $html, $attachments);
+        $DF_send = Jp7_Mail::legacy(($DF_to_name && $server != 'Windows' && !@ini_get('safe_mode')) ? $DF_to_name.' <'.$DF_to.'>' : $DF_to, $DF_subject, $message, $headers, $parameters, $DF_template, $html, $attachments);
     } else {
-        $DF_send = @jp7_mail(($DF_to_name && $server != 'Windows' && !@ini_get('safe_mode')) ? $DF_to_name.' <'.$DF_to.'>' : $DF_to, $DF_subject, $message, $headers, $parameters, $DF_template, $html, $attachments);
+        $DF_send = @Jp7_Mail::legacy(($DF_to_name && $server != 'Windows' && !@ini_get('safe_mode')) ? $DF_to_name.' <'.$DF_to.'>' : $DF_to, $DF_subject, $message, $headers, $parameters, $DF_template, $html, $attachments);
     }
     // Send Reply
     if ($DF_from && !$DF_reply_none) {
@@ -658,9 +658,9 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
             $reply_to = ($DF_from_name && $server != 'Windows' && !@ini_get('safe_mode')) ? jp7_encode_mimeheader($DF_from_name).' <'.$DF_from.'>' : $DF_from;
         }
         if ($debug) {
-            $DF_reply_send = jp7_mail($reply_to, 'Site '.$DF_client_name.' - '.$reply_subject, ($DF_reply_template && $DF_from_name) ? $DF_from_name : $message, $headers, '', ($DF_reply_template) ? $DF_reply_template : $DF_template, $html, $attachments);
+            $DF_reply_send = Jp7_Mail::legacy($reply_to, 'Site '.$DF_client_name.' - '.$reply_subject, ($DF_reply_template && $DF_from_name) ? $DF_from_name : $message, $headers, '', ($DF_reply_template) ? $DF_reply_template : $DF_template, $html, $attachments);
         } else {
-            $DF_reply_send = @jp7_mail($reply_to, 'Site '.$DF_client_name.' - '.$reply_subject, ($DF_reply_template && $DF_from_name) ? $DF_from_name : $message, $headers, '', ($DF_reply_template) ? $DF_reply_template : $DF_template, $html, $attachments);
+            $DF_reply_send = @Jp7_Mail::legacy($reply_to, 'Site '.$DF_client_name.' - '.$reply_subject, ($DF_reply_template && $DF_from_name) ? $DF_from_name : $message, $headers, '', ($DF_reply_template) ? $DF_reply_template : $DF_template, $html, $attachments);
         }
     }
     // Redirect
