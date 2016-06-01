@@ -1622,7 +1622,7 @@ function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $tem
         $mail = mail($to, $subject, $message, $headers); // Safe Mode
     }
     if ($debug) {
-        echo 'jp7_mail('.htmlentities($to).': '.$mail.'<br>';
+        echo 'Jp7_Mail::legacy('.htmlentities($to).': '.$mail.'<br>';
     }
 
     return $mail;
