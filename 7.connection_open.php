@@ -29,10 +29,7 @@ if ($_REQUEST) {
                 continue; // Conflito OpenID (openid_claimed_id)
             }
             if (is_string($value) && strpos($value, 'http://') !== false) {
-                global $debugger;
-                if ($debugger) {
-                    $debugger->sendTraceByEmail(new Exception('ID com URL'));
-                }
+                Log::error('ID com URL');
                 header('Location: http://'.$_SERVER['HTTP_HOST'].'/'.$GLOBALS['c_path']);
                 exit();
             }

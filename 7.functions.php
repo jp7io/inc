@@ -1498,137 +1498,6 @@ function jp7_extension($S)
 }
 
 /**
- * Formats and sends an e-mail message.
- *
- * @param string $to Receiver, or receivers of the mail.
- * @param string $subject Subject of the email to be sent.
- * @param string $message Message to be sent.
- * @param string $headers String to be inserted at the begin of the email header (only if $html is <tt>FALSE</tt>).
- * @param string $parameters Additional parameters to the program configured to use when sending mail using the sendmail_path configuration setting.
- * @param string $template Path to the template file.
- * @param bool $html If <tt>FALSE</tt> will send the message on the text-only format. The default value is <tt>TRUE</tt>.
- * @param string $attachments
- *
- * @see http://www.php.net/manual/en/function.mail.php
- *
- * @global bool
- *
- * @return bool Returns <tt>TRUE</tt> if the mail was successfully accepted for delivery, <tt>FALSE</tt> otherwise.
- *
- * @todo The parameter $attachments is not used.
- *
- * @author JP
- *
- * @version (2007/08/01)
- */
-function jp7_mail($to, $subject, $message, $headers = '', $parameters = '', $template = '', $html = true, $attachments = '')
-{
-    global $debug, $config;
-    // Mensagem alternativa em texto
-    if (strpos($message, '<br>') !== false) {
-        $text_hr = '';
-        for ($i = 0; $i < 80; $i++) {
-            $text_hr .= '-';
-        }
-        $message_text = str_replace("\r", '', $message);
-        $message_text = str_replace("\n", '', $message_text);
-        $message_text = str_replace('&nbsp;', ' ', $message_text);
-        $message_text = str_replace('<hr size=1 color="#666666">', $text_hr."\r\n", $message_text);
-        $message_text = str_replace('<br>', "\r\n", $message_text);
-    }
-    $message_text = strip_tags($message_text);
-    // HTML
-    if ($html) {
-        $message_html = str_replace("\r\n", "\n", $message); // PC to Linux
-        $message_html = str_replace("\r", "\n", $message_html); // Mac to Linux
-        $message_html = str_replace("\n", "\r\n", $message_html); // Linux to Mail Format
-        if (strpos($message_html, '<br>') === false && strpos($message, '<html>') === false) {
-            $message_html = str_replace("\r\n", "<br>\r\n", $message_html); // Linux to Mail Format
-        }
-        if ($template) {
-            @ini_set('allow_url_fopen', '1');
-            if ((!dirname($template) || dirname($template) == '.') && @ini_get('allow_url_fopen')) {
-                $template = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['SCRIPT_NAME']).'/'.$template;
-            }
-            if ($pos1 = strpos($template, '?')) {
-                //$template=mb_substr($template,0,$pos1+1).urlencode(mb_substr($template,$pos1+1));
-                $template = str_replace(' ', '%20', $template);
-            }
-            if (strpos($template, 'http://') !== 0) {
-                $template = 'http://'.$_SERVER['HTTP_HOST'].dirname($_SERVER['REQUEST_URI']).'/'.$template;
-            }
-            //valida usuário logado e caso o template inicie em http
-            if ($_SERVER['PHP_AUTH_USER']) {
-                $template = str_replace('http://', 'http://'.$_SERVER['PHP_AUTH_USER'].':'.$_SERVER['PHP_AUTH_PW'].'@', $template);
-            }
-            $template = file_get_contents($template);
-
-            //echo "template: ".$template;
-            $message_html = str_replace('%MESSAGE%', $message_html, $template);
-        }
-        // Evitar que a quebra de linha deixe tags quebradas - Bug
-        $message_html = str_replace('<br', "\r\n<br", $message_html);
-        $message_html = str_replace('=', '=3D', $message_html);
-        // Boundaries
-        $mime_boundary_1 = '==Multipart_Boundary_x'.md5(time() + 1).'x';
-        $mime_boundary_2 = '==Multipart_Boundary_x'.md5(time() + 2).'x';
-        // Headers
-        $headers = "MIME-Version: 1.0\r\n".
-            $headers.
-            "Return-Errors-To: sites@jp7.com.br\r\n".
-            "Content-Type: multipart/alternative;\r\n".
-            '	boundary="'.$mime_boundary_2.'"';
-            //"Content-Type: multipart/mixed;\r\n".
-            //"	boundary=\"".$mime_boundary_1."\"";
-            // Message
-        $message = "This is a multi-part message in MIME format.\r\n\r\n".
-            //"--".$mime_boundary_1."\r\n".
-            //"Content-Type: multipart/alternative;\r\n".
-            //"	boundary=\"".$mime_boundary_2."\"\r\n\r\n".
-            // TEXT
-            '--'.$mime_boundary_2."\r\n".
-            "Content-Type: text/plain; charset=\"UTF-8\"\r\n".
-            "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
-            $message_text."\r\n\r\n".
-            // HTML
-            '--'.$mime_boundary_2."\r\n".
-            "Content-Type: text/html; charset=\"UTF-8\"\r\n".
-            "Content-Transfer-Encoding: quoted-printable\r\n\r\n".
-            $message_html."\r\n\r\n".
-            // Footer
-            '--'.$mime_boundary_2."--\r\n\r\n";
-    } else {
-        // Headers
-        $headers .=
-            "Return-Errors-To: sites@jp7.com.br\r\n".
-            'Content-Type: text/plain';// charset=\"UTF-8\"\r\n".
-        //"Content-Transfer-Encoding: quoted-printable";
-        // Message
-        $message = $message_text;
-    }
-    // Encode
-    $subject = jp7_encode_mimeheader($subject);
-    // Check CRLF
-    if (strpos($_ENV['OS'], 'Windows') === false || !$_ENV['OS']) {
-        $message = str_replace("\r\n", "\n", $message);
-        $headers = str_replace("\r\n", "\n", $headers);
-    }
-    // Send
-    if ($config->server->type != InterSite::PRODUCAO) {
-        $to = 'debug@jp7.com.br';
-    }
-    $mail = mail($to, $subject, $message, $headers, $parameters);
-    if (!$mail) {
-        $mail = mail($to, $subject, $message, $headers); // Safe Mode
-    }
-    if ($debug) {
-        echo 'Jp7_Mail::legacy('.htmlentities($to).': '.$mail.'<br>';
-    }
-
-    return $mail;
-}
-
-/**
  * Write text to the image using TrueType fonts, shadows are supported.
  *
  * @param string $filename_src Path to the PNG image.
@@ -2235,28 +2104,23 @@ function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
         $traceArr = debug_backtrace();
     }
     $backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
-
+    Log::error($msgErro."\nURL: ".$_SERVER['REQUEST_URI']); // Usado para debug local
+    
     if (!$c_jp7) {
         //Envia email e exibe tela de manutenção
         if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
             Jp7_View::logError();
-            $debugger->sendTraceByEmail($backtrace);
-            $backtrace = 'Ocorreu um erro ao tentar acessar esta página, se o erro persistir envie um email para '.
-                '<a href="'.Jp7_Debugger::EMAIL.'">'.Jp7_Debugger::EMAIL.'</a>';
-
             $maintenanceHref = $debugger->getMaintenancePage().'?page='.$_SERVER['REQUEST_URI'].'&msg='.jp7_encrypt($msgErro, 'cryptK31');
             header('Location: '.$maintenanceHref);
             //Caso nao funcione o header, tenta por javascript
             ?>
 	        <script language="javascript" type="text/javascript">
-			document.location.href = "<?php echo $maintenanceHref;
-            ?>";
+			document.location.href = "<?php echo $maintenanceHref; ?>";
 			</script>
 	        <?php
             exit;
         }
     }
-    error_log($msgErro."\nURL: ".$_SERVER['REQUEST_URI']); // Usado para debug local
     return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
 }
 
