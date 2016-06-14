@@ -4,10 +4,10 @@
 set_include_path(jp7_path_find('../classes').PATH_SEPARATOR.get_include_path());
 
 if (!$config) {
-    die(jp7_debug('Configuration object not found: $config'));
+    jp7_debug('Configuration object not found: $config');
 }
 if (!$config->db || !$config->db->type) {
-    die(jp7_debug('Database not set in the $config object'));
+    jp7_debug('Database not set in the $config object');
 }
 
 // Paths
@@ -79,7 +79,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
 
     if (!$db) {
         $config->db->pass = '{pass}';
-        die(jp7_debug('Unable to connect to the database '.jp7_formatDsn($config->db)));
+        jp7_debug('Unable to connect to the database '.jp7_formatDsn($config->db));
     }
 
     if ($config->charset == 'UTF-8') {

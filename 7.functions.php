@@ -2088,40 +2088,11 @@ function jp7_human_size($size)
  * @global Jp7_Debugger
  *
  * @return string 	HTML formatted backtrace.
- * @deprecated
+ * @deprecated Throw exception instead
  */
 function jp7_debug($msgErro = null, $sql = null, $traceArr = null)
 {
-    global $debugger, $config, $c_jp7;
-
-    // Lançando exceção, utilizado no Web Services, por exemplo
-    if ($debugger->isExceptionsEnabled()) {
-        $exception = new Jp7_Interadmin_Exception($msgErro);
-        $exception->setSql($sql);
-        throw $exception;
-    }
-    if (!$traceArr) {
-        $traceArr = debug_backtrace();
-    }
-    $backtrace = $debugger->getBacktrace($msgErro, $sql, $traceArr);
-    Log::error($msgErro."\nURL: ".$_SERVER['REQUEST_URI']); // Usado para debug local
-    
-    if (!$c_jp7) {
-        //Envia email e exibe tela de manutenção
-        if ($config->server->type == InterSite::PRODUCAO || (!$config->server->type && strpos($_SERVER['HTTP_HOST'], '.') !== false)) {
-            Jp7_View::logError();
-            $maintenanceHref = $debugger->getMaintenancePage().'?page='.$_SERVER['REQUEST_URI'].'&msg='.jp7_encrypt($msgErro, 'cryptK31');
-            header('Location: '.$maintenanceHref);
-            //Caso nao funcione o header, tenta por javascript
-            ?>
-	        <script language="javascript" type="text/javascript">
-			document.location.href = "<?php echo $maintenanceHref; ?>";
-			</script>
-	        <?php
-            exit;
-        }
-    }
-    return $backtrace; // Usado no die(jp7_debug()) que exibe o erro
+    throw new Jp7_Interadmin_Exception($msgErro . ($sql ? ' - SQL : ' . $sql : ''));
 }
 
 /**
