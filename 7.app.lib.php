@@ -109,39 +109,11 @@ function jp7_app_createSelect_date($var, $time_xtra = '', $s = false, $i = false
  */
 function jp7_app_log($log, $S)
 {
-    global $jp7_app;
-    global $c_interadminConfigPath;
-    global $c_remote;
-    if ($jp7_app == 'intermail') {
-        global $s_intermail_cliente;
-        global $s_intermail_user;
-        $app_cliente = $s_intermail_cliente;
-        $app_user = $s_intermail_user;
-    } else {
-        global $s_interadmin_cliente;
-        global $s_user;
-        $app_cliente = $s_interadmin_cliente;
-        $app_user = $s_user['login'];
-    }
-    $file_path = $c_interadminConfigPath.'_log/';
-    @chmod($file_path, 0777);
-    $log_file = $file_path.$log.'.log';
-    if (file_exists($log_file) && date('d', filemtime($log_file)) == date('d')) {
-        ob_start();
-        readfile($log_file);
-        $file_data = ob_get_contents();
-        ob_end_clean();
-    }
-    $file = fopen($log_file, 'w');
-    fwrite($file, $file_data.date('d/m/Y H:i').' - '.$app_user.' - '.$_SERVER['REMOTE_ADDR'].' - '.$S."\r\n");
-    fclose($file);
-    $log_file_day = $log.'_'.date('d').'.log';
-    copy($log_file, $file_path.$log_file_day);
-    @chmod($log_file, 0777);
-    @chmod($file_path.$log_file_day, 0777);
-    if ($c_remote) {
-        interadmin_update_remote_files(['_log/'.$log.'.log', '_log/'.$log_file_day]);
-    }
+    global $s_user;
+    $app_user = $s_user['login'];
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+    
+    Log::info('[APP]['.$log.'] '.$s_user['login'].' - '.$ip.' - '.$S);
 }
 
 // jp7_msg (2003/XX/XX)
