@@ -90,24 +90,10 @@ umask(0002);
  *
  * @deprecated Kept as an alias to Pagination class.
  */
-class jp7_db_pages extends Pagination
-{
-    // Alterado o nome para Pagination
-}
-// Facades
-class Log extends InterAdminLogFacade
-{
-    // Temporary to use Laravel facades
-}
-class Storage extends InterAdminStorage
-{
-    // Temporary to use Laravel facades
-}
-class Cache extends InterAdminCacheFacade
-{
-    // Temporary to use Laravel facades
-}
-class DB extends InterAdminDBFacade
-{
-    // Temporary to use Laravel facades
-}
+class_alias('Pagination', 'jp7_db_pages');
+
+// Temporary to use Laravel facades
+class_alias('InterAdminLogFacade', 'Log');
+class_alias('InterAdminStorage', 'Storage');
+class_alias('InterAdminCacheFacade', 'Cache');
+class_alias('InterAdminDBFacade', 'DB');
