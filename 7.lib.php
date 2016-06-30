@@ -103,3 +103,11 @@ class Storage extends InterAdminStorage
 {
     // Temporary to use Laravel facades
 }
+class Cache extends InterAdminCacheFacade
+{
+    // Temporary to use Laravel facades
+}
+class DB extends InterAdminDBFacade
+{
+    // Temporary to use Laravel facades
+}
