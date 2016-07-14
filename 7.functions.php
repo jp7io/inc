@@ -578,15 +578,15 @@ function jp7_date_split($date)
     $date = explode(',', $date);
 
     return [
-        Y => $date[0],
-        m => $date[1],
-        M => jp7_date_month($date[1], true),
-        F => jp7_date_month($date[1]),
-        d => $date[2],
-        H => $date[3],
-        i => $date[4],
-        s => $date[5],
-        y => mb_substr($date[0], 2),
+        'Y' => $date[0],
+        'm' => $date[1],
+        'M' => jp7_date_month($date[1], true),
+        'F' => jp7_date_month($date[1]),
+        'd' => $date[2],
+        'H' => $date[3],
+        'i' => $date[4],
+        's' => $date[5],
+        'y' => mb_substr($date[0], 2),
     ];
 }
 
@@ -689,8 +689,11 @@ function jp7_date_month($m, $sigla = false)
             $M = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             break;
     }
-    $return = $M[$m - 1];
-
+    if (isset($M[$m - 1])) {
+        $return = $M[$m - 1];
+    } else {
+        $return = '';
+    }
     return ($sigla) ? mb_substr($return, 0, 3) : $return;
 }
 
