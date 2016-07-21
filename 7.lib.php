@@ -97,3 +97,64 @@ class_alias('InterAdminLogFacade', 'Log');
 class_alias('InterAdminStorage', 'Storage');
 class_alias('InterAdminCacheFacade', 'Cache');
 class_alias('InterAdminDBFacade', 'DB');
+class_alias('Jp7_Date', 'Date');
+class_alias('InterAdminRecordUrl', 'RecordUrl');
+
+// Laravel polyfill
+class App
+{
+    public static function environment($env)
+    {
+        return $env === getenv('APP_ENV');
+    }
+}
+
+class Request
+{
+    public static function ip()
+    {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+}
+
+class Lang extends Illuminate\Support\Facades\Lang
+{
+    // Temporario para usar facade sem Laravel
+    protected static function resolveFacadeInstance($name)
+    {
+        static $lang;
+        if (!$lang) {
+            $lang = new InterAdminLang('pt-BR');
+        }
+        return $lang;
+    }
+}
+
+function base_path($path = '')
+{
+    return BASE_PATH.($path ? DIRECTORY_SEPARATOR.$path : $path);
+}
+
+function config($key)
+{
+    static $repository;
+    if (!$repository) {
+        $config = [];
+        foreach (glob(base_path('config/*.php')) as $filename) {
+            $config[basename($filename, '.php')] = require $filename;
+        }
+        $repository = new Illuminate\Config\Repository($config);
+    }
+    if (!isset($repository[$key])) {
+        throw new OutOfBoundsException($key);
+    }
+    return $repository[$key];
+}
+
+// ORM settings for compatibility with old code
+class_alias('InterAdminTipo', 'Type');
+class_alias('InterAdmin', 'Record');
+class_alias('InterAdminFieldFile', 'FileField');
+
+InterAdminTipo::setDefaultClass('InterAdminTipo');
+Jp7\Interadmin\DynamicLoader::register();
