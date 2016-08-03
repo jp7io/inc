@@ -491,29 +491,19 @@ function jp7_register_globals()
     global $HTTP_HOST;
     if (!@ini_get('register_globals') || !$HTTP_HOST) {
         if (!empty($_SERVER)) {
-            foreach ($_SERVER as $key => $value) {
-                $GLOBALS[$key] = $_SERVER[$key];
-            }
+            $GLOBALS += $_SERVER;
         }
         if (!empty($_GET)) {
-            foreach ($_GET as $key => $value) {
-                $GLOBALS[$key] = $_GET[$key];
-            }
+            $GLOBALS += $_GET;
         }
         if (!empty($_POST)) {
-            foreach ($_POST as $key => $value) {
-                $GLOBALS[$key] = $_POST[$key];
-            }
+            $GLOBALS += $_POST;
         }
         if (!empty($_COOKIE)) {
-            foreach ($_COOKIE as $key => $value) {
-                $GLOBALS[$key] = $_COOKIE[$key];
-            }
+            $GLOBALS += $_COOKIE;
         }
         if (!empty($_SESSION)) {
-            foreach ($_SESSION as $key => $value) {
-                $GLOBALS[$key] = $_SESSION[$key];
-            }
+            $GLOBALS += $_SESSION;
         }
     }
 }
