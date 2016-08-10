@@ -144,7 +144,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
     $c_view->addHelperPath(jp7_package_path('classes/Jp7/View/Helper'), 'Jp7_View_Helper');
 
     Zend_Registry::set('config', $config);
-    // JavaScript 
+    // JavaScript
     $c_view->headScript()->appendFile($c_path_js.'jquery/jquery-1.3.2.min.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn.js');
     $c_view->headScript()->appendFile($c_path_js.'interdyn_checkflash.js');

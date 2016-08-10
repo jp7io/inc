@@ -112,7 +112,7 @@ function jp7_app_log($log, $S)
     global $s_user;
     $app_user = $s_user['login'];
     $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
-    
+
     Log::info('[APP]['.$log.'] '.$s_user['login'].' - '.$ip.' - '.$S);
 }
 

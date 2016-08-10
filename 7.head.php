@@ -23,11 +23,11 @@ if ($seo_baseurl) {
 <?php if ($config->html5) {
     ?>
 <!DOCTYPE HTML>
-<?php 
+<?php
 } else {
     ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<?php 
+<?php
 } ?>
 <html xmlns="http://www.w3.org/1999/xhtml"<?php echo $config->facebook_namespace ? ' xmlns:fb="http://www.facebook.com/2008/fbml"' : ''; ?>>
 <head>
@@ -39,39 +39,39 @@ if ($seo_baseurl) {
 <meta name="robots" content="all" />
 <meta name="author" content="JP7 - http://jp7.com.br<?php if ($c_parceiro) {
     ?> | <?php echo $c_parceiro;
-    ?><?php 
+    ?><?php
 } ?>" />
 <meta name="generator" content="JP7 InterAdmin" />
 <meta name="version" content="<?php echo interadmin_get_version(); ?>" />
 <?php if ($config->ie8compatible) {
     ?>
 	<meta http-equiv="X-UA-Compatible" content="IE=8" />
-<?php 
+<?php
 } elseif ($config->ie7compatible) {
     ?>
 	<meta http-equiv="X-UA-Compatible" content="IE=7" />
-<?php 
+<?php
 } ?>
 <?php if ($config->google_site_verification) {
     ?>
 	<meta name="google-site-verification" content="<?php echo $config->google_site_verification;
     ?>" />
-<?php 
+<?php
 } ?>
 <title><?php echo($s_session['preview']) ? 'PREVIEW | ' : ''; ?><?php if ($p_title) {
     ?><?php echo $p_title;
-    ?><?php 
+    ?><?php
 } else {
     ?><?php echo $config->lang->title;
     ?><?php if ($secao && $secao != 'home') {
     ?> | <?php echo $secaoTitle;
     ?><?php if ($subsecao && $subsecao != 'home') {
     ?> | <?php echo $subsecaoTitle;
-    ?><?php 
+    ?><?php
 }
-    ?><?php 
+    ?><?php
 }
-    ?><?php 
+    ?><?php
 } ?></title>
 <base href="<?php echo $baseHref; ?>" />
 <?php if ($c_view instanceof Zend_View) {
@@ -80,7 +80,7 @@ if ($seo_baseurl) {
     ?>
 	<?php echo $c_view->headScript();
     ?>
-<?php 
+<?php
 } ?>
 <script type="text/javascript">
 var d = document;
@@ -98,9 +98,9 @@ var tipo_id = '<?php echo $id; ?>';
 var tipos = new Array(<?php for ($i = 0; $i < $tipos->i; $i++) {
     ?>'<?php echo $tipos->id_tipo[$i];
     ?>'<?php if ($i + 1 < $tipos->i) {
-    ?>,<?php 
+    ?>,<?php
 }
-    ?><?php 
+    ?><?php
 } ?>);
 
 var path = '<?php echo $c_path; ?>'
@@ -114,7 +114,7 @@ var fullpath = '<?php echo($_SERVER['HTTPS'] ? 'https' : 'http'); ?>://'+locatio
 <?php if ($s_session['preview'] && !$isPopup) {
     ?>
 	//if(!parent.frames.length)location='http://'+location.host+'/'+path+'visualizar.php?redirect='+location.toString()
-<?php 
+<?php
 } ?>
 </script>
 <?php

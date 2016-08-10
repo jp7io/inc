@@ -12,7 +12,7 @@ class ToIdTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('teste', toId('♥teste'));
         $this->assertEquals('quemequem_busca', toId('Quem é Quem_Busca'));
     }
-    
+
     public function testToSlug()
     {
         $this->assertEquals('foo', toSlug('Foo'));

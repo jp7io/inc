@@ -8,7 +8,7 @@
     ?>
 		_gaq.push(['_setDomainName', '<?php echo $config->google_analytics_domain;
     ?>']);
-	<?php 
+	<?php
 }
     ?>
 	_gaq.push(['_trackPageview']);
@@ -19,5 +19,5 @@
 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	})();
 	</script>
-<?php 
+<?php
 } ?>

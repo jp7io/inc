@@ -4,7 +4,7 @@
     "keywords": [],
     "license": "proprietary",
     "repositories" : [
-       
+
     ],
     "require": {
         "filp/whoops": "~2.0.0",
@@ -19,13 +19,13 @@
         "illuminate/database": "~5.1"
     },
     "require-dev": {
-        
+
     },
     "autoload": {
-        
+
     },
     "scripts": {
-        
+
     },
     "config": {
         "preferred-install": "dist",
