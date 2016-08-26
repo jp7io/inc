@@ -107,6 +107,10 @@ class App
     {
         return $env === getenv('APP_ENV');
     }
+    public static function bound($interface)
+    {
+        return true;
+    }
 }
 
 class Request
