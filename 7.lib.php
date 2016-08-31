@@ -109,7 +109,7 @@ class App
     }
     public static function bound($interface)
     {
-        return true;
+        return $interface === 'config';
     }
 }
 
