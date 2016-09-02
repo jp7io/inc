@@ -1,3 +1,4 @@
 .phpintel
+.DS_Store
 3thparty/maxmind/GeoLiteCity.dat
 vendor
