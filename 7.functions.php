@@ -339,8 +339,10 @@ function checkReferer($S, $protocol = 'http')
         $S_parent = $protocol.'://'.$_SERVER['HTTP_HOST'].$parent_dirname.'/'.$S;
         $S = $protocol.'://'.$_SERVER['HTTP_HOST'].$dirname.'/'.$S;
     }
-
-    return (strpos($_SERVER['HTTP_REFERER'], $S) === 0 || strpos($_SERVER['HTTP_REFERER'], $S_parent) === 0);
+    return strpos($_SERVER['HTTP_REFERER'], $S) === 0 ||
+        strpos($_SERVER['HTTP_REFERER'], $S_parent) === 0 ||
+        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol.'://', 'https://', $S)) === 0 ||
+        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol.'://', 'https://', $S_parent)) === 0;
 }
 
 /**
