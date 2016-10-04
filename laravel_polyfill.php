@@ -34,7 +34,7 @@ class Lang extends Illuminate\Support\Facades\Lang
         global $lang;
         static $root;
         if (!$root) {
-            $root = new InterAdminLang($lang->prefix->lang === 'pt-br' ? 'pt-BR' : $lang->lang);
+            $root = new InterAdminLang($lang->lang === 'pt-br' ? 'pt-BR' : $lang->lang);
         }
         return $root;
     }
