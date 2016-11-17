@@ -267,15 +267,13 @@ if (!function_exists('hex2bin')) {
  * @author JP
  * @deprecated
  */
-function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
+function jp7_encrypt($S, $key = '', $cipher = 'AES-256-CBC', $options = false)
 {
     if (!$key) {
-        $key = md5($_SERVER['HTTP_HOST']);
+        $key = 9415616219865148;
     }
-    $key = str_pad($key, 16);
-    $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher, $mode), MCRYPT_RAND);
-
-    return bin2hex(mcrypt_encrypt($cipher, $key, $S, $mode, $iv));
+    $iv = 1986514894156162;
+    return openssl_encrypt($S, $cipher, $key, $options, $iv);
 }
 
 /**
@@ -293,15 +291,13 @@ function jp7_encrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYP
  * @author JP
  * @deprecated
  */
-function jp7_decrypt($S, $key = '', $cipher = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_ECB)
+function jp7_decrypt($S, $key = '', $cipher = 'AES-256-CBC', $options = false)
 {
     if (!$key) {
-        $key = md5($_SERVER['HTTP_HOST']);
+        $key = 9415616219865148;
     }
-    $key = str_pad($key, 16);
-    $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher, $mode), MCRYPT_RAND);
-
-    return trim(mcrypt_decrypt($cipher, $key, hex2bin($S), $mode, $iv), "\0");
+    $iv = 1986514894156162;
+    return openssl_decrypt($S, $cipher, $key, $options, $iv);
 }
 
 function toXHTML($S)
