@@ -45,6 +45,7 @@ function base_path($path = '')
     return BASE_PATH.($path ? DIRECTORY_SEPARATOR.$path : $path);
 }
 
+// BUG: Won't work recursively, i.e: config files can't require other configs
 function config($key)
 {
     static $repository;
