@@ -39,12 +39,6 @@ require __DIR__.'/laravel_polyfill.php';
  */
 global $c_jp7;
 $c_jp7 = false;
-// Security: don't leak debug variables
-if (getenv('APP_DEBUG') && getenv('APP_ENV') !== 'local') {
-    if ($_SERVER['REMOTE_ADDR'] !== gethostbyname('office.jp7.com.br')) {
-        putenv('APP_DEBUG=');
-    }
-}
 
 error_reporting(E_ALL ^ E_NOTICE);
 
