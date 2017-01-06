@@ -989,6 +989,7 @@ function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key')
  * @author JP
  *
  * @version (2007/08/08)
+ * @deprecated Use only with legacy systems
  */
 class jp7_lang
 {
