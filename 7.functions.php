@@ -904,17 +904,11 @@ function interadmin_tipos_nome($id_tipo, $nolang = false)
     if (!$id_tipo) {
         return false;
     } elseif (is_numeric($id_tipo)) {
-        global $db;
-        global $db_prefix;
         global $lang;
-        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
-        $rs = $db->Execute($sql);
-        if ($rs === false) {
-            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-        }
-        $row = $rs->FetchNextObj();
+        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'tipos WHERE id_tipo='.$id_tipo;
+        $rs = DB::select($sql);
+        $row = $rs[0];
         $nome = ($row->nome_lang && !$nolang) ? $row->nome_lang : $row->nome;
-        $rs->Close();
 
         return $nome;
     } else {
