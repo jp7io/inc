@@ -612,7 +612,7 @@ function jp7_date_format($date, $format = 'd/m/Y')
         $S = '';
         for ($i = 0;$i < mb_strlen($format);$i++) {
             $x = mb_substr($format, $i, 1);
-            $S .= ($date[$x]) ? $date[$x] : $x;
+            $S .= isset($date[$x]) ? $date[$x] : $x;
         }
 
         return $S;
