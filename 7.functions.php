@@ -11,30 +11,32 @@
  *
  * @version (2006/01/18)
  */
-function toId($string, $tofile = false, $separador = '')
-{
-    // Check if there are diacritics before replacing them
-    if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
-        $string = preg_replace('/[áàãâäÁÀÃÂÄª]/u', 'a', $string);
-        $string = preg_replace('/[éèêëÉÈÊË&]/u', 'e', $string);
-        $string = preg_replace('/[íìîïÍÌÎÏ]/u', 'i', $string);
-        $string = preg_replace('/[óòõôöÓÒÕÔÖº]/u', 'o', $string);
-        $string = preg_replace('/[úùûüÚÙÛÜ]/u', 'u', $string);
-        $string = preg_replace('/[çÇ]/u', 'c', $string);
-        $string = preg_replace('/[ñÑ]/u', 'n', $string);
+if (!function_exists('toId')) {
+    function toId($string, $tofile = false, $separador = '')
+    {
+        // Check if there are diacritics before replacing them
+        if (preg_match('/[^a-zA-Z0-9-\/ _.,]/', $string)) {
+            $string = preg_replace('/[áàãâäÁÀÃÂÄª]/u', 'a', $string);
+            $string = preg_replace('/[éèêëÉÈÊË&]/u', 'e', $string);
+            $string = preg_replace('/[íìîïÍÌÎÏ]/u', 'i', $string);
+            $string = preg_replace('/[óòõôöÓÒÕÔÖº]/u', 'o', $string);
+            $string = preg_replace('/[úùûüÚÙÛÜ]/u', 'u', $string);
+            $string = preg_replace('/[çÇ]/u', 'c', $string);
+            $string = preg_replace('/[ñÑ]/u', 'n', $string);
+        }
+        if ($tofile) {
+            $string = preg_replace('/[^a-zA-Z0-9_]/u', '_', $string);
+        } else {
+            $string = preg_replace('/[^a-zA-Z0-9_]+/u', $separador, $string);
+            $string = trim(mb_strtolower($string), $separador);
+        }
+        if ($separador) {
+            $string = str_replace('_', $separador, $string);
+        } else {
+            $string = preg_replace('/[\/-]/u', '_', $string);
+        }
+        return $string;
     }
-    if ($tofile) {
-        $string = preg_replace('/[^a-zA-Z0-9_]/u', '_', $string);
-    } else {
-        $string = preg_replace('/[^a-zA-Z0-9_]+/u', $separador, $string);
-        $string = trim(mb_strtolower($string), $separador);
-    }
-    if ($separador) {
-        $string = str_replace('_', $separador, $string);
-    } else {
-        $string = preg_replace('/[\/-]/u', '_', $string);
-    }
-    return $string;
 }
 
 /**
@@ -821,15 +823,17 @@ function interadmin_tipos_campos($campos)
  *
  * @return string
  */
-function interadmin_tipos_campos_encode($campos)
-{
-    $s = '';
-    foreach ($campos as $key => $value) {
-        unset($value['ordem']);
-        $s .= implode('{,}', $value).'{;}';
-    }
+if (!function_exists('interadmin_tipos_campos_encode')) {
+    function interadmin_tipos_campos_encode($campos)
+    {
+        $s = '';
+        foreach ($campos as $key => $value) {
+            unset($value['ordem']);
+            $s .= implode('{,}', $value).'{;}';
+        }
 
-    return $s;
+        return $s;
+    }
 }
 
 /**
