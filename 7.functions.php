@@ -2318,7 +2318,7 @@ function jp7_absolute_path($path)
 function jp7_formatDsn($db)
 {
     $driver = ($db->type === 'mysql') ? 'mysqli' : $db->type;
-    $dsn = $driver.'://'.$db->user.':'.$db->pass.'@'.$db->host.'/'.$db->name;
+    $dsn = $driver.'://'.$db->user.':'.urlencode($db->pass).'@'.$db->host.'/'.$db->name;
     if ($db->flags) {
         $dsn .= $db->flags;
     }
