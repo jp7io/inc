@@ -40,21 +40,21 @@ function jp7_app_createSelect_date($var, $time_xtra = '', $s = false, $i = false
         $i = '['.$i.']';
     }
     if ($GLOBALS['interadmin_visualizar']) {
-        if ($date[d] != '00') {
+        if ($date['d'] != '00') {
             return ''.
             '<table border="0" cellspacing="0" cellpadding="0">'.
                 '<tr>'.
-                    '<td>'.(($date[d] != '00') ? $date[d] : '').'</td>'.
+                    '<td>'.(($date['d'] != '00') ? $date['d'] : '').'</td>'.
                     '<td>&nbsp;/&nbsp;</td>'.
-                    '<td>'.(($date[m] != '00') ? $date[m] : '').'</td>'.
+                    '<td>'.(($date['m'] != '00') ? $date['m'] : '').'</td>'.
                     '<td>&nbsp;/&nbsp;</td>'.
-                    '<td>'.(($date[Y] != '0000') ? $date[Y] : '').'</td>'.
+                    '<td>'.(($date['Y'] != '0000') ? $date['Y'] : '').'</td>'.
                     '<td'.(($time_xtra) ? ' '.$time_xtra : '').' nowrap>&nbsp;-&nbsp;</td>'.
-                    '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>'.(($date[H]) ? $date[H] : '').'</td>'.
+                    '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>'.(($date['H']) ? $date['H'] : '').'</td>'.
                     '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>&nbsp;:&nbsp;</td>'.
-                    '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>'.(($date[i]) ? $date[i] : '').'</td>'.
+                    '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>'.(($date['i']) ? $date['i'] : '').'</td>'.
                     (($s) ? '<td'.(($time_xtra) ? ' '.$time_xtra : '').'>&nbsp;:&nbsp;</td>' : '').
-                    (($s) ? '<td><input '.(($obligatory) ? ' obligatory="yes"' : '').' type="text" name="'.$var.'_s'.$i.'" value="'.$date[s].'" style="color:#ccc;width:20px"></td>' : '').
+                    (($s) ? '<td><input '.(($obligatory) ? ' obligatory="yes"' : '').' type="text" name="'.$var.'_s'.$i.'" value="'.$date['s'].'" style="color:#ccc;width:20px"></td>' : '').
                 '</tr>'.
             '</table>';
         } else {
