@@ -141,7 +141,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
     $config->build = interadmin_get_version();
     $c_view = new Jp7_View();
     // Permite o uso de Helpers customizados da Jp7
-    $c_view->addHelperPath(jp7_package_path('classes/Jp7/View/Helper'), 'Jp7_View_Helper');
+    $c_view->addHelperPath(jp7_package_path('classes-deprecated/Jp7/View/Helper'), 'Jp7_View_Helper');
 
     Zend_Registry::set('config', $config);
     // JavaScript

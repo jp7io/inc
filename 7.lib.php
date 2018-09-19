@@ -96,3 +96,4 @@ class_alias('InterAdminFieldFile', 'FileField');
 
 InterAdminTipo::setDefaultClass('InterAdminTipo');
 Jp7\Interadmin\DynamicLoader::register();
+Jp7\Laravel\CacheExtension::apply();
