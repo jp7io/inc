@@ -120,7 +120,7 @@ function toBase($S, $force_magic_quotes_gpc = false)
 {
     global $db;
     if (mb_strlen($S)) {
-        $S = $db->qstr($S, get_magic_quotes_gpc() && !$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
+        $S = $db->qstr($S, !$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
         $S = trim($S);
     } else {
         $S = "''";
