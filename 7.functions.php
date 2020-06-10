@@ -958,27 +958,13 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
  * @author JP
  *
  * @version (2008/11/12)
+ * @deprecated
  */
 function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key')
 {
-    global $db;
-    global $db_prefix;
-    global $lang;
-
-    $table = $db_prefix.$lang->prefix;
-    $sql = 'SELECT id FROM '.$table.' WHERE'.
-        ' '.$field_name."='".$field_value."'".
-        (($id_tipo) ? ' AND id_tipo='.$id_tipo : '');
-    $rs = $db->Execute($sql);
-    if ($rs === false) {
-        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-    }
-    if ($row = $rs->FetchNextObj()) {
-        $I = $row->id;
-    }
-    $rs->Close();
-
-    return $I;
+    $tipoObj = new InterAdminTipo($id_tipo);
+    $record = $tipoObj->records()->where($field_name, $field_value)->first();
+    return $record->id ?? null;
 }
 
 /**
