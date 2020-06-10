@@ -1,6 +1,6 @@
 <?php
 
-class ToIdTest extends PHPUnit_Framework_TestCase
+class ToIdTest extends PHPUnit\Framework\TestCase
 {
     public function testToId()
     {

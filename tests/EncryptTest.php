@@ -1,6 +1,6 @@
 <?php
 
-class EncryptTest extends PHPUnit_Framework_TestCase
+class EncryptTest extends PHPUnit\Framework\TestCase
 {
     public function test()
     {
