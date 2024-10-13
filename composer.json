@@ -9,11 +9,14 @@
         "adodb/adodb-php": "^5.22",
         "symfony/var-dumper": "^5.4",
         "illuminate/support": "^8.75",
-        "illuminate/config": "^8.75",
-        "league/flysystem": "^2.5",
-        "illuminate/cache": "^8.75"
+        "league/flysystem": "^2.5"
     },
     "require-dev": {
+        "illuminate/cache": "^8.75",
+        "illuminate/config": "^8.75",
+        "illuminate/database": "^8.75",
+        "illuminate/filesystem": "^8.75",
+        "illuminate/log": "^8.75",
         "phpunit/phpunit": "^7.5.1"
     },
     "autoload": {},
