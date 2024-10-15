@@ -483,27 +483,21 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
  *
  * @todo Check if this function could be flagged as "deprecated".
  *
- * @version (2007/03/03)
+ * @version (2024/10/14)
  * @deprecated
  */
 function jp7_register_globals()
 {
     global $HTTP_HOST;
     if (!@ini_get('register_globals') || !$HTTP_HOST) {
-        if (!empty($_SERVER)) {
-            $GLOBALS += $_SERVER;
-        }
-        if (!empty($_GET)) {
-            $GLOBALS += $_GET;
-        }
-        if (!empty($_POST)) {
-            $GLOBALS += $_POST;
-        }
-        if (!empty($_COOKIE)) {
-            $GLOBALS += $_COOKIE;
-        }
-        if (!empty($_SESSION)) {
-            $GLOBALS += $_SESSION;
+        $superglobals = [$_SERVER, $_GET, $_POST, $_COOKIE, $_SESSION];
+
+        foreach ($superglobals as $global) {
+            if (!empty($global)) {
+                foreach ($global as $key => $value) {
+                    $GLOBALS[$key] = $value;
+                }
+            }
         }
     }
 }
