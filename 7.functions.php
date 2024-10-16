@@ -768,7 +768,7 @@ function jp7_db_checkbox($name, $value = 'S', $var = '', $readonly = '', $xtra =
     if (is_null($var_value)) {
         $var_value = $GLOBALS[$var];
     }
-    if ($GLOBALS['interadmin_visualizar']) {
+    if (isset($GLOBALS['interadmin_visualizar']) && $GLOBALS['interadmin_visualizar']) {
         return (($var_value) ? 'Sim' : 'Não');
     } else {
         return ''.
@@ -795,6 +795,7 @@ function jp7_db_update($table, $table_id_name, $table_id_value, $fields)
  */
 function interadmin_tipos_campos($campos)
 {
+    $A = [];
     $campos_parameters = ['tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id'];
     $campos = explode('{;}', $campos);
     for ($i = 0; $i < count($campos); $i++) {
