@@ -743,6 +743,11 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
     return Jp7_Deprecated::jp7_db_insert($table, $table_id_name, $table_id_value, $var_prefix, $var_check, $force_magic_quotes_gpc);
 }
 
+function jp7_db_insert_data($table, $table_id_name, $table_id_value = 0, $data, $var_check = true, $force_magic_quotes_gpc = false)
+{
+    return Jp7_Deprecated::jp7_db_insert($table, $table_id_name, $table_id_value, '', $var_check, $force_magic_quotes_gpc, $data);
+}
+
 /**
  * Creates a checkbox and a hidden field, the hidden field will have a value or not depending on whether the checkbox is checked or not.
  *
