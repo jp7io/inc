@@ -763,7 +763,7 @@ function jp7_db_insert_data($table, $table_id_name, $table_id_value = 0, $data, 
  *
  * @author JP
  *
- * @version (2007/07/13)
+ * @version (2024/10/21)
  */
 function jp7_db_checkbox($name, $value = 'S', $var = '', $readonly = '', $xtra = '', $var_value = null)
 {
@@ -771,7 +771,7 @@ function jp7_db_checkbox($name, $value = 'S', $var = '', $readonly = '', $xtra =
         $var = $name;
     }
     if (is_null($var_value)) {
-        $var_value = $GLOBALS[$var];
+        $var_value = $GLOBALS[$var] ?? '';
     }
     if (isset($GLOBALS['interadmin_visualizar']) && $GLOBALS['interadmin_visualizar']) {
         return (($var_value) ? 'Sim' : 'Não');
