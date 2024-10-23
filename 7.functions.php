@@ -590,7 +590,7 @@ function jp7_date_format($date, $format = 'd/m/Y')
 {
     global $jp7_app;
     if ($jp7_app) {
-        $lang = new jp7_lang('pt-br', true);
+        $lang = new Jp7Lang('pt-br', true);
     } else {
         global $lang;
     }
@@ -743,7 +743,7 @@ function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix 
     return Jp7_Deprecated::jp7_db_insert($table, $table_id_name, $table_id_value, $var_prefix, $var_check, $force_magic_quotes_gpc);
 }
 
-function jp7_db_insert_data($table, $table_id_name, $table_id_value = 0, $data, $var_check = true, $force_magic_quotes_gpc = false)
+function jp7_db_insert_data($table, $table_id_name, $table_id_value = 0, $data = [], $var_check = true, $force_magic_quotes_gpc = false)
 {
     return Jp7_Deprecated::jp7_db_insert($table, $table_id_name, $table_id_value, '', $var_check, $force_magic_quotes_gpc, $data);
 }
@@ -968,15 +968,23 @@ function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key')
 }
 
 /**
- * class jp7_lang.
+ * class jp7Lang.
  *
  * @author JP
  *
  * @version (2007/08/08)
  * @deprecated Use only with legacy systems
  */
-class jp7_lang
+class jp7Lang
 {
+
+    private $config;
+    public $lang;
+    public $prefix;
+    public $path;
+    public $path_url;
+    public $path_2;
+
     /**
      * Checks the current language.
      *
@@ -986,23 +994,23 @@ class jp7_lang
      * @global string
      * @global string
      *
-     * @return jp7_lang Object with the following properties: $this->lang, $this->prefix, $this->path and $this->path_2.
+     * @return jp7Lang Object with the following properties: $this->lang, $this->prefix, $this->path and $this->path_2.
      *
      * @author JP
      *
      * @version (2006/09/12)
      */
-    public function __construct($lang = '', $force = false)
+    public function __construct($config, $lang = '', $force = false)
     {
-        global $config;
+        $this->config = $config;
         if (!$lang) {
-            $lang = $config->lang_default;
+            $lang = $this->config->lang_default;
         }
         if ($force) {
             $this->lang = $lang;
         } else {
             $this->lang = ($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME'];
-            if ($_SERVER['QUERY_STRING']) {
+            if (!empty($_SERVER['QUERY_STRING'])) {
                 $pos1 = strpos($this->lang, $_SERVER['QUERY_STRING']);
                 if ($pos1 !== false) {
                     $this->lang = mb_substr($this->lang, 0, $pos1);
@@ -1010,7 +1018,7 @@ class jp7_lang
             }
             $this->lang = explode('/', $this->lang);
             //if($c_path){ // Old Way
-                $path_size = explode('/', jp7_path($config->server->path));
+                $path_size = explode('/', jp7_path($this->config->server->path));
             $path_size = count($path_size);
                 //$this->lang=$this->lang[$path_size]; // Old Way
                 $this->lang = $this->lang[count($this->lang) - 3]; // For Hotsites
@@ -1018,8 +1026,8 @@ class jp7_lang
             $this->lang = str_replace('_', '', $this->lang); // Apache Redirect
         }
         $langs = ['de', 'en', 'es', 'fr', 'jp', 'pt', 'pt-br'];
-        //if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$config->name_id||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
-        if (!in_array($this->lang, $langs) || $this->lang == $config->lang_default) {
+        //if(!$this->lang||$this->lang=="pt-br"||$this->lang=="site"||$this->lang==$this->config->name_id||$this->lang=="hotsites"||$this->lang=="_hotsites"||$this->lang=="intranet"||$this->lang=="extranet"||$this->lang=="wap"){
+        if (!in_array($this->lang, $langs) || $this->lang == $this->config->lang_default) {
             $this->lang = $lang;
             $this->prefix = '';
             $this->path = '';
@@ -1047,7 +1055,6 @@ class jp7_lang
      */
     public function getUri($new_lang, $uri = '')
     {
-        global $config;
         $newLang = new self($new_lang, true);
         if (!$uri) {
             $uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
@@ -1068,12 +1075,12 @@ class jp7_lang
             }
         }
         // Home
-        $uri_lang = jp7_path(str_replace($config->url, '', $uri));
-        if ($config->url == $uri || $uri_lang == $this->path_url) {
-            return $config->url.(($newLang->path_url == 'site/') ? '' : $newLang->path_url).$querystring;
+        $uri_lang = jp7_path(str_replace($this->config->url, '', $uri));
+        if ($this->config->url == $uri || $uri_lang == $this->path_url) {
+            return $this->config->url.(($newLang->path_url == 'site/') ? '' : $newLang->path_url).$querystring;
         } else {
             // Default
-            return str_replace($config->url.$this->path_url, $config->url.$newLang->path_url, $uri.$querystring);
+            return str_replace($this->config->url.$this->path_url, $this->config->url.$newLang->path_url, $uri.$querystring);
         }
     }
 }
@@ -1096,16 +1103,16 @@ class interadmin_tipos
      *
      * @global ADOConnection
      * @global string
-     * @global jp7_lang
+     * @global jp7Lang
      * @global string
      *
      * @return NULL
      */
     public function interadmin_tipos_tipos($id_tipo)
     {
-        global $db, $db_prefix, $lang, $config;
+        global $db, $db_prefix, $lang;
         settype($id_tipo, 'integer');
-        $sql = 'SELECT parent_id_tipo,model_id_tipo,nome,nome'.(($lang->lang != $config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
+        $sql = 'SELECT parent_id_tipo,model_id_tipo,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
         $rs = interadmin_query($sql);
         while ($row = $rs->FetchNextObj()) {
             $this->id_tipo[] = $id_tipo;
