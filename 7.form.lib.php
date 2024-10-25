@@ -840,9 +840,8 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
 }
 
 if (!function_exists('interadmin_arquivos_preview')) {
-    function interadmin_arquivos_preview($S, $name = '', $presrc = false, $icon_small = false)
+    function interadmin_arquivos_preview($c_arquivos_parametros, $S, $name = '', $presrc = false, $icon_small = false)
     {
-        global $c_arquivos_parametros;
         $ext = jp7_extension($S);
         $icon_size = ($icon_small) ? '16' : '32';
         if ($ext) {
