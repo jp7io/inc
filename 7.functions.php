@@ -856,7 +856,7 @@ function interadmin_tipos_campo($db_prefix, $type_id, $var_key)
     global $db, $type_campos, $type_model_type_id;
     $type_model_type_id = $type_id;
     while ($type_model_type_id) {
-        jp7_db_select($db_prefix.'_tipos', 'type_id', $type_model_type_id, 'tipo_');
+        jp7_db_select($db_prefix.'_types', 'type_id', $type_model_type_id, 'tipo_');
     }
     $type_campos = explode('{;}', $type_campos);
     foreach ($type_campos as $campo) {
@@ -909,7 +909,7 @@ function interadmin_tipos_nome($type_id, $nolang = false)
         return false;
     } elseif (is_numeric($type_id)) {
         global $lang;
-        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'tipos WHERE type_id='.$type_id;
+        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'types WHERE type_id='.$type_id;
         $rs = DB::select($sql);
         $row = $rs[0];
         $nome = ($row->nome_lang && !$nolang) ? $row->nome_lang : $row->nome;
@@ -1112,7 +1112,7 @@ class interadmin_tipos
     {
         global $db, $db_prefix, $lang;
         settype($type_id, 'integer');
-        $sql = 'SELECT parent_type_id,model_type_id,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE type_id='.$type_id;
+        $sql = 'SELECT parent_type_id,model_type_id,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_types WHERE type_id='.$type_id;
         $rs = interadmin_query($sql);
         while ($row = $rs->FetchNextObj()) {
             $this->type_id[] = $type_id;
@@ -1247,7 +1247,7 @@ function interadmin_type_id($id = '', $parent_type_id = 0, $model_type_id = 0)
         $sql = 'SELECT type_id FROM '.$db_prefix.$lang->prefix.
         ' WHERE id='.$id;
     } else {
-        $sql = 'SELECT type_id FROM '.$db_prefix.'_tipos'.
+        $sql = 'SELECT type_id FROM '.$db_prefix.'_types'.
         ' WHERE parent_type_id='.$parent_type_id.
         (($model_type_id) ? ' AND model_type_id='.$model_type_id : '').
         ' ORDER BY ordem,nome';

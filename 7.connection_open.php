@@ -92,7 +92,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
         if ($_GET['lang'] == $config->lang_default) {
             $lang = new jp7_lang($_GET['lang'], $_GET['lang']);
         } else {
-            $columns = $db->MetaColumns($db_prefix.'_tipos');
+            $columns = $db->MetaColumns($db_prefix.'_types');
             if ($columns['NOME_'.mb_strtoupper($_GET['lang'])]) {
                 $lang = new jp7_lang($_GET['lang'], $_GET['lang']);
             }

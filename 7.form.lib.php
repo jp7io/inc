@@ -115,7 +115,7 @@ function interadmin_returnCampo($campo)
                 $form .= ob_get_contents();
                 ob_end_clean();
             } else {
-                $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+                $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_types'.
                 ' WHERE parent_type_id='.$campo_nome.
                 ' ORDER BY ordem,nome';
                 $rs = $db->Execute($sql);
@@ -262,7 +262,7 @@ function interadmin_combo($current_id, $parent_type_id_2, $nivel = 0, $prefix = 
     global $db_prefix;
     global $select_campos_sql_temp;
     global $lang;
-    $sql = 'SELECT tabela,campos,language FROM '.$db_prefix.'_tipos'.
+    $sql = 'SELECT tabela,campos,language FROM '.$db_prefix.'_types'.
     ' WHERE type_id='.$parent_type_id_2;
     $rs = $db->Execute($sql);
     if ($rs === false) {
@@ -390,7 +390,7 @@ function interadmin_tipos_combo($current_type_id, $parent_type_id_2, $nivel = 0,
 
     if (is_null($opcoes)) {
         $rows = [];
-        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_types'.
             ' WHERE 1=1'.
             ((is_numeric($parent_type_id_2)) ? ' AND parent_type_id='.$parent_type_id_2 : ' AND parent_type_id=0').
             $sql_where.
@@ -722,7 +722,7 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
                 } elseif (strpos($key, 'select_multi') === 0) {
                     // Selects Multi
                     if ($key_out && is_int(intval($key_out))) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($key_out);
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_types WHERE type_id='.intval($key_out);
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -734,7 +734,7 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
                     }
                     if ($value/*&&is_int(intval($value))*/) {
                         if ($campo[xtra]) {
-                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id IN ('.$value.')';
+                            $sql = 'SELECT nome FROM '.$db_prefix.'_types WHERE type_id IN ('.$value.')';
                             $rs = $db->Execute($sql);
                             if ($rs === false) {
                                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -759,7 +759,7 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
                 } elseif (strpos($key, 'select_') === 0) {
                     // Selects
                     if ($key_out && is_int(intval($key_out))) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($key_out);
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_types WHERE type_id='.intval($key_out);
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -771,7 +771,7 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
                     }
                     if ($value && is_int(intval($value))) {
                         if ($campo[xtra]) {
-                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($value);
+                            $sql = 'SELECT nome FROM '.$db_prefix.'_types WHERE type_id='.intval($value);
                             $rs = $db->Execute($sql);
                             if ($rs === false) {
                                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -806,7 +806,7 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
                         $rs->Close();
                     }
                     if ($key_out) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.$key_out;
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_types WHERE type_id='.$key_out;
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
