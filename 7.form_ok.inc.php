@@ -16,7 +16,7 @@ $interadmin_date_publish = date('Y-m-d H:i:s');
 // Log
 $interadmin_log = date('d/m/Y H:i').' - '.(($user_log) ? $user_log : $s_user['login']).' - '.(($id) ? 'modify' : 'insert').' - '.$_SERVER['REMOTE_ADDR'].chr(13);
 if ($id) {
-    $sql = 'SELECT log FROM '.$db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : '').' WHERE id='.$id;
+    $sql = 'SELECT log FROM '.$db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : '').' WHERE id='.$id;
     $rs = $db->Execute($sql);
     if ($rs === false) {
         throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -29,48 +29,48 @@ if ($id) {
 
 // Table Fields
 $table_fields_notallowed = ['id','type_id','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish'];
-$table_columns = $db->MetaColumnNames($db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : ''));
+$table_columns = $db->MetaColumnNames($db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : ''));
 array_shift($table_columns);
 foreach ($table_columns as $table_field_name) {
     $table_fields_arr[] = $table_field_name;
 }
 
 // Check Table Fields for Custom Tables
-if ($tipo_tabela) {
+if ($type_tabela) {
     foreach ($table_fields_arr as $field) {
         if (strpos($field, 'varchar_') === 0 || strpos($field, 'select_') === 0) {
-            $tipo_tabela_key = $field;
+            $type_tabela_key = $field;
         }
     }
 }
 
 // Loop
 for ($i = 0;$i < $quantidade;$i++) {
-    if ($varchar_key[$i] || $select_key[$i] || $quantidade < 2 || ($tipo_tabela && $GLOBALS[$tipo_tabela_key][$i])) {
+    if ($varchar_key[$i] || $select_key[$i] || $quantidade < 2 || ($type_tabela && $GLOBALS[$type_tabela_key][$i])) {
         // Campos
         foreach ($table_columns as $table_field_name) {
             if (strpos($table_field_name, 'file_') === 0) {
                 if ($_FILES[$table_field_name]['tmp_name'][$i]) {
                     // Insert/Update
-                    $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
-                    $keywords = basename($_FILES[$table_field_name]['name'][$i], '.'.$tipo['extension']);
-                    $tipo = mb_strtolower($tipo['extension']);
+                    $type = pathinfo($_FILES[$table_field_name]['name'][$i]);
+                    $keywords = basename($_FILES[$table_field_name]['name'][$i], '.'.$type['extension']);
+                    $type = mb_strtolower($type['extension']);
                     $invalid_extensions = ['php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js'];
-                    if (!in_array($tipo, $invalid_extensions)) {
+                    if (!in_array($type, $invalid_extensions)) {
                         $lang_temp = $lang;
                         $lang = $lang->lang;
                         $id_arquivo_banco = jp7_db_insert($db_prefix.'_arquivos_banco', 'id_arquivo_banco', $id_arquivo_banco);
                         $lang = $lang_temp;
                         $id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
                         $path = '../../upload/'.(($type_id) ? toId(interadmin_tipos_nome($type_id, true)).'/' : '');
-                        $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
-                        $tipo = mb_strtolower($tipo['extension']);
+                        $type = pathinfo($_FILES[$table_field_name]['name'][$i]);
+                        $type = mb_strtolower($type['extension']);
                         if (!is_dir($path)) {
                             mkdir($path, 0777);
                         } else {
                             @chmod($path, 0777);
                         }
-                        $dst = $path.$id_arquivo_banco.'.'.$tipo;
+                        $dst = $path.$id_arquivo_banco.'.'.$type;
                         if (!copy($_FILES[$table_field_name]['tmp_name'][$i], $dst)) {
                             throw new Exception('Erro na cópia do arquivo!');
                         }
@@ -172,14 +172,14 @@ for ($i = 0;$i < $quantidade;$i++) {
         */
         $interadmin_publish = 'S';
         $interadmin_char_key = 'S';
-        $interadmin_id = jp7_db_insert($db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : ''), 'id', $interadmin_id, 'interadmin_');
+        $interadmin_id = jp7_db_insert($db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : ''), 'id', $interadmin_id, 'interadmin_');
 
         if ($quantidade > 1) {
             $interadmin_id = '';
         }
         // Disparo
-        if ($tipo_disparo) {
-            $tipo_disparo();
+        if ($type_disparo) {
+            $type_disparo();
         }
     }
 }

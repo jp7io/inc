@@ -117,16 +117,16 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
 
     // Tipos (Navegação) (2007/05/16 by JP)
     if (!$wap) {
-        $tipos = new interadmin_tipos($type_id, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
-        $secao = toId($tipos->nome[0]);
-        $secaoTitle = $tipos->nome[0];
-        $subsecao = toId($tipos->nome[1]);
-        $subsecaoTitle = $tipos->nome[1];
+        $types = new interadmin_tipos($type_id, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
+        $secao = toId($types->nome[0]);
+        $secaoTitle = $types->nome[0];
+        $subsecao = toId($types->nome[1]);
+        $subsecaoTitle = $types->nome[1];
         if (!$seo) {
             if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists(ucfirst($config->name_id).'_InterAdminTipo')) {
                 InterAdminTipo::setDefaultClass(ucfirst($config->name_id).'_InterAdminTipo');
             }
-            $tipoObj = InterAdminTipo::getInstance($type_id);
+            $typeObj = InterAdminTipo::getInstance($type_id);
             if ($id) {
                 $interAdminObj = new InterAdmin($id);
             }
@@ -134,7 +134,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
     }
 
     // Login Check
-    if (isset($tipos) && ($tipos->restrito[1] || $tipos->restrito[$tipos->i - 1])) {
+    if (isset($types) && ($types->restrito[1] || $types->restrito[$types->i - 1])) {
         include '../../inc/login_check.php';
     }
 

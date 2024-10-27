@@ -853,13 +853,13 @@ if (!function_exists('interadmin_tipos_campos_encode')) {
  */
 function interadmin_tipos_campo($db_prefix, $type_id, $var_key)
 {
-    global $db, $tipo_campos, $tipo_model_type_id;
-    $tipo_model_type_id = $type_id;
-    while ($tipo_model_type_id) {
-        jp7_db_select($db_prefix.'_tipos', 'type_id', $tipo_model_type_id, 'tipo_');
+    global $db, $type_campos, $type_model_type_id;
+    $type_model_type_id = $type_id;
+    while ($type_model_type_id) {
+        jp7_db_select($db_prefix.'_tipos', 'type_id', $type_model_type_id, 'tipo_');
     }
-    $tipo_campos = explode('{;}', $tipo_campos);
-    foreach ($tipo_campos as $campo) {
+    $type_campos = explode('{;}', $type_campos);
+    foreach ($type_campos as $campo) {
         $campo = explode('{,}', $campo);
         if ($campo[0] == $var_key) {
             return [
@@ -962,8 +962,8 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
  */
 function jp7_id_value($field_value, $type_id = 0, $field_name = 'varchar_key')
 {
-    $tipoObj = new InterAdminTipo($type_id);
-    $record = $tipoObj->records()->where($field_name, $field_value)->first();
+    $typeObj = new InterAdminTipo($type_id);
+    $record = $typeObj->records()->where($field_name, $field_value)->first();
     return $record->id ?? null;
 }
 
@@ -1273,7 +1273,7 @@ class interadmin_cabecalho
     /**
      * Gets text and images of the specified type.
      *
-     * @param int    $i             Index of the type on the global $tipos, the default value is 0.
+     * @param int    $i             Index of the type on the global $types, the default value is 0.
      * @param int    $model_type_id Value of the model_type_id of this type, used to find the correct type, default value is 5.
      * @param string $check         Fields which will have their values checked to make sure they are not empty, names separated by comma (,), the default value is "file_1,file_2".
      * @param bool   $rand          The default value is <tt>FALSE</tt>.
@@ -1290,8 +1290,8 @@ class interadmin_cabecalho
     {
         global $db;
         global $db_prefix;
-        global $tipos;
-        if ($type_id = interadmin_type_id(0, $tipos->type_id[$i], $model_type_id)) {
+        global $types;
+        if ($type_id = interadmin_type_id(0, $types->type_id[$i], $model_type_id)) {
             $sql = 'SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM '.$db_prefix.$lang->prefix.
             ' WHERE type_id='.$type_id.
             " AND char_key<>''".

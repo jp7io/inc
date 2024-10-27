@@ -95,9 +95,9 @@ var isFrame = '<?php echo $isFrame; ?>';
 
 var DMquerystring = null;
 var tipo_id = '<?php echo $id; ?>';
-var tipos = new Array(<?php for ($i = 0; $i < $tipos->i; $i++) {
-    ?>'<?php echo $tipos->type_id[$i];
-    ?>'<?php if ($i + 1 < $tipos->i) {
+var tipos = new Array(<?php for ($i = 0; $i < $types->i; $i++) {
+    ?>'<?php echo $types->type_id[$i];
+    ?>'<?php if ($i + 1 < $types->i) {
     ?>,<?php
 }
     ?><?php
