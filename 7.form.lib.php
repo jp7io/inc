@@ -839,14 +839,14 @@ function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $o
     return $vars_out;
 }
 
-if (!function_exists('interadmin_arquivos_preview')) {
-    function interadmin_arquivos_preview($c_arquivos_parametros, $S, $name = '', $presrc = false, $icon_small = false)
+if (!function_exists('interadmin_files_preview')) {
+    function interadmin_files_preview($c_files_parametros, $S, $name = '', $presrc = false, $icon_small = false)
     {
         $ext = jp7_extension($S);
         $icon_size = ($icon_small) ? '16' : '32';
         if ($ext) {
             if (in_array($ext, ['gif', 'jpg', 'jpeg', 'png'])) {
-                $S = '<div class="image_preview_background"><img '.(($presrc) ? 'pre' : '').'src="'.$S.(strpos($S, '?') ? '&' : '?').'size=40x40"'.$c_arquivos_parametros.(($name) ? ' alt="'.$name.'"' : '').'></div>';
+                $S = '<div class="image_preview_background"><img '.(($presrc) ? 'pre' : '').'src="'.$S.(strpos($S, '?') ? '&' : '?').'size=40x40"'.$c_files_parametros.(($name) ? ' alt="'.$name.'"' : '').'></div>';
             } elseif (in_array($ext, ['doc', 'pdf', 'ppt', 'swf', 'wmv', 'xls', 'zip', 'docx', 'xlsx'])) {
                 $S = '<div><img src="/_default/img/aplicacao/ico_file_'.$ext.'_'.$icon_size.'.gif"'.(($name) ? ' alt="'.$name.'"' : '').' style="width:'.$icon_size.'px;height:'.$icon_size.'px;background:transparent"></div>';
             } else {

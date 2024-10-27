@@ -59,9 +59,9 @@ for ($i = 0;$i < $quantidade;$i++) {
                     if (!in_array($type, $invalid_extensions)) {
                         $lang_temp = $lang;
                         $lang = $lang->lang;
-                        $id_arquivo_banco = jp7_db_insert($db_prefix.'_arquivos_banco', 'id_arquivo_banco', $id_arquivo_banco);
+                        $id_file_banco = jp7_db_insert($db_prefix.'_files_banco', 'id_file_banco', $id_file_banco);
                         $lang = $lang_temp;
-                        $id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+                        $id_file_banco = str_pad($id_file_banco, 8, '0', STR_PAD_LEFT);
                         $path = '../../upload/'.(($type_id) ? toId(interadmin_tipos_nome($type_id, true)).'/' : '');
                         $type = pathinfo($_FILES[$table_field_name]['name'][$i]);
                         $type = mb_strtolower($type['extension']);
@@ -70,7 +70,7 @@ for ($i = 0;$i < $quantidade;$i++) {
                         } else {
                             @chmod($path, 0777);
                         }
-                        $dst = $path.$id_arquivo_banco.'.'.$type;
+                        $dst = $path.$id_file_banco.'.'.$type;
                         if (!copy($_FILES[$table_field_name]['tmp_name'][$i], $dst)) {
                             throw new Exception('Erro na cópia do arquivo!');
                         }
