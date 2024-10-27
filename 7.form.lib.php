@@ -97,7 +97,7 @@ function interadmin_returnCampo($campo)
         if ($xtra == 'radio') {
             $nomevarchar = 'varchar_'.$c_lang_varchar;
             $sql = 'SELECT id,'.$nomevarchar.' FROM '.$db_prefix.
-                ' WHERE id_tipo='.$campo_nome.
+                ' WHERE type_id='.$campo_nome.
                 ' ORDER BY int_key, char_key,varchar_key';
             $rs = $db->Execute($sql);
             if ($rs === false) {
@@ -115,15 +115,15 @@ function interadmin_returnCampo($campo)
                 $form .= ob_get_contents();
                 ob_end_clean();
             } else {
-                $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
-                ' WHERE parent_id_tipo='.$campo_nome.
+                $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+                ' WHERE parent_type_id='.$campo_nome.
                 ' ORDER BY ordem,nome';
                 $rs = $db->Execute($sql);
                 if ($rs === false) {
                     throw new Jp7_Interadmin_Exception($db->ErrorMsg());
                 }
                 while ($row = $rs->FetchNextObj()) {
-                    $form .= '<option value="'.$row->id_tipo.'"'.(($row->id_tipo == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
+                    $form .= '<option value="'.$row->type_id.'"'.(($row->type_id == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
                 }
                 $rs->Close();
             }
@@ -148,7 +148,7 @@ function interadmin_returnCampo($campo)
         if (strpos($campo, 'varchar_') === 0) {
             switch ($xtra) {
                 case 'id': // ID
-                    $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                    $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_',event)\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?type_id=".$GLOBALS['type_id'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                     break;
                 case 'email': // E-Mail
                     $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.',event)\"";
@@ -255,15 +255,15 @@ function interadmin_returnCampo($campo)
 }
 
 // 2007/01/04 by JP
-function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = '', $sql_where = '', $style = 'select', $field_name = '', $field_label = '', $obrigatorio = '', $readonly = '')
+function interadmin_combo($current_id, $parent_type_id_2, $nivel = 0, $prefix = '', $sql_where = '', $style = 'select', $field_name = '', $field_label = '', $obrigatorio = '', $readonly = '')
 {
-    global $id_tipo;
+    global $type_id;
     global $db;
     global $db_prefix;
     global $select_campos_sql_temp;
     global $lang;
     $sql = 'SELECT tabela,campos,language FROM '.$db_prefix.'_tipos'.
-    ' WHERE id_tipo='.$parent_id_tipo_2;
+    ' WHERE type_id='.$parent_type_id_2;
     $rs = $db->Execute($sql);
     if ($rs === false) {
         throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -295,13 +295,13 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
     // Loop
     if ($select_tabela) {
         $sql = 'SELECT id,varchar_key,deleted'.$select_campos_2.' FROM '.$db_prefix.'_'.$select_tabela.
-        ' WHERE id_tipo='.$parent_id_tipo_2.
+        ' WHERE type_id='.$parent_type_id_2.
         $sql_where.
         " AND (deleted='' OR deleted IS NULL) ".
         ' ORDER BY varchar_key';
     } else {
         $sql = 'SELECT id,varchar_key,deleted'.$select_campos_2.' FROM '.$db_prefix.(($select_lang) ? $lang->prefix : '').
-        ' WHERE id_tipo='.$parent_id_tipo_2.
+        ' WHERE type_id='.$parent_type_id_2.
         $sql_where.
         " AND (deleted='' OR deleted IS NULL) ".
         " AND (publish<>'') ".
@@ -321,11 +321,11 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
     }
     switch ($style) {
         case 'checkbox':
-            $R .= '<div><input type="hidden" name="'.$field_name.'" value="" /><input type="checkbox" id="'.$field_name.'_all" value=""'.((is_array($current_id) && $rs->RecordCount() == count($current_id)) ? ' checked="checked" style="color:blue"' : '').(($readonly) ? ' disabled' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' onclick="DFselectAll(this)" /><label for="'.$field_name.'_all" unselectable="on"'.((is_array($current_id) && $rs->RecordCount() == count($current_id)) ? ' style="color:blue"' : '').">TODOS</label></div>\n";
+            $R .= '<div><input type="hidden" name="'.$field_name.'" value="" /><input type="checkbox" id="'.$field_name.'_all" value=""'.((is_array($current_id) && $rs->RecordCount() == count($current_id)) ? ' checked="checked" style="color:blue"' : '').(($readonly) ? ' disabled' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' onclick="DFselectAll(this)" /><label for="'.$field_name.'_all" unselectable="on"'.((is_array($current_id) && $rs->RecordCount() == count($current_id)) ? ' style="color:blue"' : '').">TODOS</label></div>\n";
             break;
         case 'radio':
             if (!$obrigatorio) {
-                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'" label="'.$field_label.'" value=""'.(($readonly) ? ' disabled' : '').((!$current_id) ? ' checked="checked" style="color:blue"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'" unselectable="on"'.((!$current_id) ? ' style="color:blue"' : '').">Nenhum</label></div>\n";
+                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'" label="'.$field_label.'" value=""'.(($readonly) ? ' disabled' : '').((!$current_id) ? ' checked="checked" style="color:blue"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'" unselectable="on"'.((!$current_id) ? ' style="color:blue"' : '').">Nenhum</label></div>\n";
             }
             break;
         case 'combo':
@@ -365,15 +365,15 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
         // Output
         switch ($style) {
             case 'checkbox':
-                $R .= '<div><input type="checkbox" name="'.$field_name.'" id="'.$field_name.'_'.$row->id.'" label="'.$field_label.'" value="'.$row->id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' onclick="DFselectAllCheck(this)" /><label for="'.$field_name.'_'.$row->id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</label></div>\n";
+                $R .= '<div><input type="checkbox" name="'.$field_name.'" id="'.$field_name.'_'.$row->id.'" label="'.$field_label.'" value="'.$row->id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' onclick="DFselectAllCheck(this)" /><label for="'.$field_name.'_'.$row->id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</label></div>\n";
                 break;
             case 'radio':
-                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->id.'" label="'.$field_label.'" value="'.$row->id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</label></div>\n";
+                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->id.'" label="'.$field_label.'" value="'.$row->id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</label></div>\n";
                 break;
             default:
-                $R .= '<option value="'.$row->id.'"'.(($selected) ? ' selected="selected" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').'>'./*mb_substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</option>\n";
+                $R .= '<option value="'.$row->id.'"'.(($selected) ? ' selected="selected" style="color:blue"' : '').(($row->id == $id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').'>'./*mb_substr($row->varchar_key,0,1).")".*/$S.$row->varchar_key.jp7_string_left($select_campos_sql, 100)."</option>\n";
                 break;
-                //if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
+                //if($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_type_id,$row->type_id,$nivel+1,$prefix,"",$style,$field_name);
         }
     }
     $rs->Close();
@@ -382,17 +382,17 @@ function interadmin_combo($current_id, $parent_id_tipo_2, $nivel = 0, $prefix = 
 }
 
 // 2008/01/09 by JP
-function interadmin_tipos_combo($current_id_tipo, $parent_id_tipo_2, $nivel = 0, $prefix = '', $sql_where = '', $style = 'select', $field_name = '', $classes = false, $readonly = '', $obrigatorio = '', $opcoes = null)
+function interadmin_tipos_combo($current_type_id, $parent_type_id_2, $nivel = 0, $prefix = '', $sql_where = '', $style = 'select', $field_name = '', $classes = false, $readonly = '', $obrigatorio = '', $opcoes = null)
 {
-    global $id_tipo;
+    global $type_id;
     global $db;
     global $db_prefix;
 
     if (is_null($opcoes)) {
         $rows = [];
-        $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
+        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
             ' WHERE 1=1'.
-            ((is_numeric($parent_id_tipo_2)) ? ' AND parent_id_tipo='.$parent_id_tipo_2 : ' AND parent_id_tipo=0').
+            ((is_numeric($parent_type_id_2)) ? ' AND parent_type_id='.$parent_type_id_2 : ' AND parent_type_id=0').
             $sql_where.
             ' ORDER BY ordem,nome';
         $rs = $db->Execute($sql);
@@ -417,48 +417,48 @@ function interadmin_tipos_combo($current_id_tipo, $parent_id_tipo_2, $nivel = 0,
     }
     $i = 0;
     foreach ($rows as $row) {
-        if (is_array($current_id_tipo)) {
-            $selected = in_array($row->id_tipo, $current_id_tipo);
+        if (is_array($current_type_id)) {
+            $selected = in_array($row->type_id, $current_type_id);
         } else {
-            $selected = ($row->id_tipo == $current_id_tipo);
+            $selected = ($row->type_id == $current_type_id);
         }
-        if (interadmin_tipos_nome($parent_id_tipo_2) == 'Classes' || $classes) {
+        if (interadmin_tipos_nome($parent_type_id_2) == 'Classes' || $classes) {
             $classes = true;
         }
         switch ($style) {
             case 'checkbox':
                 if (!$i && !$nivel) {
-                    if (is_array($current_id_tipo)) {
-                        $selected_2 = in_array('N', $current_id_tipo);
+                    if (is_array($current_type_id)) {
+                        $selected_2 = in_array('N', $current_type_id);
                     } else {
-                        $selected_2 = ('N' == $current_id_tipo);
+                        $selected_2 = ('N' == $current_type_id);
                     }
                     if (is_null($opcoes)) {
                         echo '<input type="checkbox" name="'.$field_name.'" id="'.$field_name.'_N"
 							value="N"'.$readonly.(($selected_2) ? ' checked="checked"
-							style="color:blue"' : '').(($row->id_tipo == 'N') ? ' style="color:red"' : '').
+							style="color:blue"' : '').(($row->type_id == 'N') ? ' style="color:red"' : '').
                             (($classes) ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_N"
 							unselectable="on"'.(($selected_2) ? ' style="color:blue"' : '').">NENHUM</label><br />\n";
                     } else {
                         echo '<input type="hidden" name="'.$field_name.'" value="" />
 							<input type="checkbox" id="'.$field_name.'_all"
-							value=""'.((is_array($current_id_tipo) && count($rows) == count($current_id_tipo)) ? '
-							checked="checked" style="color:blue"' : '').(($readonly) ? ' disabled' : '').(($row->id_tipo == $id_tipo) ? '
+							value=""'.((is_array($current_type_id) && count($rows) == count($current_type_id)) ? '
+							checked="checked" style="color:blue"' : '').(($readonly) ? ' disabled' : '').(($row->type_id == $type_id) ? '
 							style="color:red"' : '').' onclick="DFselectAll(this)" /><label for="'.$field_name.'_all"
-							unselectable="on"'.((is_array($current_id_tipo) && count($rows) == count($current_id_tipo)) ? ' style="color:blue"' : '').">TODOS</label><br />\n";
+							unselectable="on"'.((is_array($current_type_id) && count($rows) == count($current_type_id)) ? ' style="color:blue"' : '').">TODOS</label><br />\n";
                     }
                 }
-                echo '<input type="checkbox" name="'.$field_name.'" id="'.$field_name.'_'.$row->id_tipo.'" value="'.$row->id_tipo.'"'.$readonly.(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id_tipo.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->nome."</label><br />\n";
+                echo '<input type="checkbox" name="'.$field_name.'" id="'.$field_name.'_'.$row->type_id.'" value="'.$row->type_id.'"'.$readonly.(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->type_id == $type_id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->type_id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->nome."</label><br />\n";
                 break;
             case 'radio':
-                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->id_tipo.'" label="'.$field_label.'" value="'.$row->id_tipo.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_id_tipo_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->id_tipo.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->nome."</label></div>\n";
+                $R .= '<div><input type="radio" name="'.$field_name.'" id="'.$field_name.'_'.$row->type_id.'" label="'.$field_label.'" value="'.$row->type_id.'"'.(($obrigatorio) ? ' obligatory="yes"' : '').(($readonly) ? ' disabled' : '').(($selected) ? ' checked="checked" style="color:blue"' : '').(($row->type_id == $type_id) ? ' style="color:red"' : '').((interadmin_tipos_nome($parent_type_id_2) == 'Classes') ? ' style="background:#DDD"' : '').' /><label for="'.$field_name.'_'.$row->type_id.'" unselectable="on"'.(($selected) ? ' style="color:blue"' : '').'>'.$S.$row->nome."</label></div>\n";
                 break;
             default:
-                echo '<option value="'.$row->id_tipo.'"'.$readonly.(($selected) ? ' SELECTED style="color:blue"' : '').(($row->id_tipo == $id_tipo) ? ' style="color:red"' : '').(($classes) ? ' style="background:#DDD"' : '').'>'.mb_substr($row->nome, 0, 1).')'.$S.$row->nome."</option>\n";
+                echo '<option value="'.$row->type_id.'"'.$readonly.(($selected) ? ' SELECTED style="color:blue"' : '').(($row->type_id == $type_id) ? ' style="color:red"' : '').(($classes) ? ' style="background:#DDD"' : '').'>'.mb_substr($row->nome, 0, 1).')'.$S.$row->nome."</option>\n";
                 break;
         }
         if (!$opcoes && ($style != 'checkbox' || $nivel < 2)) {
-            interadmin_tipos_combo($current_id_tipo, $row->id_tipo, $nivel + 1, $prefix, '', $style, $field_name, $classes, $readonly);
+            interadmin_tipos_combo($current_type_id, $row->type_id, $nivel + 1, $prefix, '', $style, $field_name, $classes, $readonly);
         }
         $i++;
     }
@@ -679,7 +679,7 @@ function jp7_DF_sendMail($post_vars, $from_info = false, $env_info = true, $atta
 }
 
 // jp7_DF_prepareVars (2006/03/09)
-function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $only_interadmin = false)
+function jp7_DF_prepareVars($db_prefix, $type_id, $vars_in, $var_prefix = '', $only_interadmin = false)
 {
     global $db;
     global $db_name;
@@ -700,7 +700,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 if ($var_prefix) {
                     $key = mb_substr($key, mb_strlen($var_prefix));
                 }
-                $campo = interadmin_tipos_campo($db_prefix, $id_tipo, $key);
+                $campo = interadmin_tipos_campo($db_prefix, $type_id, $key);
                 $key_out = $campo[nome];
                 if (!$key_out) {
                     $key_out = $key;
@@ -722,7 +722,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 } elseif (strpos($key, 'select_multi') === 0) {
                     // Selects Multi
                     if ($key_out && is_int(intval($key_out))) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($key_out);
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($key_out);
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -734,7 +734,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     }
                     if ($value/*&&is_int(intval($value))*/) {
                         if ($campo[xtra]) {
-                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo IN ('.$value.')';
+                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id IN ('.$value.')';
                             $rs = $db->Execute($sql);
                             if ($rs === false) {
                                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -759,7 +759,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 } elseif (strpos($key, 'select_') === 0) {
                     // Selects
                     if ($key_out && is_int(intval($key_out))) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($key_out);
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($key_out);
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -771,7 +771,7 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                     }
                     if ($value && is_int(intval($value))) {
                         if ($campo[xtra]) {
-                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.intval($value);
+                            $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.intval($value);
                             $rs = $db->Execute($sql);
                             if ($rs === false) {
                                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -795,18 +795,18 @@ function jp7_DF_prepareVars($db_prefix, $id_tipo, $vars_in, $var_prefix = '', $o
                 } elseif (strpos($key, 'parent_id') === 0) {
                     // Parent ID
                     if ($value) {
-                        $sql = 'SELECT id_tipo,varchar_key FROM '.$db_prefix.' WHERE id='.$value;
+                        $sql = 'SELECT type_id,varchar_key FROM '.$db_prefix.' WHERE id='.$value;
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
                         }
                         $row = $rs->FetchNextObj();
-                        $key_out = $row->id_tipo;
+                        $key_out = $row->type_id;
                         $value = $row->varchar_key;
                         $rs->Close();
                     }
                     if ($key_out) {
-                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE id_tipo='.$key_out;
+                        $sql = 'SELECT nome FROM '.$db_prefix.'_tipos WHERE type_id='.$key_out;
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());

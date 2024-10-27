@@ -840,7 +840,7 @@ if (!function_exists('interadmin_tipos_campos_encode')) {
  * Gets an array containing "nome" and "xtra" values of a field on Interadmin.
  *
  * @param string $db_prefix Prefix of the table.
- * @param string $id_tipo ID of the type which will be searched (column "id_tipo").
+ * @param string $type_id ID of the type which will be searched (column "type_id").
  * @param string $var_key Name of the field from this type that will be got. e.g. "varchar_key".
  *
  * @global ADOConnection
@@ -851,12 +851,12 @@ if (!function_exists('interadmin_tipos_campos_encode')) {
  *
  * @version (2004/11/03)
  */
-function interadmin_tipos_campo($db_prefix, $id_tipo, $var_key)
+function interadmin_tipos_campo($db_prefix, $type_id, $var_key)
 {
-    global $db, $tipo_campos, $tipo_model_id_tipo;
-    $tipo_model_id_tipo = $id_tipo;
-    while ($tipo_model_id_tipo) {
-        jp7_db_select($db_prefix.'_tipos', 'id_tipo', $tipo_model_id_tipo, 'tipo_');
+    global $db, $tipo_campos, $tipo_model_type_id;
+    $tipo_model_type_id = $type_id;
+    while ($tipo_model_type_id) {
+        jp7_db_select($db_prefix.'_tipos', 'type_id', $tipo_model_type_id, 'tipo_');
     }
     $tipo_campos = explode('{;}', $tipo_campos);
     foreach ($tipo_campos as $campo) {
@@ -894,22 +894,22 @@ function interadmin_query($sql, $sql_db = '', $sql_debug = false, $numrows = nul
 /**
  * Gets the name of a type from its ID.
  *
- * @param int $id_tipo ID of the type.
+ * @param int $type_id ID of the type.
  * @param bool $nolang If <tt>TRUE</tt> it will return the name regardless of the current language, the default value is <tt>FALSE</tt>.
  *
- * @return string|bool If $id_tipo is numeric it is returned the name of the type, if it evaluates as <tt>FALSE</tt> it is returned <tt>FALSE</tt>, otherwise it is returned "Tipos".
+ * @return string|bool If $type_id is numeric it is returned the name of the type, if it evaluates as <tt>FALSE</tt> it is returned <tt>FALSE</tt>, otherwise it is returned "Tipos".
  *
  * @author JP
  *
  * @version (2008/01/09)
  */
-function interadmin_tipos_nome($id_tipo, $nolang = false)
+function interadmin_tipos_nome($type_id, $nolang = false)
 {
-    if (!$id_tipo) {
+    if (!$type_id) {
         return false;
-    } elseif (is_numeric($id_tipo)) {
+    } elseif (is_numeric($type_id)) {
         global $lang;
-        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'tipos WHERE id_tipo='.$id_tipo;
+        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'tipos WHERE type_id='.$type_id;
         $rs = DB::select($sql);
         $row = $rs[0];
         $nome = ($row->nome_lang && !$nolang) ? $row->nome_lang : $row->nome;
@@ -920,9 +920,9 @@ function interadmin_tipos_nome($id_tipo, $nolang = false)
     }
 }
 
-function interadmin_list($table, $id_tipo, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
+function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
 {
-    return Jp7_Deprecated::interadmin_list($table, $id_tipo, $id, $type, $order, $field, $sql_where, $seo);
+    return Jp7_Deprecated::interadmin_list($table, $type_id, $id, $type, $order, $field, $sql_where, $seo);
 }
 
 /**
@@ -943,10 +943,10 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
 }
 
 /**
- * Gets the ID of a record on the database from its "varchar_key" and "id_tipo" values.
+ * Gets the ID of a record on the database from its "varchar_key" and "type_id" values.
  *
  * @param string $field_value Value of the field.
- * @param int $id_tipo Value of the field "id_tipo" (Optional).
+ * @param int $type_id Value of the field "type_id" (Optional).
  * @param string $field_name Name of the field (Optional).
  *
  * @global ADOConnection
@@ -960,9 +960,9 @@ function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $fie
  * @version (2008/11/12)
  * @deprecated
  */
-function jp7_id_value($field_value, $id_tipo = 0, $field_name = 'varchar_key')
+function jp7_id_value($field_value, $type_id = 0, $field_name = 'varchar_key')
 {
-    $tipoObj = new InterAdminTipo($id_tipo);
+    $tipoObj = new InterAdminTipo($type_id);
     $record = $tipoObj->records()->where($field_name, $field_value)->first();
     return $record->id ?? null;
 }
@@ -1099,7 +1099,7 @@ class interadmin_tipos
     /**
      * Gets data of the specified type from the database, and does the same with all of its parent types recursively.
      *
-     * @param int $id_tipo ID of the type.
+     * @param int $type_id ID of the type.
      *
      * @global ADOConnection
      * @global string
@@ -1108,15 +1108,15 @@ class interadmin_tipos
      *
      * @return NULL
      */
-    public function interadmin_tipos_tipos($id_tipo)
+    public function interadmin_tipos_tipos($type_id)
     {
         global $db, $db_prefix, $lang;
-        settype($id_tipo, 'integer');
-        $sql = 'SELECT parent_id_tipo,model_id_tipo,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
+        settype($type_id, 'integer');
+        $sql = 'SELECT parent_type_id,model_type_id,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE type_id='.$type_id;
         $rs = interadmin_query($sql);
         while ($row = $rs->FetchNextObj()) {
-            $this->id_tipo[] = $id_tipo;
-            $this->model_id_tipo[] = $row->model_id_tipo;
+            $this->type_id[] = $type_id;
+            $this->model_type_id[] = $row->model_type_id;
             $this->nome[] = ($row->nome_lang) ? $row->nome_lang : $row->nome;
             $this->nome_original[] = $row->nome;
             $this->nome_id[] = toId($row->nome);
@@ -1125,38 +1125,38 @@ class interadmin_tipos
             $this->busca[] = $row->busca;
             $this->restrito[] = $row->restrito;
             $this->admin[] = $row->admin;
-            $this->interadmin_tipos_tipos($row->parent_id_tipo);
+            $this->interadmin_tipos_tipos($row->parent_type_id);
         }
         $rs->Close();
     }
     /**
      * Finds the type of a record by its ID, gets its data from the database, and does the same with all of its parent types recursively.
      *
-     * @param int  $id_tipo        ID of the type.
-     * @param int  $id             ID of the record (optional), it overrides the value of $id_tipo with the record's id_tipo.
-     * @param bool $replaceGlobals If <tt>TRUE</tt> the global $id_tipo is replaced by the local $id_tipo, the default value is <tt>FALSE</tt>.
+     * @param int  $type_id        ID of the type.
+     * @param int  $id             ID of the record (optional), it overrides the value of $type_id with the record's type_id.
+     * @param bool $replaceGlobals If <tt>TRUE</tt> the global $type_id is replaced by the local $type_id, the default value is <tt>FALSE</tt>.
      *
      * @global ADOConnection
      * @global string
      * @global string
      * @global string
      *
-     * @todo Check if the "Parent Id" and "Grand Parent Id" code are working properly, since they are replacing $id_tipo it might not bring the children data.
+     * @todo Check if the "Parent Id" and "Grand Parent Id" code are working properly, since they are replacing $type_id it might not bring the children data.
      *
      * @return interadmin_tipos
      */
-    public function __construct($id_tipo, $id = 0, $replaceGlobals = false)
+    public function __construct($type_id, $id = 0, $replaceGlobals = false)
     {
         global $db, $db_prefix, $lang, $id_nome, $implicit_parents_names;
         // Id
         if ($id && is_numeric($id)) {
-            $sql = 'SELECT id_tipo,parent_id,varchar_key FROM '.$db_prefix.$lang->prefix.' WHERE id='.$id;
+            $sql = 'SELECT type_id,parent_id,varchar_key FROM '.$db_prefix.$lang->prefix.' WHERE id='.$id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
             while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
+                $type_id = $row->type_id;
                 $parent_id = $row->parent_id;
                 $id_nome = $row->varchar_key;
             }
@@ -1164,38 +1164,38 @@ class interadmin_tipos
         }
         // Parent Id
         if ($parent_id && is_numeric($parent_id)) {
-            $sql = 'SELECT id_tipo,parent_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$parent_id;
+            $sql = 'SELECT type_id,parent_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$parent_id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
             while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
+                $type_id = $row->type_id;
                 $grand_parent_id = $row->parent_id;
             }
             $rs->Close();
         }
         // Grand Parent Id
         if ($grand_parent_id && is_numeric($grand_parent_id)) {
-            $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.' WHERE id='.$grand_parent_id;
+            $sql = 'SELECT type_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$grand_parent_id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
             while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
+                $type_id = $row->type_id;
             }
             $rs->Close();
         }
         // Tipos
-        if ($id_tipo && is_numeric($id_tipo)) {
+        if ($type_id && is_numeric($type_id)) {
             if ($replaceGlobals) {
-                $GLOBALS['id_tipo'] = $id_tipo;
+                $GLOBALS['type_id'] = $type_id;
             }
-            $this->interadmin_tipos_tipos($id_tipo);
-            if ($this->id_tipo) {
-                $this->id_tipo = array_reverse($this->id_tipo);
-                $this->model_id_tipo = array_reverse($this->model_id_tipo);
+            $this->interadmin_tipos_tipos($type_id);
+            if ($this->type_id) {
+                $this->type_id = array_reverse($this->type_id);
+                $this->model_type_id = array_reverse($this->model_type_id);
                 $this->nome = array_reverse($this->nome);
                 $this->nome_original = array_reverse($this->nome_original);
                 $this->nome_id = array_reverse($this->nome_id);
@@ -1204,7 +1204,7 @@ class interadmin_tipos
                 $this->busca = array_reverse($this->busca);
                 $this->restrito = array_reverse($this->restrito);
                 $this->admin = array_reverse($this->admin);
-                $this->i = count($this->id_tipo);
+                $this->i = count($this->type_id);
                 $this->path = implode('/', $this->nome_id);
                 $this->path_title = implode('/', $this->nome);
             }
@@ -1224,32 +1224,32 @@ class interadmin_tipos
 }
 
 /**
- * Gets the id_tipo from the record's ID or from its parent_id_tipo.
+ * Gets the type_id from the record's ID or from its parent_type_id.
  *
  * @param int $id Record's ID.
- * @param int $parent_id_tipo Parent type's ID (optional).
- * @param int $model_id_tipo Model type's ID (optional).
+ * @param int $parent_type_id Parent type's ID (optional).
+ * @param int $model_type_id Model type's ID (optional).
  *
  * @global ADOConnection
  * @global string
  * @global string
  *
- * @return int|NULL If $id is specified it returns its id_tipo, otherwise it returns the first child's id_tipo for the $parent_id_tipo. If both fail nothing is returned.
+ * @return int|NULL If $id is specified it returns its type_id, otherwise it returns the first child's type_id for the $parent_type_id. If both fail nothing is returned.
  *
  * @version (2007/05/23)
  */
-function interadmin_id_tipo($id = '', $parent_id_tipo = 0, $model_id_tipo = 0)
+function interadmin_type_id($id = '', $parent_type_id = 0, $model_type_id = 0)
 {
     global $db;
     global $db_prefix;
     global $lang;
     if ($id) {
-        $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.
+        $sql = 'SELECT type_id FROM '.$db_prefix.$lang->prefix.
         ' WHERE id='.$id;
     } else {
-        $sql = 'SELECT id_tipo FROM '.$db_prefix.'_tipos'.
-        ' WHERE parent_id_tipo='.$parent_id_tipo.
-        (($model_id_tipo) ? ' AND model_id_tipo='.$model_id_tipo : '').
+        $sql = 'SELECT type_id FROM '.$db_prefix.'_tipos'.
+        ' WHERE parent_type_id='.$parent_type_id.
+        (($model_type_id) ? ' AND model_type_id='.$model_type_id : '').
         ' ORDER BY ordem,nome';
     }
     $sql .= ' LIMIT 1';
@@ -1258,7 +1258,7 @@ function interadmin_id_tipo($id = '', $parent_id_tipo = 0, $model_id_tipo = 0)
         throw new Jp7_Interadmin_Exception($db->ErrorMsg());
     }
     if ($row = $rs->FetchNextObj()) {
-        return $row->id_tipo;
+        return $row->type_id;
     }
     $rs->Close();
 }
@@ -1274,7 +1274,7 @@ class interadmin_cabecalho
      * Gets text and images of the specified type.
      *
      * @param int    $i             Index of the type on the global $tipos, the default value is 0.
-     * @param int    $model_id_tipo Value of the model_id_tipo of this type, used to find the correct type, default value is 5.
+     * @param int    $model_type_id Value of the model_type_id of this type, used to find the correct type, default value is 5.
      * @param string $check         Fields which will have their values checked to make sure they are not empty, names separated by comma (,), the default value is "file_1,file_2".
      * @param bool   $rand          The default value is <tt>FALSE</tt>.
      *
@@ -1286,14 +1286,14 @@ class interadmin_cabecalho
      *
      * @version (2006/11/29)
      */
-    public function __construct($i = 0, $model_id_tipo = 5, $check = 'file_1,file_2', $rand = false)
+    public function __construct($i = 0, $model_type_id = 5, $check = 'file_1,file_2', $rand = false)
     {
         global $db;
         global $db_prefix;
         global $tipos;
-        if ($id_tipo = interadmin_id_tipo(0, $tipos->id_tipo[$i], $model_id_tipo)) {
+        if ($type_id = interadmin_type_id(0, $tipos->type_id[$i], $model_type_id)) {
             $sql = 'SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM '.$db_prefix.$lang->prefix.
-            ' WHERE id_tipo='.$id_tipo.
+            ' WHERE type_id='.$type_id.
             " AND char_key<>''".
             " AND publish<>''".
             " AND deleted=''".
@@ -1329,7 +1329,7 @@ class interadmin_cabecalho
             }
         }
         if (!$check_ok && $i) {
-            $this->interadmin_cabecalho($i - 1, $model_id_tipo, $check, $rand);
+            $this->interadmin_cabecalho($i - 1, $model_type_id, $check, $rand);
         }
     }
 }

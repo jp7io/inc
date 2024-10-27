@@ -117,7 +117,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
 
     // Tipos (Navegação) (2007/05/16 by JP)
     if (!$wap) {
-        $tipos = new interadmin_tipos($id_tipo, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
+        $tipos = new interadmin_tipos($type_id, ($interadmin_tipos_noid) ? 0 : ($id) ? $id : $parent_id, true);
         $secao = toId($tipos->nome[0]);
         $secaoTitle = $tipos->nome[0];
         $subsecao = toId($tipos->nome[1]);
@@ -126,7 +126,7 @@ if (strpos($_SERVER['PHP_SELF'], '_admin/phpmyadmin') === false && empty($only_i
             if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists(ucfirst($config->name_id).'_InterAdminTipo')) {
                 InterAdminTipo::setDefaultClass(ucfirst($config->name_id).'_InterAdminTipo');
             }
-            $tipoObj = InterAdminTipo::getInstance($id_tipo);
+            $tipoObj = InterAdminTipo::getInstance($type_id);
             if ($id) {
                 $interAdminObj = new InterAdmin($id);
             }

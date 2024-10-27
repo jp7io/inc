@@ -2,7 +2,7 @@
 
 // General Vars
 $interadmin_id = $id;
-$interadmin_id_tipo = $id_tipo;
+$interadmin_type_id = $type_id;
 $interadmin_parent_id = $parent_id;
 $interadmin_publish = ($parent_id) ? 'S' : $publish;
 
@@ -28,7 +28,7 @@ if ($id) {
 }
 
 // Table Fields
-$table_fields_notallowed = ['id','id_tipo','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish'];
+$table_fields_notallowed = ['id','type_id','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish'];
 $table_columns = $db->MetaColumnNames($db_prefix.$referer_lang_prefix.(($tipo_tabela) ? '_'.$tipo_tabela : ''));
 array_shift($table_columns);
 foreach ($table_columns as $table_field_name) {
@@ -62,7 +62,7 @@ for ($i = 0;$i < $quantidade;$i++) {
                         $id_arquivo_banco = jp7_db_insert($db_prefix.'_arquivos_banco', 'id_arquivo_banco', $id_arquivo_banco);
                         $lang = $lang_temp;
                         $id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
-                        $path = '../../upload/'.(($id_tipo) ? toId(interadmin_tipos_nome($id_tipo, true)).'/' : '');
+                        $path = '../../upload/'.(($type_id) ? toId(interadmin_tipos_nome($type_id, true)).'/' : '');
                         $tipo = pathinfo($_FILES[$table_field_name]['name'][$i]);
                         $tipo = mb_strtolower($tipo['extension']);
                         if (!is_dir($path)) {
@@ -189,4 +189,3 @@ $file = fopen(BASE_PATH.'/interadmin/interadmin.log', 'w');
 fwrite($file, $s_user['login']);
 fclose($file);
 //copy("interadmin.log",$c_cliente_physical_path."interadmin.log");
-
