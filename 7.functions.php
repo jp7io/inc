@@ -798,7 +798,7 @@ function jp7_db_update($table, $table_id_name, $table_id_value, $fields)
  *
  * @version (2007/03/10)
  */
-function interadmin_tipos_campos($campos)
+function interadmin_types_fields($campos)
 {
     $A = [];
     $campos_parameters = ['tipo', 'nome', 'ajuda', 'tamanho', 'obrigatorio', 'separador', 'xtra', 'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes', 'default', 'nome_id'];
@@ -823,8 +823,8 @@ function interadmin_tipos_campos($campos)
  *
  * @return string
  */
-if (!function_exists('interadmin_tipos_campos_encode')) {
-    function interadmin_tipos_campos_encode($campos)
+if (!function_exists('interadmin_types_fields_encode')) {
+    function interadmin_types_fields_encode($campos)
     {
         $s = '';
         foreach ($campos as $key => $value) {
