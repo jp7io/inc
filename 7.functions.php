@@ -1296,7 +1296,7 @@ class interadmin_cabecalho
             ' WHERE type_id='.$type_id.
             " AND char_key<>''".
             " AND publish<>''".
-            " AND deleted=''".
+            " AND deleted_at=''".
             ' ORDER BY int_key,date_publish DESC';
             $rs = $db->Execute($sql);
             if ($rs === false) {

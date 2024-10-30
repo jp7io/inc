@@ -297,13 +297,13 @@ function interadmin_combo($current_id, $parent_type_id_2, $nivel = 0, $prefix = 
         $sql = 'SELECT id,varchar_key,deleted_at'.$select_campos_2.' FROM '.$db_prefix.'_'.$select_tabela.
         ' WHERE type_id='.$parent_type_id_2.
         $sql_where.
-        " AND (deleted='' OR deleted IS NULL) ".
+        " AND (deleted_at='' OR deleted_at IS NULL) ".
         ' ORDER BY varchar_key';
     } else {
         $sql = 'SELECT id,varchar_key,deleted_at'.$select_campos_2.' FROM '.$db_prefix.(($select_lang) ? $lang->prefix : '').
         ' WHERE type_id='.$parent_type_id_2.
         $sql_where.
-        " AND (deleted='' OR deleted IS NULL) ".
+        " AND (deleted_at='' OR deleted_at IS NULL) ".
         " AND (publish<>'') ".
         ' ORDER BY int_key,varchar_key,select_key';
     }
