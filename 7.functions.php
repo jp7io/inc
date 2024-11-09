@@ -89,10 +89,10 @@ function toSeoSearch($field, $str, $regexp = '[^[:alnum:]]*')
         $char = str_replace('u', '[uúùûü]', $char);
         $char = str_replace('c', '[cç]', $char);
         $char = str_replace('n', '[nñ]', $char);
-        $sql_where .= $char.$regexp;
+        $sql_where .= $char . $regexp;
     }
 
-    return 'REPLACE('.$field.",' ','') REGEXP '^".$sql_where."$'";
+    return 'REPLACE(' . $field . ",' ','') REGEXP '^" . $sql_where . "$'";
 }
 
 /**
@@ -141,8 +141,8 @@ function toBase($S, $force_magic_quotes_gpc = false)
  */
 function toForm($S)
 {
-    $S = str_replace("\'", '&#39;', $S);// Bug LocaWeb e JavaScript
-    $S = str_replace('\"', '"', $S);// Bug LocaWeb
+    $S = str_replace("\'", '&#39;', $S); // Bug LocaWeb e JavaScript
+    $S = str_replace('\"', '"', $S); // Bug LocaWeb
     return stripslashes(str_replace('"', '&quot;', $S));
 }
 
@@ -170,11 +170,11 @@ function toHTML($S, $HTML = false, $busca_replace = false)
             $S = str_replace(chr(13), ' <br /> ', $S);
         }
         //elseif(strpos(mb_strtolower($S),"<p>")===false)$S="<p>".$S."</p>";
-        $S = str_replace("\'", "'", $S);// Bug LocaWeb
-        $S = str_replace("''", "'", $S);// Bug LocaWeb
-        $S = str_replace('\"', '"', $S);// Bug LocaWeb
+        $S = str_replace("\'", "'", $S); // Bug LocaWeb
+        $S = str_replace("''", "'", $S); // Bug LocaWeb
+        $S = str_replace('\"', '"', $S); // Bug LocaWeb
         if ($busca_replace && $busca) {
-            $S = preg_replace("/[^@\.]".$busca."[^@\.]/i", ' <span class="font-search">'.mb_strtoupper($busca).'</span> ', $S);
+            $S = preg_replace("/[^@\.]" . $busca . "[^@\.]/i", ' <span class="font-search">' . mb_strtoupper($busca) . '</span> ', $S);
         }
 
         return stripslashes($S);
@@ -250,7 +250,7 @@ function toXml($S)
 if (!function_exists('hex2bin')) {
     function hex2bin($S)
     {
-        return pack('H'.mb_strlen($S), $S);
+        return pack('H' . mb_strlen($S), $S);
     }
 }
 
@@ -334,13 +334,13 @@ function checkReferer($S, $protocol = 'http')
             $dirname = '';
         }
 
-        $S_parent = $protocol.'://'.$_SERVER['HTTP_HOST'].$parent_dirname.'/'.$S;
-        $S = $protocol.'://'.$_SERVER['HTTP_HOST'].$dirname.'/'.$S;
+        $S_parent = $protocol . '://' . $_SERVER['HTTP_HOST'] . $parent_dirname . '/' . $S;
+        $S = $protocol . '://' . $_SERVER['HTTP_HOST'] . $dirname . '/' . $S;
     }
     return strpos($_SERVER['HTTP_REFERER'], $S) === 0 ||
         strpos($_SERVER['HTTP_REFERER'], $S_parent) === 0 ||
-        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol.'://', 'https://', $S)) === 0 ||
-        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol.'://', 'https://', $S_parent)) === 0;
+        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol . '://', 'https://', $S)) === 0 ||
+        strpos($_SERVER['HTTP_REFERER'], replace_prefix($protocol . '://', 'https://', $S_parent)) === 0;
 }
 
 /**
@@ -367,7 +367,7 @@ function jp7_string_left($S, $length)
         }
     }
 
-    return (mb_strlen($S) > $length) ? mb_substr($S, 0, $length).'...' : $S;
+    return (mb_strlen($S) > $length) ? mb_substr($S, 0, $length) . '...' : $S;
 }
 
 /**
@@ -402,14 +402,14 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
                 // if it's an "empty element" with or without xhtml-conform closing slash (f.e. <br/>)
                 if (preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])) {
                     // do nothing
-                // if tag is a closing tag (f.e. </b>)
+                    // if tag is a closing tag (f.e. </b>)
                 } elseif (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
                     // delete tag from $open_tags list
                     $pos = array_search($tag_matchings[1], $open_tags);
                     if ($pos !== false) {
                         unset($open_tags[$pos]);
                     }
-                // if tag is an opening tag (f.e. <b>)
+                    // if tag is an opening tag (f.e. <b>)
                 } elseif (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
                     // add tag to the beginning of $open_tags list
                     array_unshift($open_tags, mb_strtolower($tag_matchings[1]));
@@ -469,7 +469,7 @@ function jp7_truncate($text, $length = 100, $considerHtml = true, $ending = '...
     if ($considerHtml) {
         // close all unclosed html-tags
         foreach ($open_tags as $tag) {
-            $truncate .= '</'.$tag.'>';
+            $truncate .= '</' . $tag . '>';
         }
     }
 
@@ -606,7 +606,7 @@ function jp7_date_format($date, $format = 'd/m/Y')
         }
         $date = jp7_date_split($date);
         $S = '';
-        for ($i = 0;$i < mb_strlen($format);$i++) {
+        for ($i = 0; $i < mb_strlen($format); $i++) {
             $x = mb_substr($format, $i, 1);
             $S .= isset($date[$x]) ? $date[$x] : $x;
         }
@@ -631,10 +631,18 @@ function jp7_date_week($w, $sigla = false)
 {
     global $lang;
     switch ($lang->lang) {
-        case 'en': $W = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']; break;
-        case 'de': $W = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']; break;
-        case 'es': $W = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; break;
-        default: $W = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']; break;
+        case 'en':
+            $W = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            break;
+        case 'de':
+            $W = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+            break;
+        case 'es':
+            $W = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            break;
+        default:
+            $W = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            break;
     }
     if (!is_int($w)) {
         $w = date('w', strtotime($w));
@@ -776,9 +784,9 @@ function jp7_db_checkbox($name, $value = 'S', $var = '', $readonly = '', $xtra =
     if (isset($GLOBALS['interadmin_visualizar']) && $GLOBALS['interadmin_visualizar']) {
         return (($var_value) ? 'Sim' : 'Não');
     } else {
-        return ''.
-        '<input type="checkbox" name="jp7_db_checkbox_'.$name.'" id="jp7_db_checkbox_'.$name.'" value="'.$value.'"'.(($var_value) ? ' checked="checked"' : '').$readonly." onclick=\"form['".$name."'].value=(checked)?value:''\"".(($xtra) ? ' '.$xtra : '').' />'.
-        '<input type="hidden" name="'.$name.'" value="'.(($var_value) ? $value : '').'" />';
+        return '' .
+            '<input type="checkbox" name="jp7_db_checkbox_' . $name . '" id="jp7_db_checkbox_' . $name . '" value="' . $value . '"' . (($var_value) ? ' checked="checked"' : '') . $readonly . " onclick=\"form['" . $name . "'].value=(checked)?value:''\"" . (($xtra) ? ' ' . $xtra : '') . ' />' .
+            '<input type="hidden" name="' . $name . '" value="' . (($var_value) ? $value : '') . '" />';
     }
 }
 
@@ -829,7 +837,7 @@ if (!function_exists('interadmin_types_fields_encode')) {
         $s = '';
         foreach ($campos as $key => $value) {
             unset($value['ordem']);
-            $s .= implode('{,}', $value).'{;}';
+            $s .= implode('{,}', $value) . '{;}';
         }
 
         return $s;
@@ -856,7 +864,7 @@ function interadmin_tipos_campo($db_prefix, $type_id, $var_key)
     global $db, $type_campos, $type_model_type_id;
     $type_model_type_id = $type_id;
     while ($type_model_type_id) {
-        jp7_db_select($db_prefix.'_types', 'type_id', $type_model_type_id, 'tipo_');
+        jp7_db_select($db_prefix . '_types', 'type_id', $type_model_type_id, 'tipo_');
     }
     $type_campos = explode('{;}', $type_campos);
     foreach ($type_campos as $campo) {
@@ -909,7 +917,7 @@ function interadmin_tipos_nome($type_id, $nolang = false)
         return false;
     } elseif (is_numeric($type_id)) {
         global $lang;
-        $sql = 'SELECT nome,nome'.$lang->prefix.' AS nome_lang FROM '.DB::getTablePrefix().'types WHERE type_id='.$type_id;
+        $sql = 'SELECT nome,nome' . $lang->prefix . ' AS nome_lang FROM ' . DB::getTablePrefix() . 'types WHERE type_id=' . $type_id;
         $rs = DB::select($sql);
         $row = $rs[0];
         $nome = ($row->nome_lang && !$nolang) ? $row->nome_lang : $row->nome;
@@ -920,7 +928,7 @@ function interadmin_tipos_nome($type_id, $nolang = false)
     }
 }
 
-function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
+function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,publish_at,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
 {
     return Jp7_Deprecated::interadmin_list($table, $type_id, $id, $type, $order, $field, $sql_where, $seo);
 }
@@ -1018,10 +1026,10 @@ class jp7Lang
             }
             $this->lang = explode('/', $this->lang);
             //if($c_path){ // Old Way
-                $path_size = explode('/', jp7_path($this->config->server->path));
+            $path_size = explode('/', jp7_path($this->config->server->path));
             $path_size = count($path_size);
-                //$this->lang=$this->lang[$path_size]; // Old Way
-                $this->lang = $this->lang[count($this->lang) - 3]; // For Hotsites
+            //$this->lang=$this->lang[$path_size]; // Old Way
+            $this->lang = $this->lang[count($this->lang) - 3]; // For Hotsites
             //}else $this->lang=$this->lang[1]; // Old Way
             $this->lang = str_replace('_', '', $this->lang); // Apache Redirect
         }
@@ -1033,8 +1041,8 @@ class jp7Lang
             $this->path = '';
             $this->path_url = 'site/';
         } else {
-            $this->prefix = '_'.$this->lang;
-            $this->path = $this->lang.'/';
+            $this->prefix = '_' . $this->lang;
+            $this->path = $this->lang . '/';
             $this->path_url = $this->path;
         }
         $this->path_2 = $this->path_url; // Replace later (?)
@@ -1057,7 +1065,7 @@ class jp7Lang
     {
         $newLang = new self($new_lang, true);
         if (!$uri) {
-            $uri = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $uri = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         }
         // Separates Query String from Uri
         $uri_parts = explode('?', $uri);
@@ -1067,20 +1075,20 @@ class jp7Lang
             foreach ($querystring_arr as $value) {
                 $arr = explode('=', $value);
                 if ($arr[0] != 'id') {
-                    $values[] = $arr[0].'='.$arr[1];
+                    $values[] = $arr[0] . '=' . $arr[1];
                 }
             }
             if ($values) {
-                $querystring = '?'.implode('&', (array) $values);
+                $querystring = '?' . implode('&', (array) $values);
             }
         }
         // Home
         $uri_lang = jp7_path(str_replace($this->config->url, '', $uri));
         if ($this->config->url == $uri || $uri_lang == $this->path_url) {
-            return $this->config->url.(($newLang->path_url == 'site/') ? '' : $newLang->path_url).$querystring;
+            return $this->config->url . (($newLang->path_url == 'site/') ? '' : $newLang->path_url) . $querystring;
         } else {
             // Default
-            return str_replace($this->config->url.$this->path_url, $this->config->url.$newLang->path_url, $uri.$querystring);
+            return str_replace($this->config->url . $this->path_url, $this->config->url . $newLang->path_url, $uri . $querystring);
         }
     }
 }
@@ -1112,7 +1120,7 @@ class interadmin_tipos
     {
         global $db, $db_prefix, $lang;
         settype($type_id, 'integer');
-        $sql = 'SELECT parent_type_id,model_type_id,nome,nome'.(($lang->lang != $this->config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_types WHERE type_id='.$type_id;
+        $sql = 'SELECT parent_type_id,model_type_id,nome,nome' . (($lang->lang != $this->config->lang_default) ? '_' . $lang->lang : '') . ' AS nome_lang,template,menu,busca,restrito,admin FROM ' . $db_prefix . '_types WHERE type_id=' . $type_id;
         $rs = interadmin_query($sql);
         while ($row = $rs->FetchNextObj()) {
             $this->type_id[] = $type_id;
@@ -1150,7 +1158,7 @@ class interadmin_tipos
         global $db, $db_prefix, $lang, $id_nome, $implicit_parents_names;
         // Id
         if ($id && is_numeric($id)) {
-            $sql = 'SELECT type_id,parent_id,varchar_key FROM '.$db_prefix.$lang->prefix.' WHERE id='.$id;
+            $sql = 'SELECT type_id,parent_id,varchar_key FROM ' . $db_prefix . $lang->prefix . ' WHERE id=' . $id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -1164,7 +1172,7 @@ class interadmin_tipos
         }
         // Parent Id
         if ($parent_id && is_numeric($parent_id)) {
-            $sql = 'SELECT type_id,parent_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$parent_id;
+            $sql = 'SELECT type_id,parent_id FROM ' . $db_prefix . $lang->prefix . ' WHERE id=' . $parent_id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -1177,7 +1185,7 @@ class interadmin_tipos
         }
         // Grand Parent Id
         if ($grand_parent_id && is_numeric($grand_parent_id)) {
-            $sql = 'SELECT type_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$grand_parent_id;
+            $sql = 'SELECT type_id FROM ' . $db_prefix . $lang->prefix . ' WHERE id=' . $grand_parent_id;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -1215,9 +1223,9 @@ class interadmin_tipos
             if (!in_array($nome, (array) $implicit_parents_names)) {
                 $path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
                 $path_seo_arr[] = $path_seo;
-                $this->path_seo[] = '/'.$GLOBALS['c_path'].implode('/', $path_seo_arr);
+                $this->path_seo[] = '/' . $GLOBALS['c_path'] . implode('/', $path_seo_arr);
             } else {
-                $this->path_seo[] = '/'.$GLOBALS['c_path'].toSeo($nome);
+                $this->path_seo[] = '/' . $GLOBALS['c_path'] . toSeo($nome);
             }
         }
     }
@@ -1244,13 +1252,13 @@ function interadmin_type_id($id = '', $parent_type_id = 0, $model_type_id = 0)
     global $db_prefix;
     global $lang;
     if ($id) {
-        $sql = 'SELECT type_id FROM '.$db_prefix.$lang->prefix.
-        ' WHERE id='.$id;
+        $sql = 'SELECT type_id FROM ' . $db_prefix . $lang->prefix .
+            ' WHERE id=' . $id;
     } else {
-        $sql = 'SELECT type_id FROM '.$db_prefix.'_types'.
-        ' WHERE parent_type_id='.$parent_type_id.
-        (($model_type_id) ? ' AND model_type_id='.$model_type_id : '').
-        ' ORDER BY ordem,nome';
+        $sql = 'SELECT type_id FROM ' . $db_prefix . '_types' .
+            ' WHERE parent_type_id=' . $parent_type_id .
+            (($model_type_id) ? ' AND model_type_id=' . $model_type_id : '') .
+            ' ORDER BY ordem,nome';
     }
     $sql .= ' LIMIT 1';
     $rs = $db->Execute($sql);
@@ -1292,12 +1300,12 @@ class interadmin_cabecalho
         global $db_prefix;
         global $types;
         if ($type_id = interadmin_type_id(0, $types->type_id[$i], $model_type_id)) {
-            $sql = 'SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM '.$db_prefix.$lang->prefix.
-            ' WHERE type_id='.$type_id.
-            " AND char_key<>''".
-            " AND publish<>''".
-            " AND deleted_at=''".
-            ' ORDER BY int_key,date_publish DESC';
+            $sql = 'SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM ' . $db_prefix . $lang->prefix .
+                ' WHERE type_id=' . $type_id .
+                " AND char_key<>''" .
+                " AND publish<>''" .
+                " AND deleted_at=''" .
+                ' ORDER BY int_key,publish_at DESC';
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -1321,7 +1329,7 @@ class interadmin_cabecalho
             $rs->Close();
             $check_arr = explode(',', $check);
             foreach ($check_arr as $check_field) {
-                eval("\$check_value=\$this->".$check_field.';');
+                eval("\$check_value=\$this->" . $check_field . ';');
                 if ($check_value) {
                     $check_ok = true;
                     break;
@@ -1354,7 +1362,7 @@ function jp7_path($S, $reverse = false)
     if ($reverse) {
         return (mb_substr($S, mb_strlen($S) - 1) == '/') ? mb_substr($S, 0, mb_strlen($S) - 1) : $S;
     } else {
-        return (mb_substr($S, -1) == '/' || !$S) ? $S : $S.'/';
+        return (mb_substr($S, -1) == '/' || !$S) ? $S : $S . '/';
     }
 }
 
@@ -1397,8 +1405,8 @@ function jp7_include($file)
     }
     $include = @include $file;
     if (!$include) {
-        if (!@include '../../'.$file) {
-            @include jp7_doc_root().$file;
+        if (!@include '../../' . $file) {
+            @include jp7_doc_root() . $file;
         }
     }
 }
@@ -1431,31 +1439,31 @@ function jp7_path_find($file)
     }
     for ($i = 0; $i <= $path_levels; $i++) {
         ($i) ? $path .= '../' : $path = '';
-        if ($ok = @file_exists($path.$file)) {
+        if ($ok = @file_exists($path . $file)) {
             break;
-        } elseif (strpos($path.$file, $web_root) === 0) {
+        } elseif (strpos($path . $file, $web_root) === 0) {
             break; // já na raiz, evita erros de open_base_dir()
         }
     }
     if (!$ok) {
         // Necessário para localização de includes em templates
-        $path = jp7_path($GLOBALS['c_doc_root'], true).dirname($_SERVER['REQUEST_URI']).'/';
-        $ok = @file_exists($path.$file);
+        $path = jp7_path($GLOBALS['c_doc_root'], true) . dirname($_SERVER['REQUEST_URI']) . '/';
+        $ok = @file_exists($path . $file);
     }
     if (!$ok) {
         if (strpos($file, '/head.php') !== false) {
             return jp7_path_find(str_replace('/head.php', '/7.head.php', $file));
         }
         if ($GLOBALS['c_template'] && strpos($file, '../../inc/') !== false) {
-            return jp7_path_find(str_replace('../../inc/', '../../../_templates/'.$GLOBALS['c_template'].'/inc/', $file));
+            return jp7_path_find(str_replace('../../inc/', '../../../_templates/' . $GLOBALS['c_template'] . '/inc/', $file));
         }
         $path = '';
-        if (@file_exists(jp7_doc_root().$file)) {
+        if (@file_exists(jp7_doc_root() . $file)) {
             $path = jp7_doc_root();
         }
     }
 
-    return ($debugger) ? $debugger->showFilename($path.$file) : $path.$file;
+    return ($debugger) ? $debugger->showFilename($path . $file) : $path . $file;
 }
 
 /**
@@ -1475,7 +1483,7 @@ function jp7_extension($S)
         $S = reset($arr);
     }
     $path_parts = pathinfo($S);
-    $ext = trim($path_parts['extension'].' ');
+    $ext = trim($path_parts['extension'] . ' ');
 
     return (!$ext) ? '---' : $ext;
 }
@@ -1519,7 +1527,7 @@ function jp7_image_text($filename_src, $filename_dst, $size, $angle, $x, $y, $co
         imagettftext($im, $size, $angle, $x + $shadow[x], $y + $shadow[y], $shadow_color, $fontfile, $text);
     }
     $padding = explode(' ', $padding);
-    imagettftext($im, $size, $angle, ($x === 'center' || $x === 'right' || $x === 'trim') ? $padding[3] : $x, ($y === 'center') ? 0 : $y, $antialiasing.$col_arr, $fontfile, $text);
+    imagettftext($im, $size, $angle, ($x === 'center' || $x === 'right' || $x === 'trim') ? $padding[3] : $x, ($y === 'center') ? 0 : $y, $antialiasing . $col_arr, $fontfile, $text);
     imagepng($im, $filename_dst);
     imagedestroy($im);
     // Center
@@ -1541,7 +1549,7 @@ function jp7_image_text($filename_src, $filename_dst, $size, $angle, $x, $y, $co
             jp7_image_text($filename_src, $filename_dst, $size, $angle, $x, $y, $col, $fontfile, $text, '', $shadow, $antialiasing);
         }
         imagedestroy($im);
-    // Right
+        // Right
     } elseif ($x === 'right') {
         $im = imagecreatefrompng($filename_dst);
         if ($truecolor) {
@@ -1556,7 +1564,7 @@ function jp7_image_text($filename_src, $filename_dst, $size, $angle, $x, $y, $co
             jp7_image_text($filename_src, $filename_dst, $size, $angle, $x, $y, $col, $fontfile, $text, '', $shadow, $antialiasing);
         }
         imagedestroy($im);
-    // Trim
+        // Trim
     } elseif ($x === 'trim') {
         $im = imagecreatefrompng($filename_dst);
         if ($truecolor) {
@@ -1601,9 +1609,11 @@ function jp7_imageCreateFromBmp($filename)
     }
     //2 : Chargement des entêtes BMP
     $bmp = unpack(
-        'Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel'.
-        '/Vcompression/Vsize_bitmap/Vhoriz_resolution'.
-        '/Vvert_resolution/Vcolors_used/Vcolors_important', fread($f1, 40));
+        'Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' .
+            '/Vcompression/Vsize_bitmap/Vhoriz_resolution' .
+            '/Vvert_resolution/Vcolors_used/Vcolors_important',
+        fread($f1, 40)
+    );
     $bmp['colors'] = pow(2, $bmp['bits_per_pixel']);
     if ($bmp['size_bitmap'] == 0) {
         $bmp['size_bitmap'] = $file['file_size'] - $file['bitmap_offset'];
@@ -1620,7 +1630,7 @@ function jp7_imageCreateFromBmp($filename)
     //3 : Chargement des couleurs de la palette
     $palette = [];
     if ($bmp['colors'] < 16777216) {
-        $palette = unpack('V'.$bmp['colors'], fread($f1, $bmp['colors'] * 4));
+        $palette = unpack('V' . $bmp['colors'], fread($f1, $bmp['colors'] * 4));
     }
 
     //4 : Création de l'image
@@ -1634,15 +1644,15 @@ function jp7_imageCreateFromBmp($filename)
         $x = 0;
         while ($x < $bmp['width']) {
             if ($bmp['bits_per_pixel'] == 24) {
-                $color = unpack('V', mb_substr($img, $p, 3).$vide);
+                $color = unpack('V', mb_substr($img, $p, 3) . $vide);
             } elseif ($bmp['bits_per_pixel'] == 16) {
                 $color = unpack('n', mb_substr($img, $p, 2));
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 8) {
-                $color = unpack('n', $vide.mb_substr($img, $p, 1));
+                $color = unpack('n', $vide . mb_substr($img, $p, 1));
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 4) {
-                $color = unpack('n', $vide.mb_substr($img, floor($p), 1));
+                $color = unpack('n', $vide . mb_substr($img, floor($p), 1));
                 if (($p * 2) % 2 == 0) {
                     $color[1] = ($color[1] >> 4);
                 } else {
@@ -1650,7 +1660,7 @@ function jp7_imageCreateFromBmp($filename)
                 }
                 $color[1] = $palette[$color[1] + 1];
             } elseif ($bmp['bits_per_pixel'] == 1) {
-                $color = unpack('n', $vide.mb_substr($img, floor($p), 1));
+                $color = unpack('n', $vide . mb_substr($img, floor($p), 1));
                 if (($p * 8) % 8 == 0) {
                     $color[1] = $color[1] >> 7;
                 } elseif (($p * 8) % 8 == 1) {
@@ -1746,7 +1756,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
         $mime = $imageinfo['mime'];
     } else {
         // Magick Get Size
-        $command = $command_path.'identify -verbose '.$source;
+        $command = $command_path . 'identify -verbose ' . $source;
         exec($command, $output, $return_var);
         $source_geometry = explode('x', mb_substr($output[2], strpos($output[2], ':') + 2));
         $source_w = $source_geometry[0];
@@ -1768,7 +1778,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
     if ($source_w / $source_h == $width / $height) {
         $dest_w = $width;
         $dest_h = $height;
-    // Destination is square (with same width and height - crop if needed)
+        // Destination is square (with same width and height - crop if needed)
     } elseif ($crop && $crop !== 'border') {
         $pre_dst_w = ceil(($height * $source_w) / $source_h);
         $pre_dst_h = ceil(($width * $source_h) / $source_w);
@@ -1783,7 +1793,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
         }
         $new_width = $width;
         $new_height = $height;
-    // The image is resized until it gets the maximum width or height (without crop)
+        // The image is resized until it gets the maximum width or height (without crop)
     } else {
         $pre_dst_w = intval(round(($height * $source_w) / $source_h));
         $pre_dst_h = intval(round(($width * $source_h) / $source_w));
@@ -1823,7 +1833,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
                 }
             } else {
                 // Magick Convert Quality
-                $command = $command_path.'convert '.$source.' -quality '.$quality." +profile '*' ".$dest;
+                $command = $command_path . 'convert ' . $source . ' -quality ' . $quality . " +profile '*' " . $dest;
                 exec($command, $output, $return_var);
             }
         } else {
@@ -1862,7 +1872,7 @@ function jp7_resizeImage($resource, $source, $dest, $width, $height, $quality = 
             imagedestroy($im_dest);
         } else {
             // Magick Resize
-            $command = $command_path.'convert '.$source.' -resize '.$dest_w.'x'.$dest_h.'! -quality '.$quality." +profile '*' ".$dest;
+            $command = $command_path . 'convert ' . $source . ' -resize ' . $dest_w . 'x' . $dest_h . '! -quality ' . $quality . " +profile '*' " . $dest;
             exec($command, $output, $return_var);
         }
     }
@@ -2056,7 +2066,7 @@ function jp7_file_size($file)
 function jp7_human_size($size)
 {
     $size = ceil($size / 1024);
-    $size = ($size < 1024) ? ceil($size).'KB' : round($size / 1024, 1).'MB';
+    $size = ($size < 1024) ? ceil($size) . 'KB' : round($size / 1024, 1) . 'MB';
 
     return $size;
 }
@@ -2185,7 +2195,7 @@ function jp7_file_exists($filename)
 {
     $include_paths = explode(PATH_SEPARATOR, get_include_path());
     foreach ($include_paths as $include_path) {
-        if (file_exists($include_path.'/'.$filename)) {
+        if (file_exists($include_path . '/' . $filename)) {
             return true;
         }
     }
@@ -2209,9 +2219,9 @@ function jp7_is_windows()
 function jp7_is_executable($executable)
 {
     if (JP7_IS_WINDOWS) {
-        $comando = 'for %G in ("%path:;=" "%") do @IF EXIST %G/'.$executable.'.exe echo 1';
+        $comando = 'for %G in ("%path:;=" "%") do @IF EXIST %G/' . $executable . '.exe echo 1';
     } else {
-        $comando = 'type -P '.$executable;
+        $comando = 'type -P ' . $executable;
     }
 
     return (bool) @shell_exec($comando);
@@ -2228,7 +2238,7 @@ function jp7_is_executable($executable)
  */
 function interadmin_get_version()
 {
-    return trim(file_get_contents(BASE_PATH.'/.version'));
+    return trim(file_get_contents(BASE_PATH . '/.version'));
 }
 
 /**
@@ -2251,20 +2261,20 @@ function jp7_xml_encode($data, $options = [])
 
     $options += $default;
     if ($options['send_headers']) {
-        header('Content-Type: text/xml; charset='.$options['encoding']);
+        header('Content-Type: text/xml; charset=' . $options['encoding']);
     }
     $xml = '';
     if ($options['xml_tag']) {
-        $xml .= '<?xml version="1.0" encoding="'.$options['encoding'].'"?>';
+        $xml .= '<?xml version="1.0" encoding="' . $options['encoding'] . '"?>';
     }
     foreach ($data as $key => $value) {
-        $xml .= '<'.$key.'>';
+        $xml .= '<' . $key . '>';
         if (is_array($value)) {
             $xml .= jp7_xml_encode($value, ['xml_tag' => false, 'send_headers' => false]);
         } else {
             $xml .= $value;
         }
-        $xml .= '</'.$key.'>';
+        $xml .= '</' . $key . '>';
     }
 
     return $xml;
@@ -2298,7 +2308,7 @@ function jp7_absolute_path($path)
     }
     $path = implode(DIRECTORY_SEPARATOR, $absolutes);
 
-    return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '').$path;
+    return ((strpos($absolutes[0], ':') === false) ? DIRECTORY_SEPARATOR : '') . $path;
 }
 
 /**
@@ -2311,7 +2321,7 @@ function jp7_absolute_path($path)
 function jp7_formatDsn($db)
 {
     $driver = ($db->type === 'mysql') ? 'mysqli' : $db->type;
-    $dsn = $driver.'://'.$db->user.':'.urlencode($db->pass).'@'.$db->host.'/'.$db->name;
+    $dsn = $driver . '://' . $db->user . ':' . urlencode($db->pass) . '@' . $db->host . '/' . $db->name;
     if ($db->flags) {
         $dsn .= $db->flags;
     }
@@ -2388,16 +2398,53 @@ function array_full_diff($array_a, $array_b)
 function jp7_normalize($string)
 {
     $table = [
-        'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a', 'ª' => 'a',
-        'Á' => 'A', 'À' => 'A', 'Ã' => 'A', 'Â' => 'A', 'Ä' => 'A',
-        'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', '&' => 'e',
-        'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
-        'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
-        'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
-        'ó' => 'o', 'ò' => 'o', 'õ' => 'o', 'ô' => 'o', 'ö' => 'o', 'º' => 'o',
-        'Ó' => 'O', 'Ò' => 'O', 'Õ' => 'O', 'Ô' => 'O', 'Ö' => 'O',
-        'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
-        'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
+        'á' => 'a',
+        'à' => 'a',
+        'ã' => 'a',
+        'â' => 'a',
+        'ä' => 'a',
+        'ª' => 'a',
+        'Á' => 'A',
+        'À' => 'A',
+        'Ã' => 'A',
+        'Â' => 'A',
+        'Ä' => 'A',
+        'é' => 'e',
+        'è' => 'e',
+        'ê' => 'e',
+        'ë' => 'e',
+        '&' => 'e',
+        'É' => 'E',
+        'È' => 'E',
+        'Ê' => 'E',
+        'Ë' => 'E',
+        'í' => 'i',
+        'ì' => 'i',
+        'î' => 'i',
+        'ï' => 'i',
+        'Í' => 'I',
+        'Ì' => 'I',
+        'Î' => 'I',
+        'Ï' => 'I',
+        'ó' => 'o',
+        'ò' => 'o',
+        'õ' => 'o',
+        'ô' => 'o',
+        'ö' => 'o',
+        'º' => 'o',
+        'Ó' => 'O',
+        'Ò' => 'O',
+        'Õ' => 'O',
+        'Ô' => 'O',
+        'Ö' => 'O',
+        'ú' => 'u',
+        'ù' => 'u',
+        'û' => 'u',
+        'ü' => 'u',
+        'Ú' => 'U',
+        'Ù' => 'U',
+        'Û' => 'U',
+        'Ü' => 'U',
         'ç' => 'c',
         'Ç' => 'C',
         'ñ' => 'n',
@@ -2505,7 +2552,7 @@ if (!function_exists('http_parse_headers')) {
                 $key = $h[0];
             } else {
                 if (substr($h[0], 0, 1) == "\t") {
-                    $headers[$key] .= "\r\n\t".trim($h[0]);
+                    $headers[$key] .= "\r\n\t" . trim($h[0]);
                 } elseif (!$key) {
                     $headers[0] = trim($h[0]);
                 }
@@ -2520,7 +2567,7 @@ function jp7_package_path($package)
 {
     $pattern = '/^(inc|classes)/';
     if (!preg_match($pattern, $package)) {
-        throw new InvalidArgumentException('Package does no match '.$pattern);
+        throw new InvalidArgumentException('Package does no match ' . $pattern);
     }
     return __DIR__ . '/../' . $package;
 }

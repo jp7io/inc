@@ -8,15 +8,15 @@ $interadmin_publish = ($parent_id) ? 'S' : $publish;
 
 // Dates
 if (!$id) {
-    $interadmin_date_insert = date('Y-m-d H:i:s');
+    $interadmin_created_at = date('Y-m-d H:i:s');
 }
-$interadmin_date_modify = date('Y-m-d H:i:s');
-$interadmin_date_publish = date('Y-m-d H:i:s');
+$interadmin_updated_at = date('Y-m-d H:i:s');
+$interadmin_publish_at = date('Y-m-d H:i:s');
 
 // Log
-$interadmin_log = date('d/m/Y H:i').' - '.(($user_log) ? $user_log : $s_user['login']).' - '.(($id) ? 'modify' : 'insert').' - '.$_SERVER['REMOTE_ADDR'].chr(13);
+$interadmin_log = date('d/m/Y H:i') . ' - ' . (($user_log) ? $user_log : $s_user['login']) . ' - ' . (($id) ? 'modify' : 'insert') . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13);
 if ($id) {
-    $sql = 'SELECT log FROM '.$db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : '').' WHERE id='.$id;
+    $sql = 'SELECT log FROM ' . $db_prefix . $referer_lang_prefix . (($type_tabela) ? '_' . $type_tabela : '') . ' WHERE id=' . $id;
     $rs = $db->Execute($sql);
     if ($rs === false) {
         throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -28,8 +28,8 @@ if ($id) {
 }
 
 // Table Fields
-$table_fields_notallowed = ['id','type_id','parent_id','date_insert','date_modify','date_key','date_1','date_publish','log','publish'];
-$table_columns = $db->MetaColumnNames($db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : ''));
+$table_fields_notallowed = ['id', 'type_id', 'parent_id', 'created_at', 'updated_at', 'date_key', 'date_1', 'publish_at', 'log', 'publish'];
+$table_columns = $db->MetaColumnNames($db_prefix . $referer_lang_prefix . (($type_tabela) ? '_' . $type_tabela : ''));
 array_shift($table_columns);
 foreach ($table_columns as $table_field_name) {
     $table_fields_arr[] = $table_field_name;
@@ -45,7 +45,7 @@ if ($type_tabela) {
 }
 
 // Loop
-for ($i = 0;$i < $quantidade;$i++) {
+for ($i = 0; $i < $quantidade; $i++) {
     if ($varchar_key[$i] || $select_key[$i] || $quantidade < 2 || ($type_tabela && $GLOBALS[$type_tabela_key][$i])) {
         // Campos
         foreach ($table_columns as $table_field_name) {
@@ -53,16 +53,16 @@ for ($i = 0;$i < $quantidade;$i++) {
                 if ($_FILES[$table_field_name]['tmp_name'][$i]) {
                     // Insert/Update
                     $type = pathinfo($_FILES[$table_field_name]['name'][$i]);
-                    $keywords = basename($_FILES[$table_field_name]['name'][$i], '.'.$type['extension']);
+                    $keywords = basename($_FILES[$table_field_name]['name'][$i], '.' . $type['extension']);
                     $type = mb_strtolower($type['extension']);
                     $invalid_extensions = ['php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'inc', 'js'];
                     if (!in_array($type, $invalid_extensions)) {
                         $lang_temp = $lang;
                         $lang = $lang->lang;
-                        $id_file_banco = jp7_db_insert($db_prefix.'_files_banco', 'id_file_banco', $id_file_banco);
+                        $id_file_banco = jp7_db_insert($db_prefix . '_files_banco', 'id_file_banco', $id_file_banco);
                         $lang = $lang_temp;
                         $id_file_banco = str_pad($id_file_banco, 8, '0', STR_PAD_LEFT);
-                        $path = '../../upload/'.(($type_id) ? toId(interadmin_tipos_nome($type_id, true)).'/' : '');
+                        $path = '../../upload/' . (($type_id) ? toId(interadmin_tipos_nome($type_id, true)) . '/' : '');
                         $type = pathinfo($_FILES[$table_field_name]['name'][$i]);
                         $type = mb_strtolower($type['extension']);
                         if (!is_dir($path)) {
@@ -70,11 +70,11 @@ for ($i = 0;$i < $quantidade;$i++) {
                         } else {
                             @chmod($path, 0777);
                         }
-                        $dst = $path.$id_file_banco.'.'.$type;
+                        $dst = $path . $id_file_banco . '.' . $type;
                         if (!copy($_FILES[$table_field_name]['tmp_name'][$i], $dst)) {
                             throw new Exception('Erro na cópia do arquivo!');
                         }
-                        $GLOBALS['interadmin_'.$table_field_name] = $dst;
+                        $GLOBALS['interadmin_' . $table_field_name] = $dst;
                     }
                 }
             } elseif (!array_search($table_field_name, $table_fields_notallowed) && strpos($table_field_name, 'date_') === false && strpos($table_field_name, 'time_') === false) {
@@ -82,39 +82,39 @@ for ($i = 0;$i < $quantidade;$i++) {
                 if(strpos($table_field_name,"select_multi_")===0){
                     eval("\$interadmin_field_value=\$".$table_field_name."[".$i."];");
                 */
-                eval("\$interadmin_field_value=\$".$table_field_name.'['.$i.'];');
+                eval("\$interadmin_field_value=\$" . $table_field_name . '[' . $i . '];');
                 if (is_array($interadmin_field_value)) {
                     if ($interadmin_field_value) {
-                        eval("\$interadmin_".$table_field_name."=implode(\",\",\$interadmin_field_value);");
+                        eval("\$interadmin_" . $table_field_name . "=implode(\",\",\$interadmin_field_value);");
                     } else {
-                        eval("\$interadmin_".$table_field_name.'="";');
+                        eval("\$interadmin_" . $table_field_name . '="";');
                     }
                 } else {
-                    eval("\$interadmin_".$table_field_name."=\$".$table_field_name.'['.$i.'];');
-                    eval("\$interadmin_".$table_field_name."_xtra=\$".$table_field_name.'_xtra['.$i.'];');
+                    eval("\$interadmin_" . $table_field_name . "=\$" . $table_field_name . '[' . $i . '];');
+                    eval("\$interadmin_" . $table_field_name . "_xtra=\$" . $table_field_name . '_xtra[' . $i . '];');
                 }
             } elseif (strpos($table_field_name, 'time_') !== false) {
-                if ($GLOBALS[$table_field_name.'_i'][$i]) {
-                    $GLOBALS['interadmin_'.$table_field_name] = $GLOBALS[$table_field_name.'_H'][$i].':'.$GLOBALS[$table_field_name.'_i'][$i].':00';
+                if ($GLOBALS[$table_field_name . '_i'][$i]) {
+                    $GLOBALS['interadmin_' . $table_field_name] = $GLOBALS[$table_field_name . '_H'][$i] . ':' . $GLOBALS[$table_field_name . '_i'][$i] . ':00';
                 }
-            } elseif (strpos($table_field_name, 'date_') !== false && $table_field_name != 'date_insert' && $table_field_name != 'date_modify' && $table_field_name != 'date_publish') {
-                if ($GLOBALS[$table_field_name.'_Y'][$i]) {
-                    $data = $GLOBALS[$table_field_name.'_Y'][$i].'-'.$GLOBALS[$table_field_name.'_m'][$i].'-'.$GLOBALS[$table_field_name.'_d'][$i];
-                    $hora = ' '.(($GLOBALS[$table_field_name.'_H'][$i]) ? $GLOBALS[$table_field_name.'_H'][$i] : '00').':'.(($GLOBALS[$table_field_name.'_i'][$i]) ? $GLOBALS[$table_field_name.'_i'][$i] : '00').':00';
+            } elseif (strpos($table_field_name, 'date_') !== false && $table_field_name != 'created_at' && $table_field_name != 'updated_at' && $table_field_name != 'publish_at') {
+                if ($GLOBALS[$table_field_name . '_Y'][$i]) {
+                    $data = $GLOBALS[$table_field_name . '_Y'][$i] . '-' . $GLOBALS[$table_field_name . '_m'][$i] . '-' . $GLOBALS[$table_field_name . '_d'][$i];
+                    $hora = ' ' . (($GLOBALS[$table_field_name . '_H'][$i]) ? $GLOBALS[$table_field_name . '_H'][$i] : '00') . ':' . (($GLOBALS[$table_field_name . '_i'][$i]) ? $GLOBALS[$table_field_name . '_i'][$i] : '00') . ':00';
 
                     //se a data for inválida, apaga os dados para nao dar erros de sqls
                     //tenta usar a data completa
-                    if (strtotime($data.$hora)) {
-                        $dataCorreta = $data.$hora;
-                    //se nao der, tenta usar ela sem hora
+                    if (strtotime($data . $hora)) {
+                        $dataCorreta = $data . $hora;
+                        //se nao der, tenta usar ela sem hora
                     } elseif (strtotime($data)) {
-                        $dataCorreta = $data.' 00:00:00';
-                    //se nao der nao salvar nada, pois é inválida
+                        $dataCorreta = $data . ' 00:00:00';
+                        //se nao der nao salvar nada, pois é inválida
                     } else {
                         $dataCorreta = '';
                     }
 
-                    $GLOBALS['interadmin_'.$table_field_name] = $dataCorreta;
+                    $GLOBALS['interadmin_' . $table_field_name] = $dataCorreta;
                 }
             }
         }
@@ -134,7 +134,7 @@ for ($i = 0;$i < $quantidade;$i++) {
             $interadmin_text_1_end = mb_substr($interadmin_text_1, $pos1);
             //$interadmin_text_1_end=str_replace("<br/>","",$interadmin_text_1_end);
             $interadmin_text_1_end = str_replace('<p>&nbsp;</p>', '', $interadmin_text_1_end);
-            $interadmin_text_1 = $interadmin_text_1_start.$interadmin_text_1_end;
+            $interadmin_text_1 = $interadmin_text_1_start . $interadmin_text_1_end;
             $interadmin_text_1 = str_replace(' </p>', '</p>', $interadmin_text_1);
             //$interadmin_text_1=$db->qstr($interadmin_text_1,get_magic_quotes_gpc());
         }
@@ -148,7 +148,7 @@ for ($i = 0;$i < $quantidade;$i++) {
             $interadmin_text_2_end = mb_substr($interadmin_text_2, $pos1);
             //$interadmin_text_2_end=str_replace("<br/>","",$interadmin_text_2_end);
             $interadmin_text_2_end = str_replace('<p>&nbsp;</p>', '', $interadmin_text_2_end);
-            $interadmin_text_2 = $interadmin_text_2_start.$interadmin_text_2_end;
+            $interadmin_text_2 = $interadmin_text_2_start . $interadmin_text_2_end;
             $interadmin_text_2 = str_replace(' </p>', '</p>', $interadmin_text_2);
         }
         // Select_Multi
@@ -172,7 +172,7 @@ for ($i = 0;$i < $quantidade;$i++) {
         */
         $interadmin_publish = 'S';
         $interadmin_char_key = 'S';
-        $interadmin_id = jp7_db_insert($db_prefix.$referer_lang_prefix.(($type_tabela) ? '_'.$type_tabela : ''), 'id', $interadmin_id, 'interadmin_');
+        $interadmin_id = jp7_db_insert($db_prefix . $referer_lang_prefix . (($type_tabela) ? '_' . $type_tabela : ''), 'id', $interadmin_id, 'interadmin_');
 
         if ($quantidade > 1) {
             $interadmin_id = '';
@@ -185,7 +185,7 @@ for ($i = 0;$i < $quantidade;$i++) {
 }
 
 // InterAdmin Log File
-$file = fopen(BASE_PATH.'/interadmin/interadmin.log', 'w');
+$file = fopen(BASE_PATH . '/interadmin/interadmin.log', 'w');
 fwrite($file, $s_user['login']);
 fclose($file);
 //copy("interadmin.log",$c_cliente_physical_path."interadmin.log");
