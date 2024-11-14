@@ -7,16 +7,16 @@
     "require": {
         "filp/whoops": "^2.16",
         "adodb/adodb-php": "^5.22",
-        "symfony/var-dumper": "^6.4",
-        "illuminate/support": "^10.10",
+        "symfony/var-dumper": "^7.0",
+        "illuminate/support": "^11.9",
         "league/flysystem": "^3.0"
     },
     "require-dev": {
-        "illuminate/cache": "^10.10",
-        "illuminate/config": "^10.10",
-        "illuminate/database": "^10.10",
-        "illuminate/filesystem": "^10.10",
-        "illuminate/log": "^10.10",
+        "illuminate/cache": "^11.9",
+        "illuminate/config": "^11.9",
+        "illuminate/database": "^11.9",
+        "illuminate/filesystem": "^11.9",
+        "illuminate/log": "^11.9",
         "phpunit/phpunit": "^9.6"
     },
     "autoload": {},
