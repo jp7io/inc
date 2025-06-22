@@ -250,7 +250,7 @@ function interadmin_returnCampo($campo)
             echo "</tbody>\r\n";
             $tit_start = false;
         }
-        echo '<tr><td height='.(($quantidade > 1 || $s_session['screenwidth'] <= 800) ? 5 : 10)." colspan=4></td></tr>\r\n";
+        echo '<tr><td height='.(($quantidade > 1) ? 5 : 10)." colspan=4></td></tr>\r\n";
     }
 }
 
