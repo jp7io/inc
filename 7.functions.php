@@ -613,6 +613,11 @@ function jp7_date_format($date, $format = 'd/m/Y')
 
     if ($date instanceof Jp7_Date) {
         $date = $date->format('Y-m-d H:m:i');
+    } elseif ($date instanceof \DateTimeInterface) {
+        // Plain Carbon (interadmin, post classes-deprecated): Jp7_Date masked the empty/zero
+        // date to '0000-00-00...', whereas Carbon underflows it to year -0001 -- normalise it
+        // back to the InterAdmin zero-date convention so the split below renders empty.
+        $date = ((int) $date->format('Y') < 1) ? '0000-00-00 00:00:00' : $date->format('Y-m-d H:i:s');
     }
 
     if ($date) {

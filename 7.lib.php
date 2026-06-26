@@ -58,14 +58,37 @@ jp7_register_globals();
  * @global Jp7_Debugger $debugger
  */
 global $debugger;
-$debugger = new Jp7_Debugger();
+// Jp7_Debugger lives in jp7io/classes-deprecated. Tenants that still require the package
+// keep the real debug toolbar; once it is removed (interadmin Step 4) fall back to a no-op
+// stand-in so boot does not fatal. showFilename() passes the path through unchanged
+// (see jp7_load_partial / interadmin_arquivo in 7.functions.php).
+$debugger = class_exists('Jp7_Debugger') ? new Jp7_Debugger() : new class {
+    public function showSql($sql, $expanded = false) {}
+    public function showFilename($file) { return $file; }
+    public function setSafePoint($bool = true) {}
+    public function showToolbar() {}
+    public function __call($name, $arguments) { return $arguments[0] ?? null; }
+};
 
 /*
  * @global Browser $is
  */
 global $is;
 define('JP7_IS_WINDOWS', jp7_is_windows());
-$is = new Browser($_SERVER['HTTP_USER_AGENT']);
+// Browser (user-agent sniffer) lives in jp7io/classes-deprecated. Keep it for tenants that
+// still require the package; otherwise (interadmin Step 4) use a null-object exposing the
+// same public surface so legacy reads (e.g. $is->ch) resolve to null instead of fataling.
+$is = class_exists('Browser')
+    ? new Browser($_SERVER['HTTP_USER_AGENT'] ?? '')
+    : new class ($_SERVER['HTTP_USER_AGENT'] ?? '') {
+        public $userAgent;
+        public $browser = '';
+        public $v = -1;
+        public $os = '';
+        public $robot = '';
+        public function __construct($userAgent) { $this->userAgent = $userAgent; }
+        public function __get($name) { return null; }
+    };
 
 register_shutdown_function('jp7_check_shutdown');
 // Convert errors to Exceptions - Code taken from Laravel
@@ -85,14 +108,20 @@ umask(0002);
  *
  * @deprecated Kept as an alias to Pagination class.
  */
-class_alias('Pagination', 'jp7_db_pages');
+if (class_exists('Pagination')) {
+    class_alias('Pagination', 'jp7_db_pages');
+}
 
-// ORM settings for compatibility with old code
-class_alias('Jp7_Date', 'Date');
-class_alias('InterAdminRecordUrl', 'RecordUrl');
+// ORM settings for compatibility with old code. The right-hand classes-deprecated names
+// survive for tenants that still require the package; interadmin (Step 4) resolves the
+// aliases to their modern replacements instead so the legacy global names keep working.
+class_alias(class_exists('Jp7_Date') ? 'Jp7_Date' : \Carbon\Carbon::class, 'Date');
+if (class_exists('InterAdminRecordUrl')) {
+    class_alias('InterAdminRecordUrl', 'RecordUrl');
+}
 class_alias('InterAdminTipo', 'Type');
 class_alias('InterAdmin', 'Record');
-class_alias('InterAdminFieldFile', 'FileField');
+class_alias(class_exists('InterAdminFieldFile') ? 'InterAdminFieldFile' : \Jp7\Interadmin\Field\FileField::class, 'FileField');
 
 InterAdminTipo::setDefaultClass('InterAdminTipo');
 Jp7\Interadmin\DynamicLoader::register();
