@@ -109,8 +109,6 @@ function wap_toHTML($S)
  * @param string $S The input string.
  * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
  *
- * @global ADOConnection
- *
  * @return string Quoted string.
  *
  * @version (2003/08/25)
@@ -118,10 +116,16 @@ function wap_toHTML($S)
  */
 function toBase($S, $force_magic_quotes_gpc = false)
 {
-    global $db;
     if (mb_strlen($S)) {
-        $S = $db->qstr($S, !$force_magic_quotes_gpc); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
-        $S = trim($S);
+        // PDO::quote via Laravel, which is exactly what the host app's ADOdb bridge already
+        // did for qstr() -- it never reached ADOdb for this. $force_magic_quotes_gpc is
+        // ignored for the same reason it was ignored there: magic_quotes died in PHP 5.4, so
+        // ADOdb's second argument had no effect on any supported runtime.
+        $connection = \Illuminate\Support\Facades\DB::connection();
+        if (!$connection->getPdo()) {
+            $connection->reconnect();
+        }
+        $S = trim($connection->getPdo()->quote($S)); //trata as aspas. Ex.: 'mysql' fica \'mysql\'
     } else {
         $S = "''";
     }
@@ -869,7 +873,8 @@ if (!function_exists('interadmin_tipos_campos_encode')) {
  */
 function interadmin_tipos_campo($db_prefix, $id_tipo, $var_key)
 {
-    global $db, $tipo_campos, $tipo_model_id_tipo;
+    // $db was declared here too, unused -- it went with the ADOdb removal.
+    global $tipo_campos, $tipo_model_id_tipo;
     $tipo_model_id_tipo = $id_tipo;
     while ($tipo_model_id_tipo) {
         jp7_db_select($db_prefix.'_tipos', 'id_tipo', $tipo_model_id_tipo, 'tipo_');
@@ -1095,151 +1100,12 @@ class jp7_lang
 }
 
 /**
- * class interadmin_tipos.
- *
- * @author Thiago
- *
- * @version (2007/07/10)
- *
- * @deprecated It will be incorporated and suplanted by InterAdminTipos
- */
-class interadmin_tipos
-{
-    /**
-     * Gets data of the specified type from the database, and does the same with all of its parent types recursively.
-     *
-     * @param int $id_tipo ID of the type.
-     *
-     * @global ADOConnection
-     * @global string
-     * @global jp7_lang
-     * @global string
-     *
-     * @return NULL
-     */
-    public function interadmin_tipos_tipos($id_tipo)
-    {
-        global $db, $db_prefix, $lang, $config;
-        settype($id_tipo, 'integer');
-        $sql = 'SELECT parent_id_tipo,model_id_tipo,nome,nome'.(($lang->lang != $config->lang_default) ? '_'.$lang->lang : '').' AS nome_lang,template,menu,busca,restrito,admin FROM '.$db_prefix.'_tipos WHERE id_tipo='.$id_tipo;
-        $rs = interadmin_query($sql);
-        while ($row = $rs->FetchNextObj()) {
-            $this->id_tipo[] = $id_tipo;
-            $this->model_id_tipo[] = $row->model_id_tipo;
-            $this->nome[] = ($row->nome_lang) ? $row->nome_lang : $row->nome;
-            $this->nome_original[] = $row->nome;
-            $this->nome_id[] = toId($row->nome);
-            $this->template[] = $row->template;
-            $this->menu[] = $row->menu;
-            $this->busca[] = $row->busca;
-            $this->restrito[] = $row->restrito;
-            $this->admin[] = $row->admin;
-            $this->interadmin_tipos_tipos($row->parent_id_tipo);
-        }
-        $rs->Close();
-    }
-    /**
-     * Finds the type of a record by its ID, gets its data from the database, and does the same with all of its parent types recursively.
-     *
-     * @param int  $id_tipo        ID of the type.
-     * @param int  $id             ID of the record (optional), it overrides the value of $id_tipo with the record's id_tipo.
-     * @param bool $replaceGlobals If <tt>TRUE</tt> the global $id_tipo is replaced by the local $id_tipo, the default value is <tt>FALSE</tt>.
-     *
-     * @global ADOConnection
-     * @global string
-     * @global string
-     * @global string
-     *
-     * @todo Check if the "Parent Id" and "Grand Parent Id" code are working properly, since they are replacing $id_tipo it might not bring the children data.
-     *
-     * @return interadmin_tipos
-     */
-    public function __construct($id_tipo, $id = 0, $replaceGlobals = false)
-    {
-        global $db, $db_prefix, $lang, $id_nome, $implicit_parents_names;
-        // Id
-        if ($id && is_numeric($id)) {
-            $sql = 'SELECT id_tipo,parent_id,varchar_key FROM '.$db_prefix.$lang->prefix.' WHERE id='.$id;
-            $rs = $db->Execute($sql);
-            if ($rs === false) {
-                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-            }
-            while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
-                $parent_id = $row->parent_id;
-                $id_nome = $row->varchar_key;
-            }
-            $rs->Close();
-        }
-        // Parent Id
-        if ($parent_id && is_numeric($parent_id)) {
-            $sql = 'SELECT id_tipo,parent_id FROM '.$db_prefix.$lang->prefix.' WHERE id='.$parent_id;
-            $rs = $db->Execute($sql);
-            if ($rs === false) {
-                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-            }
-            while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
-                $grand_parent_id = $row->parent_id;
-            }
-            $rs->Close();
-        }
-        // Grand Parent Id
-        if ($grand_parent_id && is_numeric($grand_parent_id)) {
-            $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.' WHERE id='.$grand_parent_id;
-            $rs = $db->Execute($sql);
-            if ($rs === false) {
-                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-            }
-            while ($row = $rs->FetchNextObj()) {
-                $id_tipo = $row->id_tipo;
-            }
-            $rs->Close();
-        }
-        // Tipos
-        if ($id_tipo && is_numeric($id_tipo)) {
-            if ($replaceGlobals) {
-                $GLOBALS['id_tipo'] = $id_tipo;
-            }
-            $this->interadmin_tipos_tipos($id_tipo);
-            if ($this->id_tipo) {
-                $this->id_tipo = array_reverse($this->id_tipo);
-                $this->model_id_tipo = array_reverse($this->model_id_tipo);
-                $this->nome = array_reverse($this->nome);
-                $this->nome_original = array_reverse($this->nome_original);
-                $this->nome_id = array_reverse($this->nome_id);
-                $this->template = array_reverse($this->template);
-                $this->menu = array_reverse($this->menu);
-                $this->busca = array_reverse($this->busca);
-                $this->restrito = array_reverse($this->restrito);
-                $this->admin = array_reverse($this->admin);
-                $this->i = count($this->id_tipo);
-                $this->path = implode('/', $this->nome_id);
-                $this->path_title = implode('/', $this->nome);
-            }
-        }
-        $path_seo = '';
-        $path_seo_arr = [];
-        foreach ((array) $this->nome as $key => $nome) {
-            if (!in_array($nome, (array) $implicit_parents_names)) {
-                $path_seo = toSeo($nome); //. (($key < count($this->nome) - 1) ? '/' : '');
-                $path_seo_arr[] = $path_seo;
-                $this->path_seo[] = '/'.$GLOBALS['c_path'].implode('/', $path_seo_arr);
-            } else {
-                $this->path_seo[] = '/'.$GLOBALS['c_path'].toSeo($nome);
-            }
-        }
-    }
-}
-
-/**
  * Gets the id_tipo from the record's ID or from its parent_id_tipo.
  *
  * @param int $id Record's ID.
  * @param int $parent_id_tipo Parent type's ID (optional).
  * @param int $model_id_tipo Model type's ID (optional).
  *
- * @global ADOConnection
  * @global string
  * @global string
  *
@@ -1249,98 +1115,30 @@ class interadmin_tipos
  */
 function interadmin_id_tipo($id = '', $parent_id_tipo = 0, $model_id_tipo = 0)
 {
-    global $db;
     global $db_prefix;
     global $lang;
+
+    // Laravel, not the ADOdb `global $db`: this was the last live ADOdb caller in the
+    // package, and the host app's bridge could not be removed while it stood. The ids were
+    // interpolated straight into the SQL before; they are bound now.
     if ($id) {
-        $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.
-        ' WHERE id='.$id;
+        $sql = 'SELECT id_tipo FROM '.$db_prefix.$lang->prefix.' WHERE id = ?';
+        $bindings = [$id];
     } else {
         $sql = 'SELECT id_tipo FROM '.$db_prefix.'_tipos'.
-        ' WHERE parent_id_tipo='.$parent_id_tipo.
-        (($model_id_tipo) ? ' AND model_id_tipo='.$model_id_tipo : '').
+        ' WHERE parent_id_tipo = ?'.
+        (($model_id_tipo) ? ' AND model_id_tipo = ?' : '').
         ' ORDER BY ordem,nome';
+        $bindings = ($model_id_tipo) ? [$parent_id_tipo, $model_id_tipo] : [$parent_id_tipo];
     }
     $sql .= ' LIMIT 1';
-    $rs = $db->Execute($sql);
-    if ($rs === false) {
-        throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-    }
-    if ($row = $rs->FetchNextObj()) {
-        return $row->id_tipo;
-    }
-    $rs->Close();
-}
 
-/**
- * class interadmin_cabecalho.
- *
- * @version (2006/11/29)
- */
-class interadmin_cabecalho
-{
-    /**
-     * Gets text and images of the specified type.
-     *
-     * @param int    $i             Index of the type on the global $tipos, the default value is 0.
-     * @param int    $model_id_tipo Value of the model_id_tipo of this type, used to find the correct type, default value is 5.
-     * @param string $check         Fields which will have their values checked to make sure they are not empty, names separated by comma (,), the default value is "file_1,file_2".
-     * @param bool   $rand          The default value is <tt>FALSE</tt>.
-     *
-     * @global ADOConnection
-     * @global string
-     * @global string
-     *
-     * @return interadmin_cabecalho
-     *
-     * @version (2006/11/29)
-     */
-    public function __construct($i = 0, $model_id_tipo = 5, $check = 'file_1,file_2', $rand = false)
-    {
-        global $db;
-        global $db_prefix;
-        global $tipos;
-        if ($id_tipo = interadmin_id_tipo(0, $tipos->id_tipo[$i], $model_id_tipo)) {
-            $sql = 'SELECT varchar_key,varchar_1,varchar_2,file_1,file_2 FROM '.$db_prefix.$lang->prefix.
-            ' WHERE id_tipo='.$id_tipo.
-            " AND char_key<>''".
-            " AND publish<>''".
-            " AND deleted=''".
-            ' ORDER BY int_key,date_publish DESC';
-            $rs = $db->Execute($sql);
-            if ($rs === false) {
-                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
-            }
-            if ($rand) {
-                $rand = rand(1, $rs->RecordCount());
-            }
-            $j = 1;
-            while ($row = $rs->FetchNextObj()) {
-                if ($j == $rand || !$rand) {
-                    $this->varchar_key = $row->varchar_key;
-                    $this->varchar_1 = $row->varchar_1;
-                    $this->varchar_2 = $row->varchar_2;
-                    $this->varchar_3 = $row->varchar_3;
-                    $this->file_1 = $row->file_1;
-                    $this->file_2 = $row->file_2;
-                    break;
-                }
-                $j++;
-            }
-            $rs->Close();
-            $check_arr = explode(',', $check);
-            foreach ($check_arr as $check_field) {
-                eval("\$check_value=\$this->".$check_field.';');
-                if ($check_value) {
-                    $check_ok = true;
-                    break;
-                }
-            }
-        }
-        if (!$check_ok && $i) {
-            $this->interadmin_cabecalho($i - 1, $model_id_tipo, $check, $rand);
-        }
-    }
+    // A failed query threw Jp7_Interadmin_Exception off ErrorMsg(); Laravel raises
+    // QueryException by itself, so the check is gone rather than reimplemented.
+    $row = \Illuminate\Support\Facades\DB::selectOne($sql, $bindings);
+
+    // Returns nothing (null) when there is no match, as before -- callers test falsiness.
+    return $row ? $row->id_tipo : null;
 }
 
 function jp7_flash($src, $w, $h, $alt = '', $id = '', $xtra = '', $parameters = '')
