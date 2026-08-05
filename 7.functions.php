@@ -356,21 +356,9 @@ function checkReferer($S, $protocol = 'http')
  * @return string Shrunk string.
  *
  * @version (2008/07/04)
- *
- * @global string
- * @global string
  */
 function jp7_string_left($S, $length)
 {
-    global $s_session, $c_lang;
-    if ($c_lang) {
-        foreach ($c_lang as $item) {
-            if ($item[0] == $s_session['lang'] && $item[2]) {
-                $length = $length * 8;
-            } // Check if language uses entities for characters (eg.: japanese)
-        }
-    }
-
     return (mb_strlen($S) > $length) ? mb_substr($S, 0, $length).'...' : $S;
 }
 
