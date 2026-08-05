@@ -1246,7 +1246,7 @@ function jp7_path_find($file)
     }
     if (!$ok) {
         // Necessário para localização de includes em templates
-        $path = jp7_path($GLOBALS['c_doc_root'], true).dirname($_SERVER['REQUEST_URI']).'/';
+        $path = jp7_path(jp7_doc_root(), true).dirname($_SERVER['REQUEST_URI']).'/';
         $ok = @file_exists($path.$file);
     }
     if (!$ok) {
